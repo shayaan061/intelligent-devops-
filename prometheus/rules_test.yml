@@ -1,0 +1,153 @@
+# Unit tests for rules.yml. Run from prometheus/:
+#   promtool test rules rules_test.yml
+
+rule_files:
+  - rules.yml
+
+evaluation_interval: 5s
+
+tests:
+  # ---------- Each fault fires the expected alert on the right service ----------
+  - interval: 5s
+    input_series:
+      # api-service burning 0.9 cores against a 1-core limit
+      - series: 'container_cpu_usage_seconds_total{name="api-service"}'
+        values: '0+4.5x30'
+      - series: 'container_spec_cpu_quota{name="api-service"}'
+        values: '100000x30'
+      - series: 'container_spec_cpu_period{name="api-service"}'
+        values: '100000x30'
+
+      # api-service at 440MiB of 512MiB (86%)
+      - series: 'container_memory_working_set_bytes{name="api-service"}'
+        values: '461373440x30'
+      - series: 'container_spec_memory_limit_bytes{name="api-service"}'
+        values: '536870912x30'
+
+      # every api-service /data request takes 1-5s
+      - series: 'http_request_duration_seconds_bucket{job="api-service",endpoint="/data",le="1.0"}'
+        values: '0x30'
+      - series: 'http_request_duration_seconds_bucket{job="api-service",endpoint="/data",le="5.0"}'
+        values: '0+5x30'
+      - series: 'http_request_duration_seconds_bucket{job="api-service",endpoint="/data",le="+Inf"}'
+        values: '0+5x30'
+
+      # frontend: half of / requests are 502
+      - series: 'http_requests_total{job="frontend",endpoint="/",method="GET",status="200"}'
+        values: '0+5x30'
+      - series: 'http_requests_total{job="frontend",endpoint="/",method="GET",status="502"}'
+        values: '0+5x30'
+
+      - series: 'up{job="api-service",instance="api-service:5000"}'
+        values: '0x30'
+      - series: 'redis_up{job="redis",instance="redis-exporter:9121"}'
+        values: '0x30'
+      - series: 'up{job="cadvisor",instance="cadvisor:8080"}'
+        values: '0x30'
+
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: HighCPU
+        exp_alerts:
+          - exp_labels: {alertname: HighCPU, name: api-service, service: api-service, severity: warning, category: resource}
+            exp_annotations:
+              summary: "High CPU on api-service"
+              description: "api-service is using 90% of its CPU limit."
+
+      - eval_time: 1m
+        alertname: HighMemory
+        exp_alerts:
+          - exp_labels: {alertname: HighMemory, name: api-service, service: api-service, severity: warning, category: resource}
+            exp_annotations:
+              summary: "High memory on api-service"
+              description: "api-service is using 85.94% of its memory limit."
+
+      - eval_time: 1m
+        alertname: HighLatency
+        exp_alerts:
+          - exp_labels: {alertname: HighLatency, job: api-service, service: api-service, severity: warning, category: latency}
+            exp_annotations:
+              summary: "High p95 latency on api-service"
+              description: "p95 latency on api-service is 4.8s (threshold 1s)."
+
+      - eval_time: 1m
+        alertname: HighErrorRate
+        exp_alerts:
+          - exp_labels: {alertname: HighErrorRate, job: frontend, service: frontend, severity: critical, category: errors}
+            exp_annotations:
+              summary: "High error rate on frontend"
+              description: "50% of requests to frontend are failing (threshold 10%)."
+
+      - eval_time: 1m
+        alertname: ServiceDown
+        exp_alerts:
+          - exp_labels: {alertname: ServiceDown, job: api-service, instance: "api-service:5000", service: api-service, severity: critical, category: availability}
+            exp_annotations:
+              summary: "api-service is down"
+              description: "Prometheus cannot scrape api-service (api-service:5000)."
+
+      - eval_time: 1m
+        alertname: RedisDown
+        exp_alerts:
+          - exp_labels: {alertname: RedisDown, job: redis, instance: "redis-exporter:9121", service: redis, severity: critical, category: availability}
+            exp_annotations:
+              summary: "redis is down"
+              description: "redis_exporter cannot reach redis."
+
+      - eval_time: 1m
+        alertname: ExporterDown
+        exp_alerts:
+          - exp_labels: {alertname: ExporterDown, job: cadvisor, instance: "cadvisor:8080", service: monitoring, severity: warning, category: monitoring}
+            exp_annotations:
+              summary: "Monitoring target cadvisor is down"
+              description: "Container or redis alerts may be missing while cadvisor is unreachable."
+
+      # `for:` holds alerts back: nothing has fired 10s into the fault
+      - eval_time: 10s
+        alertname: ServiceDown
+        exp_alerts: []
+
+  # ---------- Healthy system: no alerts ----------
+  - interval: 5s
+    input_series:
+      - series: 'container_cpu_usage_seconds_total{name="frontend"}'
+        values: '0+0.5x30'          # 0.1 cores
+      - series: 'container_spec_cpu_quota{name="frontend"}'
+        values: '100000x30'
+      - series: 'container_spec_cpu_period{name="frontend"}'
+        values: '100000x30'
+      - series: 'container_memory_working_set_bytes{name="frontend"}'
+        values: '52428800x30'       # 50MiB
+      - series: 'container_spec_memory_limit_bytes{name="frontend"}'
+        values: '536870912x30'
+      # redis has no limit in some setups: must not divide by zero
+      - series: 'container_memory_working_set_bytes{name="redis"}'
+        values: '10485760x30'
+      - series: 'container_spec_memory_limit_bytes{name="redis"}'
+        values: '0x30'
+      - series: 'http_request_duration_seconds_bucket{job="frontend",endpoint="/",le="0.1"}'
+        values: '0+5x30'
+      - series: 'http_request_duration_seconds_bucket{job="frontend",endpoint="/",le="+Inf"}'
+        values: '0+5x30'
+      # slow /health requests are ignored
+      - series: 'http_request_duration_seconds_bucket{job="frontend",endpoint="/health",le="0.1"}'
+        values: '0x30'
+      - series: 'http_request_duration_seconds_bucket{job="frontend",endpoint="/health",le="+Inf"}'
+        values: '0+5x30'
+      - series: 'http_requests_total{job="frontend",endpoint="/",method="GET",status="200"}'
+        values: '0+100x30'
+      - series: 'http_requests_total{job="frontend",endpoint="/",method="GET",status="500"}'
+        values: '0+5x30'            # ~5%, under 10%
+      - series: 'up{job="frontend",instance="frontend:5000"}'
+        values: '1x30'
+      - series: 'redis_up{job="redis",instance="redis-exporter:9121"}'
+        values: '1x30'
+
+    alert_rule_test:
+      - {eval_time: 2m, alertname: HighCPU, exp_alerts: []}
+      - {eval_time: 2m, alertname: HighMemory, exp_alerts: []}
+      - {eval_time: 2m, alertname: HighLatency, exp_alerts: []}
+      - {eval_time: 2m, alertname: HighErrorRate, exp_alerts: []}
+      - {eval_time: 2m, alertname: ServiceDown, exp_alerts: []}
+      - {eval_time: 2m, alertname: RedisDown, exp_alerts: []}
+      - {eval_time: 2m, alertname: ExporterDown, exp_alerts: []}

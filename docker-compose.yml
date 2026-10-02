@@ -1,0 +1,128 @@
+x-flask-healthcheck: &flask-healthcheck
+  test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"]
+  interval: 10s
+  timeout: 5s
+  retries: 3
+  start_period: 10s
+
+services:
+
+  frontend:
+    build: ./app
+    container_name: frontend
+    ports:
+      - "5001:5000"
+    environment:
+      API_SERVICE_URL: http://api-service:5000
+    cpus: "1.0"
+    mem_limit: 512m
+    restart: unless-stopped
+    healthcheck: *flask-healthcheck
+    depends_on:
+      - api-service
+
+  api-service:
+    build: ./api-service
+    container_name: api-service
+    ports:
+      - "5002:5000"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    cpus: "1.0"
+    mem_limit: 512m
+    restart: unless-stopped
+    healthcheck: *flask-healthcheck
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    mem_limit: 256m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.62.0
+    container_name: redis-exporter
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules.yml:/etc/prometheus/rules.yml:ro
+    restart: unless-stopped
+    depends_on:
+      - alertmanager
+      - frontend
+      - api-service
+      - redis-exporter
+      - cadvisor
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    restart: unless-stopped
+
+  # Steady background traffic; HTTP alerts need requests to evaluate.
+  # Web UI at :8089 (headless by default).
+  load:
+    image: locustio/locust:2.31.8
+    container_name: load
+    command: -f /mnt/locust/locustfile.py --headless --host http://frontend:5000 --users ${LOAD_USERS:-5} --spawn-rate 1
+    volumes:
+      - ./load:/mnt/locust:ro
+    restart: unless-stopped
+    depends_on:
+      - frontend
+
+  # Not started by `docker compose up`; run on demand:
+  #   docker compose run --rm injector suite --scenarios 1-9 --shuffle
+  injector:
+    build: ./injector
+    container_name: injector
+    profiles: ["tools"]
+    environment:
+      FRONTEND_URL: http://frontend:5000
+      API_SERVICE_URL: http://api-service:5000
+      GROUND_TRUTH_PATH: /experiments/ground_truth.csv
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./experiments:/experiments

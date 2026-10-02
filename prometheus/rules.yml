@@ -1,0 +1,117 @@
+# Rule-based detection (SUGGESTED_PLAN.md §6.1).
+#
+# Every alert carries a `service` label (frontend | api-service | redis) so the
+# gateway can map it onto the topology. Never reference fault_*_active here:
+# those gauges are ground truth for scoring only.
+#
+# Timing: 30s rate windows + `for: 20s` so a fault is detected in under a
+# minute (a 1m window needs ~48s just to cross 0.8 on a CPU fault).
+# Latency/error rules need traffic to evaluate; with no requests the rate is
+# NaN and nothing fires (run Locust or the injector's load).
+
+groups:
+  - name: resources
+    rules:
+      - alert: HighCPU
+        # CPU used / CPU allowed (cpus: "1.0" in compose -> quota/period = 1)
+        expr: |
+          label_replace(
+            sum by (name) (rate(container_cpu_usage_seconds_total{name=~"frontend|api-service"}[30s]))
+            /
+            max by (name) (container_spec_cpu_quota{name=~"frontend|api-service"} / container_spec_cpu_period{name=~"frontend|api-service"}),
+            "service", "$1", "name", "(.*)"
+          ) > 0.8
+        for: 20s
+        labels:
+          severity: warning
+          category: resource
+        annotations:
+          summary: "High CPU on {{ $labels.service }}"
+          description: "{{ $labels.service }} is using {{ $value | humanizePercentage }} of its CPU limit."
+
+      - alert: HighMemory
+        # working_set excludes reclaimable page cache; limit > 0 skips unlimited containers
+        expr: |
+          label_replace(
+            max by (name) (container_memory_working_set_bytes{name=~"frontend|api-service|redis"})
+            /
+            max by (name) (container_spec_memory_limit_bytes{name=~"frontend|api-service|redis"} > 0),
+            "service", "$1", "name", "(.*)"
+          ) > 0.8
+        for: 20s
+        labels:
+          severity: warning
+          category: resource
+        annotations:
+          summary: "High memory on {{ $labels.service }}"
+          description: "{{ $labels.service }} is using {{ $value | humanizePercentage }} of its memory limit."
+
+  - name: http
+    rules:
+      - alert: HighLatency
+        expr: |
+          label_replace(
+            histogram_quantile(0.95,
+              sum by (le, job) (rate(http_request_duration_seconds_bucket{job=~"frontend|api-service", endpoint=~"/|/data"}[30s]))
+            ),
+            "service", "$1", "job", "(.*)"
+          ) > 1
+        for: 20s
+        labels:
+          severity: warning
+          category: latency
+        annotations:
+          summary: "High p95 latency on {{ $labels.service }}"
+          description: "p95 latency on {{ $labels.service }} is {{ $value | humanizeDuration }} (threshold 1s)."
+
+      - alert: HighErrorRate
+        expr: |
+          label_replace(
+            sum by (job) (rate(http_requests_total{job=~"frontend|api-service", endpoint=~"/|/data", status=~"5.."}[30s]))
+            /
+            sum by (job) (rate(http_requests_total{job=~"frontend|api-service", endpoint=~"/|/data"}[30s])),
+            "service", "$1", "job", "(.*)"
+          ) > 0.1
+        for: 20s
+        labels:
+          severity: critical
+          category: errors
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "{{ $value | humanizePercentage }} of requests to {{ $labels.service }} are failing (threshold 10%)."
+
+  - name: availability
+    rules:
+      - alert: ServiceDown
+        expr: label_replace(up{job=~"frontend|api-service"}, "service", "$1", "job", "(.*)") == 0
+        for: 15s
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "{{ $labels.service }} is down"
+          description: "Prometheus cannot scrape {{ $labels.service }} ({{ $labels.instance }})."
+
+      - alert: RedisDown
+        # redis_exporter itself stays up and reports redis_up 0
+        expr: label_replace(redis_up, "service", "redis", "", "") == 0
+        for: 15s
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "redis is down"
+          description: "redis_exporter cannot reach redis."
+
+      - alert: ExporterDown
+        # Without these, container and redis alerts go silent
+        expr: up{job=~"cadvisor|redis"} == 0
+        for: 30s
+        labels:
+          severity: warning
+          category: monitoring
+          # Not "redis": job=redis is the exporter, not the redis service
+          service: monitoring
+        annotations:
+          summary: "Monitoring target {{ $labels.job }} is down"
+          description: "Container or redis alerts may be missing while {{ $labels.job }} is unreachable."
