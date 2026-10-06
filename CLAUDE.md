@@ -80,6 +80,8 @@ Tests: the rule tests above, `cd gateway && pytest -q`, `cd analyzer && python -
 
 `experiments/RESULTS.md` is the record of every test, comparison and evaluation: setup, numbers, source file, caveats. After any test-suite change, live scenario run, analyzer comparison, safety-suite run or evaluation, add the result there (and copy raw outputs to `experiments/results/`; scratch directories don't survive). Don't overwrite earlier results; mark them superseded. Check every number against its source file.
 
+`FILE_INDEX.md` maps every file to its contents (data files include their columns). Update it whenever a file is added, removed or changes purpose.
+
 ## Invariants to preserve
 
 - **`fault_*_active` gauges are ground truth.** Use them only to score the evaluation. Never pass them to the ML detector, the LLM context or the alert rules; filter them out in the gateway and the detector.

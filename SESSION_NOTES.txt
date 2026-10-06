@@ -191,3 +191,4 @@ Log
        Raw results copied from the scratchpad into experiments/results/ (comparisons, pilot log, safety CSV,
        store snapshot without fault_* data, baseline test) and docs/figures/dashboard_scenario7.png.
        CLAUDE.md rule: record every future result in RESULTS.md.
+00:30  FILE_INDEX.md: map of every file in the repo and what it contains (data files with columns and row counts, outdated docs flagged); checked that every tracked file is covered. CLAUDE.md rule to keep it current.
