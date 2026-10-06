@@ -1,0 +1,9 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+518bc238,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-06T16:54:27.716Z,2026-10-06T16:56:27.716Z,2026-10-06T16:56:28.600Z,expired,latency
+197b0bb6,5,error-api,error,api-service,api-service,reset_faults,2026-10-06T16:57:25.624Z,2026-10-06T16:58:55.624Z,2026-10-06T16:58:56.277Z,expired,error
+ea9e2972,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-06T17:07:07.461Z,2026-10-06T17:10:07.461Z,2026-10-06T17:07:52.771Z,remediated,latency
+4bd33f8a,6,redis-stopped,stop,redis,redis,restart_container,2026-10-06T17:08:54.468Z,2026-10-06T17:11:54.468Z,2026-10-06T17:09:32.034Z,remediated,stop
+741d0b99,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-06T17:14:54.376Z,2026-10-06T17:17:54.376Z,2026-10-06T17:15:36.962Z,remediated,stop
+c2cd822c,5,error-api,error,api-service,api-service,reset_faults,2026-10-06T17:17:29.836Z,2026-10-06T17:20:29.836Z,2026-10-06T17:18:18.211Z,remediated,error
+ff045026,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-06T17:34:47.300Z,2026-10-06T17:37:47.300Z,2026-10-06T17:35:27.820Z,remediated,stop
+74cd9b01,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-06T17:41:56.789Z,2026-10-06T17:44:56.789Z,2026-10-06T17:43:05.383Z,remediated,latency

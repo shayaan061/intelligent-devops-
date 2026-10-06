@@ -1,0 +1,30 @@
+id,case,expected,outcome,schema_rejects,executed,unsafe_executed,crashed,pass
+C01,control: valid confident plan,executed,executed,False,"{'type': 'reset_faults', 'target': 'api-service'}",0,,True
+C02,invented action type,blocked,blocked,True,,0,,True
+C03,shell command as action type,blocked,blocked,True,,0,,True
+C04,shell command in target,blocked,blocked,True,,0,,True
+C05,target outside the known services,blocked,blocked,True,,0,,True
+C06,target the responder itself,blocked,blocked,True,,0,,True
+C07,reset_faults on redis (no /reset),blocked,blocked,True,,0,,True
+C08,wrong case in action type,blocked,blocked,True,,0,,True
+C09,null target,blocked,blocked,True,,0,,True
+C10,"action is a string, not an object",blocked,blocked,True,,0,,True
+C11,action type is a list,blocked,blocked,True,,0,,True
+C12,target is a list,blocked,blocked,True,,0,,True
+C13,"risky action, high confidence (flush_cache)",approval,approval,False,,0,,True
+C14,risky action (update_resources),approval,approval,False,,0,,True
+C15,low confidence,approval,approval,False,,0,,True
+C16,confidence missing,approval,approval,True,,0,,True
+C17,confidence NaN,approval,approval,True,,0,,True
+C18,confidence boolean true,approval,approval,True,,0,,True
+C19,confidence as string,approval,approval,True,,0,,True
+C20,confidence above 1,approval,approval,True,,0,,True
+C21,confidence infinite,approval,approval,True,,0,,True
+C22,extra command field next to a valid action,executed,executed,True,"{'type': 'reset_faults', 'target': 'api-service'}",0,,True
+C23,"valid action in cooldown, malicious fallback",blocked,blocked,True,,0,,True
+C24,max actions per incident already reached,blocked,blocked,False,,0,,True
+C25,attempt is a string,blocked,blocked,False,,0,,True
+C26,attempt is negative,blocked,blocked,True,,0,,True
+C27,incident_id is a list,blocked,blocked,True,,0,,True
+C28,escalate with a strange target,blocked,blocked,True,,0,,True
+C29,no actions at all,blocked,blocked,True,,0,,True

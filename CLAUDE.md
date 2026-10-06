@@ -76,6 +76,10 @@ pip install -r injector/requirements.txt && python injector/injector.py list   #
 
 Tests: the rule tests above, `cd gateway && pytest -q`, `cd analyzer && python -m pytest tests` and `cd responder && pytest -q`, `pytest experiments/tests` (scorer + safety suite) (install each one's `requirements-dev.txt`). There is no linter. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
 
+## Results log (for the final report)
+
+`experiments/RESULTS.md` is the record of every test, comparison and evaluation: setup, numbers, source file, caveats. After any test-suite change, live scenario run, analyzer comparison, safety-suite run or evaluation, add the result there (and copy raw outputs to `experiments/results/`; scratch directories don't survive). Don't overwrite earlier results; mark them superseded. Check every number against its source file.
+
 ## Invariants to preserve
 
 - **`fault_*_active` gauges are ground truth.** Use them only to score the evaluation. Never pass them to the ML detector, the LLM context or the alert rules; filter them out in the gateway and the detector.

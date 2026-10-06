@@ -1,0 +1,53 @@
+B2_START 2026-10-06T17:55:23Z
+time="2026-10-06T23:25:23+05:30" level=warning msg="No services to build"
+time="2026-10-06T23:25:23+05:30" level=warning msg="Found orphan containers ([devops-test-app]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+time="2026-10-06T23:25:23+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-f168ece1f03e Creating 
+ Container intellegentdevops-injector-run-f168ece1f03e Created 
+[17:55:23] scenario 6 redis-stopped: injecting into redis for 180s
+[17:56:14] scenario 6 ended: remediated after 51s
+[17:56:14] waiting 300s for the system to settle
+[18:01:14] scenario 7 frontend-stopped: injecting into frontend for 180s
+[18:02:27] scenario 7 ended: remediated after 73s
+[18:02:27] waiting 300s for the system to settle
+[18:07:27] scenario 4 latency-api: injecting into api-service for 180s
+[18:08:43] scenario 4 ended: remediated after 76s
+[18:08:43] waiting 300s for the system to settle
+[18:13:43] scenario 5 error-api: injecting into api-service for 180s
+[18:15:07] scenario 5 ended: remediated after 83s
+B2_END 2026-10-06T18:15:07Z
+time="2026-10-06T23:50:07+05:30" level=warning msg="No services to build"
+time="2026-10-06T23:50:07+05:30" level=warning msg="Found orphan containers ([devops-test-app]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container gateway Running 
+ Container analyzer Recreate 
+ Container analyzer Recreated 
+ Container analyzer Starting 
+ Container analyzer Started 
+2026-10-06 18:20:08,789 INFO mode=runbook model=llama3.1:8b ollama=http://host.docker.internal:11434 runbooks=8 gateway=http://gateway:8000
+B1_START 2026-10-06T18:20:13Z
+time="2026-10-06T23:50:13+05:30" level=warning msg="No services to build"
+time="2026-10-06T23:50:13+05:30" level=warning msg="Found orphan containers ([devops-test-app]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+time="2026-10-06T23:50:13+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-3d8cdd2ab4f2 Creating 
+ Container intellegentdevops-injector-run-3d8cdd2ab4f2 Created 
+[18:20:14] scenario 6 redis-stopped: injecting into redis for 180s
+[18:20:57] scenario 6 ended: remediated after 44s
+[18:20:57] waiting 300s for the system to settle
+[18:25:57] scenario 7 frontend-stopped: injecting into frontend for 180s
+[18:26:42] scenario 7 ended: remediated after 45s
+[18:26:42] waiting 300s for the system to settle
+[18:31:42] scenario 4 latency-api: injecting into api-service for 180s
+[18:32:32] scenario 4 ended: remediated after 50s
+[18:32:32] waiting 300s for the system to settle
+[18:37:32] scenario 5 error-api: injecting into api-service for 180s
+[18:38:17] scenario 5 ended: remediated after 45s
+B1_END 2026-10-06T18:38:18Z
+time="2026-10-07T00:08:18+05:30" level=warning msg="No services to build"
+time="2026-10-07T00:08:18+05:30" level=warning msg="Found orphan containers ([devops-test-app]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container gateway Running 
+ Container analyzer Recreate 
+ Container analyzer Recreated 
+ Container analyzer Starting 
+ Container analyzer Started 
+2026-10-06 18:38:19,687 INFO mode=llm model=llama3.1:8b ollama=http://host.docker.internal:11434 runbooks=8 gateway=http://gateway:8000
+PILOT_DONE 2026-10-06T18:38:24Z

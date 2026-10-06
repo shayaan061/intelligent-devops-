@@ -184,3 +184,10 @@ Log
        Conclusion (pilot, n=4): on known single-cause faults runbooks beat the LLM (faster, no heavier action).
        Recommendation recorded in PROGRESS.md: §10 needs scenarios where runbooks don't fit, or the comparison
        only shows the LLM's cost.
+00:20  experiments/RESULTS.md: report-ready log of ALL tests, comparisons and results (environment, 146 automated
+       tests, 10 development runs D1-D10, pilot B1 vs B2, analyzer comparisons C0-C3, safety suite, other
+       measurements, 14 problems found by testing, objectives O1-O6 status, caveats, raw data index). Every number
+       re-checked against its source file (fixed 2: detection mean is 27.9 s; warm/cold LLM latency ranges).
+       Raw results copied from the scratchpad into experiments/results/ (comparisons, pilot log, safety CSV,
+       store snapshot without fault_* data, baseline test) and docs/figures/dashboard_scenario7.png.
+       CLAUDE.md rule: record every future result in RESULTS.md.
