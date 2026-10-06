@@ -1,0 +1,47 @@
+# Resource runbooks: memory and CPU pressure inside one container.
+# Field reference and the root_cause strategies: analyzer/runbooks.py.
+
+# A leak only goes away with a fresh process; /reset frees the fault's
+# memory but a restart is the action that also fixes a real leak.
+- name: high-memory
+  priority: 30
+  description: Container close to its memory limit; restart it before the OOM kill.
+  match:
+    alert: HighMemory
+  root_cause: matched_service
+  incident_type: memory_pressure
+  severity: high
+  action: restart_container
+  fallback: escalate
+  confidence: 0.9
+  requires_approval: false
+
+# CPU does not propagate upstream as CPU (callers show latency instead), so
+# the service with the CPU alert is the cause. Several -> deepest in the chain.
+# Beats latency, so CPU + latency on one service gives a single action.
+- name: high-cpu
+  priority: 40
+  description: CPU saturation; clear the injected load, restart if it stays.
+  match:
+    alert: HighCPU
+  root_cause: matched_service
+  incident_type: cpu_saturation
+  severity: high
+  action: reset_faults
+  fallback: restart_container
+  confidence: 0.8
+  requires_approval: false
+
+# The ML detector saw memory growing before HighMemory fires (scenario 8).
+- name: ml-memory-anomaly
+  priority: 70
+  description: ML anomaly driven by memory features with no rule alert yet; restart early.
+  match:
+    ml_feature: mem
+  root_cause: top_ml_anomaly
+  incident_type: memory_pressure
+  severity: medium
+  action: restart_container
+  fallback: escalate
+  confidence: 0.75
+  requires_approval: false

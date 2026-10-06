@@ -1,0 +1,240 @@
+{
+  "type": "incident",
+  "incident_id": "inc-0009",
+  "status": "open",
+  "timestamp": "2026-10-06T10:00:15Z",
+  "opened_at": "2026-10-06T10:00:05Z",
+  "resolved_at": null,
+  "sources": [
+    "rule"
+  ],
+  "services": [
+    "api-service",
+    "frontend"
+  ],
+  "alerts": [
+    {
+      "name": "HighCPU",
+      "service": "api-service",
+      "status": "firing",
+      "severity": "warning",
+      "category": "resource",
+      "startsAt": "2026-10-06T10:00:05Z",
+      "value": 0.97,
+      "threshold": 0.8
+    },
+    {
+      "name": "HighLatency",
+      "service": "api-service",
+      "status": "firing",
+      "severity": "warning",
+      "category": "http",
+      "startsAt": "2026-10-06T10:00:05Z",
+      "value": 5.4,
+      "threshold": 1.0
+    },
+    {
+      "name": "HighLatency",
+      "service": "frontend",
+      "status": "firing",
+      "severity": "warning",
+      "category": "http",
+      "startsAt": "2026-10-06T10:00:05Z",
+      "value": 5.5,
+      "threshold": 1.0
+    }
+  ],
+  "ml_anomalies": [],
+  "topology": {
+    "frontend": [
+      "api-service"
+    ],
+    "api-service": [
+      "redis"
+    ],
+    "redis": []
+  },
+  "context": {
+    "frontend": {
+      "up": 1,
+      "cpu": 0.08,
+      "mem": 0.25,
+      "p95": 5.5,
+      "err": 0.0,
+      "rps": 1.0,
+      "upstream_p95": 5.4,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "p95": [
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          2.756,
+          5.5
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cpu": [
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08
+        ],
+        "mem": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "upstream_p95": [
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          2.703,
+          5.4
+        ]
+      }
+    },
+    "api-service": {
+      "up": 1,
+      "cpu": 0.97,
+      "mem": 0.25,
+      "p95": 5.4,
+      "err": 0.0,
+      "rps": 1.0,
+      "upstream_p95": 0.002,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "p95": [
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          2.703,
+          5.4
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cpu": [
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.525,
+          0.97
+        ],
+        "mem": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "upstream_p95": [
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002
+        ]
+      }
+    },
+    "redis": {
+      "up": 1,
+      "ops": 8.0,
+      "mem_bytes": 1048576,
+      "clients": 2,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "ops": [
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0,
+          8.0
+        ]
+      }
+    }
+  },
+  "history": {
+    "attempt": 1,
+    "previous_actions": []
+  }
+}

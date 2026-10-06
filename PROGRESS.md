@@ -1,8 +1,8 @@
-# Progress Log: Phase 2 (Monitoring + Multi-service)
+# Progress Log: Phases 2–4 (Monitoring, Event Gateway, Analyzer)
 
-**Date:** 3 Oct 2026 · **Last updated:** 4 Oct 2026
+**Date:** 3 Oct 2026 · **Last updated:** 6 Oct 2026
 **Plan:** `SUGGESTED_PLAN.md` §3 (fixes) and §15 (immediate next steps)
-**Status:** Phase 2 is complete (commit `9415a44`). Phase 3 (Event Gateway) is next. See [Next steps](#next-steps) and `EVALUATION_GUIDE.md` for how to run and demo what exists.
+**Status:** Phase 2 is complete (commit `9415a44`). Phase 3 (Event Gateway) is complete and tested end-to-end under Docker (Step 4–5). Phase 4 (analyzer + runbooks) has started (Step 6). **Open blocker:** container CPU/memory metrics on macOS (see A below).
 
 | §15 item | Status |
 |---|---|
@@ -10,10 +10,9 @@
 | Add `api-service` + Redis + redis_exporter + cAdvisor | ✅ Done |
 | Write `prometheus/rules.yml` and `alertmanager/alertmanager.yml` | ✅ Done |
 | Implement `injector/injector.py` with ground-truth logging | ✅ Done |
-| Skeleton gateway: `/alerts` → print → WebSocket broadcast | ✅ Code done, smoke-tested; Docker end-to-end test pending (Step 4) |
+| Skeleton gateway: `/alerts` → print → WebSocket broadcast | ✅ Done, tested end-to-end under Docker (Step 4–5) |
 
-> Everything was tested locally against the real Flask services, Prometheus 2.54.1 and Alertmanager 0.27.0 binaries.
-> **Not yet run under Docker** because the daemon was off. Container-level parts (cAdvisor, the CPU/memory alerts, `docker stop` scenarios) are covered by unit tests or a fake Docker client only. First thing to do: `docker compose up --build` and check `localhost:9090/targets`.
+> First Docker run: 6 Oct 2026 (Docker 29.1.3, Docker Desktop on macOS). All 4 Prometheus targets are UP, and scenario 4 went injector → Prometheus → Alertmanager → gateway → `/ws/events` as one grouped incident.
 
 ---
 
@@ -22,8 +21,11 @@
 In order. Owners follow the work split in `SUGGESTED_PLAN.md` §9.
 
 ### A. Close out Phase 2 (before starting the gateway)
-- [ ] **Run the stack under Docker for the first time.** `docker compose up --build`, then check that all 4 targets are `UP` at `localhost:9090/targets` (`frontend`, `api-service`, `redis`, `cadvisor`).
-- [ ] **Check cAdvisor's labels on macOS.** The CPU/memory rules match `name=~"frontend|api-service"`. Confirm at `localhost:9090/graph` with `container_memory_working_set_bytes{name="api-service"}`. If the series is missing or named differently, fix `rules.yml` *and* `rules_test.yml`.
+- [x] **Run the stack under Docker for the first time.** Done 6 Oct: all 4 targets UP.
+- [ ] **⚠️ Blocker: cAdvisor has no `name` label on this Mac, so HighCPU/HighMemory can never fire** (scenarios 1, 2, 3, 8, 9 and the context's `cpu`/`mem`, which are `null`). Checked 6 Oct:
+  1. v0.49.1 couldn't talk to Docker 29 at all (API too old) and the socket wasn't visible through the `/var/run` mount. **Fixed in compose:** image → `ghcr.io/google/cadvisor:v0.53.0`, plus an explicit `/var/run/docker.sock` mount. The Docker factory now registers.
+  2. Remaining cause: Docker Desktop's **containerd image store** (`docker info` → `driver-type io.containerd.snapshotter.v1`). cAdvisor logs `failed to identify the read-write layer ID … mount-id: no such file or directory` for every container.
+  **Fix (manual):** Docker Desktop → Settings → General → untick *Use containerd for pulling and storing images* → Apply & restart, then `docker compose up -d --build`. Check with `container_memory_working_set_bytes{name="api-service"}` at `localhost:9090/graph`. Each team member running the demo on a Mac needs this setting.
 - [ ] **Run each scenario once for real** and note the alert and detection time: `docker compose run --rm injector run <1-9> --duration 180`. Scenarios 1, 2, 3, 6 and 7 have never fired on real containers.
 - [ ] **Scenario 8 should not fire HighMemory early.** It is meant to be caught by ML only. Check how long the ramp stays under 80%.
 - [ ] **Decide scoring for scenario 3:** accept `reset_faults` as well as `restart_container`, or only the restart. Write the decision into §10 of the plan.
@@ -33,17 +35,20 @@ In order. Owners follow the work split in `SUGGESTED_PLAN.md` §9.
 Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) below. Summary:
 - [x] `gateway/` FastAPI service: `POST /alerts`, `GET /health`, WebSocket `/ws/events`
 - [x] Compose service named `gateway` on port 8000
-- [ ] End-to-end test: injector → Prometheus → Alertmanager → gateway → WebSocket client
+- [x] End-to-end test: injector → Prometheus → Alertmanager → gateway → WebSocket client (scenario 4, 6 Oct)
 - [x] Tick the last box in §15 of `SUGGESTED_PLAN.md`
 
-### C. Phase 3, part 2 (Oct week 4 – Nov week 1)
-- [ ] Grouping: events within 60 s along `frontend → api-service → redis` become one incident with an `incident_id`
-- [ ] Context builder: last 10 min of CPU, memory, p95, error rate and `upstream_p95` per service, through the Prometheus HTTP API
-- [ ] Emit the full `IncidentEvent` JSON (§6.3), with `fault_*` metrics filtered out
-- [ ] `POST /anomalies` stub for the ML detector, and the `/ws/responses` channel
+### C. Phase 3, part 2 (Oct week 4 – Nov week 1) ✅ Done 6 Oct, see Step 5
+- [x] Grouping: events within 60 s along `frontend → api-service → redis` become one incident with an `incident_id`
+- [x] Context builder: last 10 min of CPU, memory, p95, error rate and `upstream_p95` per service, through the Prometheus HTTP API
+- [x] Emit the full `IncidentEvent` JSON (§6.3), with `fault_*` metrics filtered out
+- [x] `POST /anomalies` stub for the ML detector, and the `/ws/responses` channel
 
 ### D. Can start in parallel
-- [ ] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1)
+- [x] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1). First version built 6 Oct (Step 6); Riddhima to review the prompt and runbooks.
+- [ ] **Install Ollama on the host** (macOS app, Metal) and `ollama pull llama3.1:8b`. Until then every plan falls back to the runbooks (`fallback_reason: unreachable`). Then compare the LLM against B1 on the samples: `python analyzer/analyzer.py analyze analyzer/samples/scenario4.json --mode llm`.
+- [ ] **Verifier/responder must send `history.previous_actions`** as `[{"type", "target"}]` when re-analysing (§6.6); the analyzer skips actions already tried.
+- [ ] **Check scenario 8's ML feature names** against the runbook `ml-memory-anomaly` (matches any `top_features` entry containing `mem`) once the ML detector exists.
 - [ ] **Shruti:** record 1–2 hours of normal traffic under Locust now, as training data for the ML detector (Phase 7)
 - [ ] **All:** apply the edits in `PATENT_CHANGES.md` to the patent draft
 
@@ -197,3 +202,38 @@ Goal: a FastAPI service that receives Alertmanager webhooks, logs them, and broa
 - [ ] Dedup and grouping: events within 60 s along `frontend → api-service → redis` become one incident
 - [ ] Context builder: the last 10 minutes of key metrics per service, through the PromQL API, plus topology and history (see the `IncidentEvent` example in §6.3)
 - [ ] `/ws/responses` channel for the analyzer
+
+---
+
+## Step 5: Event Gateway, Phase 3 complete ✅ (6 Oct)
+
+`gateway/` is split into three files:
+- `incidents.py`: dedup and grouping. Alerts are deduped by fingerprint. A new alert or ML anomaly joins the open incident on the same chain (`frontend → api-service → redis`); `ExporterDown` (`service=monitoring`) is grouped on its own. An incident stays open while an alert is firing or an ML anomaly is < 60 s old (`GROUP_WINDOW`), then resolves. A later alert opens a new incident.
+- `context.py`: the context builder. One PromQL `query_range` per metric per service (10 min, 60 s step; the last point is the current value, the list is the `trend`). Metrics: `up, cpu, mem, p95, err, rps, upstream_p95` for frontend/api-service; `up, ops, mem_bytes, clients, mem` for redis. Same 30 s windows and endpoint filter as `rules.yml`. Container status/restart count/start time come from the Docker socket (mounted read-only). An import-time assert rejects any query containing `fault_`. NaN and missing data become `null`.
+- `app.py`: endpoints. A new incident waits `SETTLE_SECONDS` (10 s) so cause and symptom alerts go out in one `open` message; later changes go out as `updated`, then `resolved`. Each alert in the message has `value` (from the fresh context) and `threshold`.
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /alerts` | Alertmanager webhook |
+| `POST /anomalies` | ML detector: `{service, score, top_features}` (`fault_*` features dropped) |
+| `POST /responses`, or a message on `/ws/responses` | ResponsePlan from the analyzer |
+| `/ws/events` | raw alerts (`type: alert`) and incidents (`type: incident`) |
+| `/ws/responses` | plans (`type: response_plan`) |
+| `GET /events`, `/responses`, `/incidents`, `/incidents/{id}`, `/health` | inspection |
+
+Clients get the last 100 messages replayed on connect (`"replay": true`).
+
+**Tests:** `cd gateway && pip install -r requirements-dev.txt && pytest -q`: 14 tests (grouping, context builder against a fake Prometheus, endpoints, both WebSockets). All pass.
+
+**End-to-end (real Docker, scenario 4, 6 Oct):** fault injected 16:54:27 → HighLatency on api-service and frontend at 16:55:07 (40 s) → one incident `open` at 16:55:17 → `resolved` at 16:57:07. The context separated cause from symptom: frontend `upstream_p95` 7.4 s = its own p95; api-service `upstream_p95` 0.005 s. The event is ~2.7 KB; no `fault_` anywhere.
+
+## Step 6: Analyzer + runbooks, Phase 4 started (6 Oct)
+
+- `analyzer/schemas.py`: the shared contract. `IncidentEvent` (tolerant, strips `fault_*` at any depth) and `ResponsePlan` (strict: action allowlist, known targets, confidence 0–1, no `reset_faults` on redis; only `escalate` may have a null target).
+- `runbooks/*.yaml` + `analyzer/runbooks.py`: baseline B1 and the LLM fallback. Priority: monitoring-only → redis down → service down → memory → CPU → errors → latency → ML memory anomaly; no match → escalate. Root cause from topology and context only (latency: a service is "explained" by its upstream when `upstream_p95 ≥ 0.5 × p95` and the dependency is slow). Skips actions already in `history.previous_actions`.
+- `analyzer/llm.py`: Ollama `/api/chat` with the ResponsePlan JSON schema as `format`, temperature 0. Falls back to the runbook on `unreachable`, `timeout`, `invalid_json`, `schema_error`, `invalid_action`, `low_confidence` (< 0.7), etc.; the reason is in `fallback_reason`.
+- `analyzer/analyzer.py`: `serve` (WebSocket → one worker with per-incident coalescing → `POST /responses`) and `analyze <sample.json> [--mode runbook|llm]`.
+- `analyzer/samples/scenario1..9.json`: hand-written IncidentEvents. Runbook mode gives the §10 root cause and action for all 9.
+- Compose service `analyzer`; `ANALYZER_MODE=runbook` runs baseline B1.
+
+**Tests:** `cd analyzer && pip install -r requirements-dev.txt && python -m pytest tests`: 75 pass (Ollama mocked).

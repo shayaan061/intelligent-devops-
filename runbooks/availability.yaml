@@ -1,0 +1,36 @@
+# Availability runbooks: a service or its dependency is down.
+# Field reference and the root_cause strategies: analyzer/runbooks.py.
+# Lower priority is tried first; the first runbook that matches and finds a
+# root cause wins, so these beat every resource/HTTP runbook.
+
+# Redis down makes api-service return 503 and frontend 502, so HighErrorRate
+# fires on both. Those are symptoms; redis is the cause.
+- name: dependency-down
+  priority: 10
+  description: Redis is down; api-service/frontend errors are downstream symptoms.
+  match:
+    alert: RedisDown
+    down: redis
+  root_cause: redis
+  incident_type: dependency_down
+  severity: critical
+  action: restart_container
+  fallback: escalate
+  confidence: 0.9
+  requires_approval: false
+
+# frontend or api-service cannot be scraped (container stopped or crashed).
+# If several are down, the deepest one in the chain is restarted first.
+- name: service-down
+  priority: 20
+  description: An app service is down; restart its container.
+  match:
+    alert: ServiceDown
+    down: [frontend, api-service]
+  root_cause: matched_service
+  incident_type: service_down
+  severity: critical
+  action: restart_container
+  fallback: escalate
+  confidence: 0.9
+  requires_approval: false

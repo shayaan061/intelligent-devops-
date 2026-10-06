@@ -1,0 +1,241 @@
+{
+  "type": "incident",
+  "incident_id": "inc-0006",
+  "status": "open",
+  "timestamp": "2026-10-06T10:00:15Z",
+  "opened_at": "2026-10-06T10:00:05Z",
+  "resolved_at": null,
+  "sources": [
+    "rule"
+  ],
+  "services": [
+    "redis",
+    "api-service",
+    "frontend"
+  ],
+  "alerts": [
+    {
+      "name": "RedisDown",
+      "service": "redis",
+      "status": "firing",
+      "severity": "critical",
+      "category": "availability",
+      "startsAt": "2026-10-06T10:00:05Z",
+      "value": 0.0,
+      "threshold": null
+    },
+    {
+      "name": "HighErrorRate",
+      "service": "api-service",
+      "status": "firing",
+      "severity": "critical",
+      "category": "http",
+      "startsAt": "2026-10-06T10:00:05Z",
+      "value": 1.0,
+      "threshold": 0.1
+    },
+    {
+      "name": "HighErrorRate",
+      "service": "frontend",
+      "status": "firing",
+      "severity": "critical",
+      "category": "http",
+      "startsAt": "2026-10-06T10:00:05Z",
+      "value": 1.0,
+      "threshold": 0.1
+    }
+  ],
+  "ml_anomalies": [],
+  "topology": {
+    "frontend": [
+      "api-service"
+    ],
+    "api-service": [
+      "redis"
+    ],
+    "redis": []
+  },
+  "context": {
+    "frontend": {
+      "up": 1,
+      "cpu": 0.08,
+      "mem": 0.25,
+      "p95": 0.011,
+      "err": 1.0,
+      "rps": 5.0,
+      "upstream_p95": 0.006,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "p95": [
+          0.011,
+          0.011,
+          0.011,
+          0.011,
+          0.011,
+          0.011,
+          0.011,
+          0.011,
+          0.011,
+          0.011
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.5,
+          1.0
+        ],
+        "cpu": [
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08
+        ],
+        "mem": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "upstream_p95": [
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006,
+          0.006
+        ]
+      }
+    },
+    "api-service": {
+      "up": 1,
+      "cpu": 0.08,
+      "mem": 0.25,
+      "p95": 0.004,
+      "err": 1.0,
+      "rps": 5.0,
+      "upstream_p95": 0.001,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "p95": [
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.5,
+          1.0
+        ],
+        "cpu": [
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08
+        ],
+        "mem": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "upstream_p95": [
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001
+        ]
+      }
+    },
+    "redis": {
+      "up": 0,
+      "ops": null,
+      "mem_bytes": null,
+      "clients": null,
+      "container": {
+        "status": "exited",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "ops": [
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          null,
+          null
+        ]
+      }
+    }
+  },
+  "history": {
+    "attempt": 1,
+    "previous_actions": []
+  }
+}

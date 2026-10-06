@@ -1,0 +1,17 @@
+# Monitoring runbooks: problems with the monitoring stack, not the app.
+# Field reference and the root_cause strategies: analyzer/runbooks.py.
+
+# The redis_exporter (or another scrape target of the monitoring stack) is
+# down. No app service is at fault, so nothing is restarted: a human looks.
+- name: monitoring-down
+  priority: 5
+  description: Only ExporterDown is firing; monitoring problem, escalate without touching the app.
+  match:
+    only_alerts: [ExporterDown]
+  root_cause: none
+  incident_type: unknown
+  severity: medium
+  action: escalate
+  fallback: null
+  confidence: 0.9
+  requires_approval: false

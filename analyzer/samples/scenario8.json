@@ -1,0 +1,218 @@
+{
+  "_note": "Scenario 8 (gradual memory rise) is ML-only: no rule has fired yet (mem 0.62 < 0.8). The ml_anomalies entry is a guess at the planned detector's output; runbook ml-memory-anomaly matches any top feature containing 'mem' and recommends restart_container on the top-scoring service.",
+  "type": "incident",
+  "incident_id": "inc-0008",
+  "status": "open",
+  "timestamp": "2026-10-06T10:00:15Z",
+  "opened_at": "2026-10-06T10:00:05Z",
+  "resolved_at": null,
+  "sources": [
+    "ml"
+  ],
+  "services": [
+    "api-service"
+  ],
+  "alerts": [],
+  "ml_anomalies": [
+    {
+      "service": "api-service",
+      "score": 0.88,
+      "top_features": [
+        "mem_usage",
+        "mem_slope"
+      ]
+    }
+  ],
+  "topology": {
+    "frontend": [
+      "api-service"
+    ],
+    "api-service": [
+      "redis"
+    ],
+    "redis": []
+  },
+  "context": {
+    "frontend": {
+      "up": 1,
+      "cpu": 0.08,
+      "mem": 0.25,
+      "p95": 0.012,
+      "err": 0.0,
+      "rps": 5.0,
+      "upstream_p95": 0.004,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "p95": [
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012,
+          0.012
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cpu": [
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08
+        ],
+        "mem": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "upstream_p95": [
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004,
+          0.004
+        ]
+      }
+    },
+    "api-service": {
+      "up": 1,
+      "cpu": 0.08,
+      "mem": 0.62,
+      "p95": 0.007,
+      "err": 0.0,
+      "rps": 5.0,
+      "upstream_p95": 0.002,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "p95": [
+          0.007,
+          0.007,
+          0.007,
+          0.007,
+          0.007,
+          0.007,
+          0.007,
+          0.007,
+          0.007,
+          0.007
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cpu": [
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08,
+          0.08
+        ],
+        "mem": [
+          0.12,
+          0.12,
+          0.12,
+          0.12,
+          0.12,
+          0.2,
+          0.3,
+          0.41,
+          0.52,
+          0.62
+        ],
+        "upstream_p95": [
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002,
+          0.002
+        ]
+      }
+    },
+    "redis": {
+      "up": 1,
+      "ops": 40.0,
+      "mem_bytes": 1048576,
+      "clients": 2,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T08:00:00Z"
+      },
+      "trend": {
+        "ops": [
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0,
+          40.0
+        ]
+      }
+    }
+  },
+  "history": {
+    "attempt": 1,
+    "previous_actions": []
+  }
+}

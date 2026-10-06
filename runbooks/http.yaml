@@ -1,0 +1,32 @@
+# HTTP runbooks: errors and latency, which propagate up the call chain.
+# Field reference and the root_cause strategies: analyzer/runbooks.py.
+
+# frontend returns 502 when api-service fails, so both alert. The cause is
+# the deepest service that has its own errors while its dependencies are healthy.
+- name: high-error-rate
+  priority: 50
+  description: 5xx spike; reset the service whose errors are not inherited from a dependency.
+  match:
+    alert: HighErrorRate
+  root_cause: deepest_service_with_errors
+  incident_type: error_spike
+  severity: high
+  action: reset_faults
+  fallback: restart_container
+  confidence: 0.8
+  requires_approval: false
+
+# frontend waits on api-service, so a slow api-service makes both alert.
+# Walk down the chain while a service's upstream_p95 explains its p95.
+- name: high-latency
+  priority: 60
+  description: p95 latency over 1 s; reset the service whose latency is not explained by its upstream.
+  match:
+    alert: HighLatency
+  root_cause: latency_origin
+  incident_type: latency_degradation
+  severity: high
+  action: reset_faults
+  fallback: restart_container
+  confidence: 0.8
+  requires_approval: false

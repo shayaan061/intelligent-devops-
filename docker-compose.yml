@@ -61,7 +61,7 @@ services:
       - redis
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: ghcr.io/google/cadvisor:v0.53.0
     container_name: cadvisor
     ports:
       - "8080:8080"
@@ -71,6 +71,9 @@ services:
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
+      # Docker Desktop (macOS) doesn't expose the socket through /var/run;
+      # without this cAdvisor has no `name` label and HighCPU/HighMemory never fire
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
@@ -110,12 +113,38 @@ services:
     container_name: gateway
     ports:
       - "8000:8000"
+    environment:
+      PROMETHEUS_URL: http://prometheus:9090
+    volumes:
+      # Read-only use: container state and restart count for the context
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 10s
+    restart: unless-stopped
+
+  # LLM Analysis Engine (§6.4): /ws/events -> ResponsePlan -> POST gateway /responses.
+  # Ollama runs on the host (macOS app, Metal); without it every plan falls back
+  # to the YAML runbooks. ANALYZER_MODE=runbook is baseline B1 (no LLM).
+  analyzer:
+    build: ./analyzer
+    container_name: analyzer
+    environment:
+      - GATEWAY_URL=http://gateway:8000
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.1:8b}
+      - ANALYZER_MODE=${ANALYZER_MODE:-llm}
+      - LLM_TIMEOUT=${LLM_TIMEOUT:-120}
+      - RUNBOOK_DIR=/runbooks
+    volumes:
+      - ./runbooks:/runbooks:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - gateway
     restart: unless-stopped
 
   # Steady background traffic; HTTP alerts need requests to evaluate.

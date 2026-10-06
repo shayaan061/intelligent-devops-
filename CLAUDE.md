@@ -10,7 +10,13 @@ A final-year project (Sharda University) and patent disclosure: an "Intelligent 
 
 ## Current state
 
-The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. A skeleton gateway exists (`gateway/`, port 8000: `POST /alerts` → `/ws/events`, no grouping or context yet). The ML detector, LLM analyzer, responder, verifier and dashboard are still planned.
+The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. The Event Gateway (`gateway/`, port 8000) and a first analyzer (`analyzer/` + `runbooks/`) exist. The ML detector, responder (validator + executor), verifier and dashboard are still planned. See `PROGRESS.md` Steps 5–6.
+
+Gateway → analyzer contract (`analyzer/schemas.py` is the source of truth):
+- Alerts and ML anomalies (`POST /anomalies`) are grouped into incidents (`gateway/incidents.py`): one open incident per chain, open while an alert fires or an anomaly is < 60 s old. After a 10 s settle the gateway broadcasts `{"type": "incident", "status": "open|updated|resolved", ...}` on `/ws/events` with the 10-minute context from `gateway/context.py`. Never add a `fault_*` query there; an import-time assert enforces it.
+- The analyzer turns `open`/`updated` incidents into a `ResponsePlan` and POSTs it to `/responses`, which is broadcast on `/ws/responses`. It uses Ollama on the host (`OLLAMA_URL`, default `host.docker.internal:11434`) and falls back to the YAML runbooks; `ANALYZER_MODE=runbook` is baseline B1. It only recommends, never executes.
+- Re-analysis must put the actions already tried in `history.previous_actions` as `[{"type", "target"}]`.
+- On macOS, cAdvisor only gets the `name` label if Docker Desktop's containerd image store is off; otherwise HighCPU/HighMemory never fire and context `cpu`/`mem` are null (PROGRESS.md, Next steps A).
 
 Request path: `frontend` (`app/`, host port 5001) → `GET api-service:5000/data` (`api-service/`, host port 5002) → `redis` (`INCR hits`).
 - Both Flask services contain the same fault-injection, `/health`, `/metrics`, `/inject` and `/reset` code, copied into each one (the Docker build contexts are separate). A fix to that code must be made in both files.
@@ -55,7 +61,7 @@ docker compose run --rm injector reset                                  # clear 
 pip install -r injector/requirements.txt && python injector/injector.py list   # or from the host
 ```
 
-Apart from the rule tests there is no test suite, linter or git repo yet. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
+Tests: the rule tests above, `cd gateway && pytest -q` and `cd analyzer && python -m pytest tests` (install each one's `requirements-dev.txt`). There is no linter. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
 
 ## Invariants to preserve
 
