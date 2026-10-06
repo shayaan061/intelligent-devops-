@@ -1,7 +1,8 @@
 # Progress Log: Phase 2 (Monitoring + Multi-service)
 
-**Date:** 3 Oct 2026
+**Date:** 3 Oct 2026 · **Last updated:** 4 Oct 2026
 **Plan:** `SUGGESTED_PLAN.md` §3 (fixes) and §15 (immediate next steps)
+**Status:** Phase 2 is complete (commit `9415a44`). Phase 3 (Event Gateway) is next. See [Next steps](#next-steps) and `EVALUATION_GUIDE.md` for how to run and demo what exists.
 
 | §15 item | Status |
 |---|---|
@@ -9,10 +10,42 @@
 | Add `api-service` + Redis + redis_exporter + cAdvisor | ✅ Done |
 | Write `prometheus/rules.yml` and `alertmanager/alertmanager.yml` | ✅ Done |
 | Implement `injector/injector.py` with ground-truth logging | ✅ Done |
-| Skeleton gateway: `/alerts` → print → WebSocket broadcast | ⏳ **To do (Step 4, below)** |
+| Skeleton gateway: `/alerts` → print → WebSocket broadcast | ✅ Code done, smoke-tested; Docker end-to-end test pending (Step 4) |
 
 > Everything was tested locally against the real Flask services, Prometheus 2.54.1 and Alertmanager 0.27.0 binaries.
 > **Not yet run under Docker** because the daemon was off. Container-level parts (cAdvisor, the CPU/memory alerts, `docker stop` scenarios) are covered by unit tests or a fake Docker client only. First thing to do: `docker compose up --build` and check `localhost:9090/targets`.
+
+---
+
+## Next steps
+
+In order. Owners follow the work split in `SUGGESTED_PLAN.md` §9.
+
+### A. Close out Phase 2 (before starting the gateway)
+- [ ] **Run the stack under Docker for the first time.** `docker compose up --build`, then check that all 4 targets are `UP` at `localhost:9090/targets` (`frontend`, `api-service`, `redis`, `cadvisor`).
+- [ ] **Check cAdvisor's labels on macOS.** The CPU/memory rules match `name=~"frontend|api-service"`. Confirm at `localhost:9090/graph` with `container_memory_working_set_bytes{name="api-service"}`. If the series is missing or named differently, fix `rules.yml` *and* `rules_test.yml`.
+- [ ] **Run each scenario once for real** and note the alert and detection time: `docker compose run --rm injector run <1-9> --duration 180`. Scenarios 1, 2, 3, 6 and 7 have never fired on real containers.
+- [ ] **Scenario 8 should not fire HighMemory early.** It is meant to be caught by ML only. Check how long the ramp stays under 80%.
+- [ ] **Decide scoring for scenario 3:** accept `reset_faults` as well as `restart_container`, or only the restart. Write the decision into §10 of the plan.
+- [ ] **Update the §6.1 table in `SUGGESTED_PLAN.md`** to the real windows (30 s rate, `for: 20s`) and fault caps (600 s, 450 MB).
+
+### B. Phase 3, part 1: skeleton gateway (§15, last item). Owner: Shayaan
+Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) below. Summary:
+- [x] `gateway/` FastAPI service: `POST /alerts`, `GET /health`, WebSocket `/ws/events`
+- [x] Compose service named `gateway` on port 8000
+- [ ] End-to-end test: injector → Prometheus → Alertmanager → gateway → WebSocket client
+- [x] Tick the last box in §15 of `SUGGESTED_PLAN.md`
+
+### C. Phase 3, part 2 (Oct week 4 – Nov week 1)
+- [ ] Grouping: events within 60 s along `frontend → api-service → redis` become one incident with an `incident_id`
+- [ ] Context builder: last 10 min of CPU, memory, p95, error rate and `upstream_p95` per service, through the Prometheus HTTP API
+- [ ] Emit the full `IncidentEvent` JSON (§6.3), with `fault_*` metrics filtered out
+- [ ] `POST /anomalies` stub for the ML detector, and the `/ws/responses` channel
+
+### D. Can start in parallel
+- [ ] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1)
+- [ ] **Shruti:** record 1–2 hours of normal traffic under Locust now, as training data for the ML detector (Phase 7)
+- [ ] **All:** apply the edits in `PATENT_CHANGES.md` to the patent draft
 
 ---
 
@@ -108,6 +141,8 @@ Locust → frontend (app/, :5001) → api-service (:5002) → redis
 - **`load/locustfile.py`** generates about 5 requests per second. It always runs as the `load` service, because the HTTP alerts need traffic.
 - **Test results:** every `end_reason` recorded correctly. The tests also covered skipping a target that's already faulty, and Ctrl-C undoing the active fault.
 
+- **Web control panel** (`injector/web.py`, http://localhost:8088, compose service `injector-ui`). It's a browser front end to `injector.py` and does everything the CLI does: single/suite runs with a live countdown, cancel, reset, manual faults, container stop/start, Prometheus alerts and recent ground truth. Runs go through `run_scenario`, so ground truth is identical. Manual actions are blocked during a run, and **Reset all** cancels the run first; otherwise the reset would be recorded as `remediated`.
+
 **Open question for scoring:** in scenario 3, `reset_faults` also frees the memory. Decide whether to accept it alongside `restart_container`.
 
 ---
@@ -118,6 +153,7 @@ Locust → frontend (app/, :5001) → api-service (:5002) → redis
 docker compose up --build                       # whole stack + background load
 # Prometheus :9090 · Alertmanager :9093 · cAdvisor :8080 · frontend :5001 · api-service :5002
 
+# Injector UI: http://localhost:8088  (or the CLI below)
 docker compose run --rm injector list
 docker compose run --rm injector run 4 --duration 180
 docker compose run --rm injector suite --scenarios 1-9 --repeat 3 --shuffle --seed 1 --gap 60
@@ -128,20 +164,27 @@ cd prometheus && promtool test rules rules_test.yml
 
 ---
 
-## Step 4: Skeleton Event Gateway ⏳ (to do later)
+## Step 4: Skeleton Event Gateway ✅ (code done, Docker test pending)
 
 **Owner:** Shayaan · **Phase 3 in the timeline** (Oct week 4 – Nov week 1) · Plan: §6.3
 
 Goal: a FastAPI service that receives Alertmanager webhooks, logs them, and broadcasts them over WebSocket. Grouping and the context builder come after it, in the rest of Phase 3.
 
 **Skeleton scope:**
-- [ ] `gateway/` with `app.py`, `requirements.txt` (`fastapi`, `uvicorn`) and a `Dockerfile`
-- [ ] `POST /alerts`: accepts Alertmanager's webhook JSON (`status`, `alerts[]` with `labels`, `annotations`, `startsAt`, `endsAt`, `fingerprint`) and logs each alert
-- [ ] Converts each alert to a minimal `IncidentEvent`-shaped message (`alertname`, `service`, `status`, `severity`, `startsAt`, `source: "rule"`)
-- [ ] WebSocket `/ws/events`: broadcasts every message to all connected clients
-- [ ] `GET /health`
-- [ ] A `gateway` service in `docker-compose.yml` on port **8000**. The service name must be `gateway`, because Alertmanager already posts to `http://gateway:8000/alerts`.
+- [x] `gateway/` with `app.py`, `requirements.txt` (`fastapi`, `uvicorn`) and a `Dockerfile`
+- [x] `POST /alerts`: accepts Alertmanager's webhook JSON (`status`, `alerts[]` with `labels`, `annotations`, `startsAt`, `endsAt`, `fingerprint`) and logs each alert
+- [x] Converts each alert to a minimal `IncidentEvent`-shaped message (`alertname`, `service`, `status`, `severity`, `startsAt`, `source: "rule"`)
+- [x] WebSocket `/ws/events`: broadcasts every message to all connected clients
+- [x] `GET /health`
+- [x] A `gateway` service in `docker-compose.yml` on port **8000**. The service name must be `gateway`, because Alertmanager already posts to `http://gateway:8000/alerts`.
 - [ ] Test: run an injector scenario → the alert arrives at the gateway → a WebSocket client (e.g. `websocat ws://localhost:8000/ws/events`) receives it
+
+**What was built:**
+- `gateway/app.py` (FastAPI + uvicorn). Each alert becomes `{type, source: "rule", alertname, service, status, severity, category, startsAt, endsAt, fingerprint, labels, annotations}`. Annotations are dropped on resolved alerts (stale values); labels starting with `fault_` are dropped.
+- `GET /events` returns the last 100 events, and a new `/ws/events` client gets them replayed first (`"replay": true`), so a dashboard opened mid-incident has history.
+- `GET /health` reports connected clients and webhook/event counts. Malformed webhooks get a 400.
+- Compose: `gateway` service on 8000 with a healthcheck; Alertmanager now `depends_on` it.
+- Smoke-tested with FastAPI's TestClient (firing → WS, resolved → WS without annotations, replay, 400s). Not yet run under Docker.
 
 **Things to keep in mind (from steps 2–3):**
 - Use the `service` label on every alert; it's already set to `frontend` / `api-service` / `redis`.

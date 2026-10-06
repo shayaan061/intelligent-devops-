@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fault Injector</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --panel: #ffffff; --border: #e2e5ea; --text: #1b1f24; --muted: #66707c;
+    --accent: #2f6fde; --ok: #1f9d55; --warn: #c98a00; --bad: #d23c3c; --chip: #eef1f5;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216; --panel: #171b21; --border: #2a3039; --text: #e6e9ee; --muted: #8b95a3;
+      --accent: #5b93f0; --ok: #3ccf7a; --warn: #f0b429; --bad: #f06363; --chip: #232932;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--panel); position: sticky; top: 0; z-index: 2; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; }
+  header nav { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap; }
+  header nav a { color: var(--muted); text-decoration: none; font-size: 13px; }
+  header nav a:hover { color: var(--accent); }
+  main { padding: 16px 20px 40px; display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); max-width: 1500px; margin: 0 auto; }
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-7 { grid-column: span 7; }
+  .span-6 { grid-column: span 6; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; }
+  @media (max-width: 1000px) { .span-8, .span-7, .span-6, .span-5, .span-4 { grid-column: span 12; } }
+
+  button { font: inherit; border: 1px solid var(--border); background: var(--chip); color: var(--text); border-radius: 7px; padding: 6px 12px; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.danger { background: var(--bad); border-color: var(--bad); color: #fff; }
+  button.small { padding: 3px 9px; font-size: 12px; }
+  input, select { font: inherit; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; }
+  input[type=number] { width: 80px; }
+  label { color: var(--muted); font-size: 12px; display: inline-flex; flex-direction: column; gap: 3px; }
+  label.inline { flex-direction: row; align-items: center; gap: 6px; font-size: 13px; color: var(--text); }
+  .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); font-size: 12px; }
+
+  .services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 800px) { .services { grid-template-columns: 1fr; } }
+  .svc { border: 1px solid var(--border); border-radius: 9px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .svc.bad { border-color: var(--bad); } .svc.warn { border-color: var(--warn); }
+  .svc-head { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { background: var(--chip); border-radius: 999px; padding: 1px 9px; font-size: 12px; }
+  .chip.on { background: var(--bad); color: #fff; }
+  .chip.firing { background: var(--bad); color: #fff; } .chip.pending { background: var(--warn); color: #000; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { font-size: 12px; color: var(--muted); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .table-wrap { overflow-x: auto; }
+
+  .progress { height: 8px; background: var(--chip); border-radius: 99px; overflow: hidden; margin: 8px 0; }
+  .progress > div { height: 100%; background: var(--accent); transition: width .9s linear; }
+  .big { font-size: 22px; font-weight: 600; }
+  #log { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px; height: 260px; overflow-y: auto; white-space: pre-wrap; margin: 0; }
+  .empty { color: var(--muted); font-style: italic; padding: 6px 0; }
+  .reason-remediated { color: var(--ok); font-weight: 600; } .reason-expired { color: var(--muted); } .reason-cleanup { color: var(--warn); font-weight: 600; }
+  #toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 8px; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 420px; }
+  #toast.show { opacity: .95; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ Fault Injector</h1>
+  <span class="muted" id="conn">connecting…</span>
+  <button class="danger" id="reset-btn" title="Cancel any run, clear all faults, start stopped containers">Reset all</button>
+  <nav>
+    <a href="http://localhost:5001/" target="_blank">Frontend</a>
+    <a href="http://localhost:9090/alerts" target="_blank">Prometheus alerts</a>
+    <a href="http://localhost:9093" target="_blank">Alertmanager</a>
+    <a href="http://localhost:8080" target="_blank">cAdvisor</a>
+  </nav>
+</header>
+
+<main>
+  <section class="span-12">
+    <h2>Services</h2>
+    <div class="services" id="services"></div>
+  </section>
+
+  <section class="span-8">
+    <h2>Evaluation scenarios <span class="muted" style="text-transform:none;letter-spacing:0">· logged to ground_truth.csv</span></h2>
+    <div class="row" style="margin-bottom:10px">
+      <label>Duration (s)<input type="number" id="duration" value="180" min="30" max="600"></label>
+      <label>Repeat<input type="number" id="repeat" value="1" min="1" max="10"></label>
+      <label>Gap (s)<input type="number" id="gap" value="60" min="0" max="600"></label>
+      <label>Seed<input type="number" id="seed" placeholder="random"></label>
+      <label class="inline"><input type="checkbox" id="shuffle"> Shuffle</label>
+      <button class="primary" id="run-selected">Run selected</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th><input type="checkbox" id="select-all" title="Select all"></th><th>#</th><th>Scenario</th><th>Fault</th><th>Target</th><th>Expected action</th><th></th></tr></thead>
+        <tbody id="scenarios"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="span-4">
+    <h2>Current run</h2>
+    <div id="job"></div>
+  </section>
+
+  <section class="span-7">
+    <h2>Alerts <span class="muted" style="text-transform:none;letter-spacing:0">· from Prometheus</span></h2>
+    <div id="alerts"></div>
+  </section>
+
+  <section class="span-5">
+    <h2>Manual fault <span class="muted" style="text-transform:none;letter-spacing:0">· demo only, not logged</span></h2>
+    <div class="row">
+      <label>Service<select id="m-service"><option>api-service</option><option>frontend</option></select></label>
+      <label>Fault<select id="m-fault"><option>latency</option><option>error</option><option>cpu</option><option>memory</option></select></label>
+      <label>Duration (s)<input type="number" id="m-duration" value="60" min="1" max="600"></label>
+    </div>
+    <div class="row" id="m-memory" style="margin-top:10px; display:none">
+      <label>Size (MB)<input type="number" id="m-size" value="420" min="10" max="450"></label>
+      <label>Ramp (s)<input type="number" id="m-ramp" value="0" min="0" max="600"></label>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="m-inject">Inject</button>
+    </div>
+    <p class="note">Container stop/start buttons are on the service cards. Manual actions are disabled while a scenario run is active, so they can't corrupt its ground truth.</p>
+  </section>
+
+  <section class="span-6">
+    <h2>Log</h2>
+    <pre id="log" class="mono"></pre>
+  </section>
+
+  <section class="span-6">
+    <h2>Recent ground truth</h2>
+    <div class="table-wrap"><div id="gt"></div></div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let scenarios = [], busy = false;
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+async function api(path, body) {
+  try {
+    const r = await fetch(path, body === undefined ? {} : {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) toast(data.error || `${path} → ${r.status}`);
+    return {ok: r.ok, data};
+  } catch (e) { toast(`request failed: ${e}`); return {ok: false, data: {}}; }
+}
+
+function fmtSecs(s) { s = Math.max(0, Math.round(s)); return s >= 60 ? `${Math.floor(s/60)}m ${String(s%60).padStart(2,"0")}s` : `${s}s`; }
+function ago(iso) { return iso ? fmtSecs((Date.now() - Date.parse(iso)) / 1000) : ""; }
+function timeOf(iso) { return iso ? new Date(iso).toLocaleTimeString() : ""; }
+
+// ---------- scenarios ----------
+async function loadScenarios() {
+  scenarios = (await api("/api/scenarios")).data || [];
+  $("scenarios").innerHTML = scenarios.map(s => {
+    const extra = s.params.map(p => Object.entries(p).map(([k, v]) => `${k}=${v}`).join(" ")).filter(Boolean).join("; ");
+    return `<tr>
+      <td><input type="checkbox" class="pick" value="${s.id}"></td>
+      <td>${s.id}</td>
+      <td><b>${esc(s.name)}</b>${s.min_duration ? `<div class="muted" style="font-size:12px">min ${s.min_duration}s</div>` : ""}</td>
+      <td>${s.faults.map(f => `<span class="chip">${esc(f)}</span>`).join(" ")}${extra ? `<div class="muted mono">${esc(extra)}</div>` : ""}</td>
+      <td>${esc(s.target)}</td>
+      <td class="mono">${esc(s.expected_action)}</td>
+      <td><button class="small primary run-one" data-id="${s.id}">Run</button></td>
+    </tr>`;
+  }).join("");
+  document.querySelectorAll(".run-one").forEach(b => b.onclick = () => runScenarios([+b.dataset.id], true));
+}
+
+function runScenarios(ids, single) {
+  if (!ids.length) return toast("Select at least one scenario");
+  const body = {scenarios: ids, duration: +$("duration").value, gap: +$("gap").value};
+  if (!single) Object.assign(body, {repeat: +$("repeat").value, shuffle: $("shuffle").checked, seed: $("seed").value === "" ? null : +$("seed").value});
+  api("/api/run", body).then(r => { if (r.ok) { toast(`Started: ${r.data.scenarios.join(", ")}`); refresh(); } });
+}
+
+$("run-selected").onclick = () => runScenarios([...document.querySelectorAll(".pick:checked")].map(c => +c.value), false);
+$("select-all").onchange = e => document.querySelectorAll(".pick").forEach(c => c.checked = e.target.checked);
+
+// ---------- manual ----------
+$("m-fault").onchange = () => $("m-memory").style.display = $("m-fault").value === "memory" ? "flex" : "none";
+$("m-inject").onclick = () => {
+  const body = {service: $("m-service").value, fault: $("m-fault").value, duration: +$("m-duration").value};
+  if (body.fault === "memory") Object.assign(body, {size_mb: +$("m-size").value, ramp_seconds: +$("m-ramp").value});
+  api("/api/inject", body).then(r => { if (r.ok) toast(`${body.fault} → ${body.service}: ${r.data.status || "ok"}`); refresh(); });
+};
+$("reset-btn").onclick = () => {
+  if (busy && !confirm("A scenario run is active. Cancel it and reset everything?")) return;
+  api("/api/reset", {}).then(r => { if (r.ok) toast("Resetting…"); });
+};
+function containerAction(name, action) {
+  if (action === "stop" && !confirm(`Stop the ${name} container?`)) return;
+  api("/api/container", {name, action}).then(r => { if (r.ok) toast(`${action} ${name}: ok`); refresh(); });
+}
+
+// ---------- render ----------
+function renderServices(services) {
+  $("services").innerHTML = Object.entries(services).map(([name, s]) => {
+    const running = s.state === "running";
+    const faults = s.faults ? Object.entries(s.faults) : [];
+    const anyFault = faults.some(([, v]) => v);
+    const down = s.state !== "running" && s.state !== "unknown" || s.reachable === false;
+    const cls = down ? "bad" : (anyFault || (s.health && s.health !== "healthy")) ? "warn" : "ok";
+    const statusText = s.state === "unknown" ? "docker unavailable" : `${s.state}${s.health ? ` · ${s.health}` : ""}${s.reachable === false && running ? " · not responding" : ""}`;
+    return `<div class="svc ${cls === "ok" ? "" : cls}">
+      <div class="svc-head"><span class="dot ${cls}"></span>${esc(name)}</div>
+      <div class="muted">${esc(statusText)}</div>
+      <div class="chips">${faults.length ? faults.map(([f, v]) => `<span class="chip ${v ? "on" : ""}">${esc(f)}</span>`).join("") : `<span class="muted" style="font-size:12px">${name === "redis" ? "container faults only" : "no fault data"}</span>`}</div>
+      <div class="row">
+        ${s.state === "unknown" ? "" : running ? `<button class="small" ${busy ? "disabled" : ""} onclick="containerAction('${name}','stop')">Stop</button>
+                     <button class="small" ${busy ? "disabled" : ""} onclick="containerAction('${name}','restart')">Restart</button>`
+                  : `<button class="small primary" ${busy ? "disabled" : ""} onclick="containerAction('${name}','start')">Start</button>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderJob(job) {
+  if (!job) { $("job").innerHTML = `<div class="empty">Idle. Pick a scenario and press Run.</div>`; return; }
+  const sc = scenarios.find(s => s.id === job.scenario);
+  const total = job.until ? job.until - job.started : 0;
+  const left = job.until ? job.until - job.now : 0;
+  const pct = total > 0 ? Math.min(100, 100 * (1 - left / total)) : 0;
+  const title = job.phase === "running" && sc ? `#${sc.id} ${esc(sc.name)}` : job.phase === "settling" ? "Settling between scenarios" : "Starting…";
+  $("job").innerHTML = `
+    <div class="muted">Scenario ${job.index + 1} of ${job.total}${job.cancelling ? " · cancelling…" : ""}</div>
+    <div class="big">${title}</div>
+    ${sc && job.phase === "running" ? `<div class="muted">target <b>${esc(sc.target)}</b> · expect <span class="mono">${esc(sc.expected_action)}</span></div>` : ""}
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <span class="muted">${job.until ? `${fmtSecs(left)} left (planned)` : ""}</span>
+      <button class="danger small" ${job.cancelling ? "disabled" : ""} onclick="api('/api/cancel',{}).then(refresh)">Cancel run</button>
+    </div>
+    <div class="note">Queue: ${job.ids.map((id, i) => i === job.index ? `<b>${id}</b>` : id).join(" → ")}</div>
+    ${job.done.length ? `<div class="note">Finished: ${job.done.map(d => `#${d.scenario} <span class="reason-${esc(d.end_reason)}">${esc(d.end_reason)}</span>`).join(", ")}</div>` : ""}
+    <div class="note">The run ends early as <b>remediated</b> if something fixes the fault before the planned end.</div>`;
+}
+
+function renderAlerts(alerts) {
+  if (alerts === null) { $("alerts").innerHTML = `<div class="empty">Prometheus unreachable.</div>`; return; }
+  if (!alerts.length) { $("alerts").innerHTML = `<div class="empty">No pending or firing alerts. Detection takes about 40 s after a fault starts.</div>`; return; }
+  $("alerts").innerHTML = `<table><thead><tr><th>State</th><th>Alert</th><th>Service</th><th>Severity</th><th>For</th><th>Summary</th></tr></thead><tbody>${
+    alerts.map(a => `<tr><td><span class="chip ${esc(a.state)}">${esc(a.state)}</span></td><td><b>${esc(a.name)}</b></td><td>${esc(a.service)}</td><td>${esc(a.severity)}</td><td class="mono">${ago(a.since)}</td><td class="muted">${esc(a.summary)}</td></tr>`).join("")
+  }</tbody></table>`;
+}
+
+function renderLog(lines) {
+  const el = $("log"), atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+  const text = lines.join("\n");
+  if (text === el.textContent) return;
+  el.textContent = text;
+  if (atBottom) el.scrollTop = el.scrollHeight;
+}
+
+function renderGroundTruth(rows) {
+  if (!rows.length) { $("gt").innerHTML = `<div class="empty">No runs logged yet.</div>`; return; }
+  $("gt").innerHTML = `<table><thead><tr><th>#</th><th>Scenario</th><th>Start</th><th>Lasted</th><th>End reason</th></tr></thead><tbody>${
+    rows.map(r => `<tr><td>${esc(r.scenario)}</td><td>${esc(r.name)}</td><td class="mono">${timeOf(r.start)}</td>
+      <td class="mono">${fmtSecs((Date.parse(r.end) - Date.parse(r.start)) / 1000)}</td>
+      <td class="reason-${esc(r.end_reason)}">${esc(r.end_reason)}</td></tr>`).join("")
+  }</tbody></table>`;
+}
+
+async function refresh() {
+  let state;
+  try { state = await (await fetch("/api/state")).json(); }
+  catch { $("conn").textContent = "⚠ disconnected"; return; }
+  $("conn").textContent = "live";
+  busy = !!state.job;
+  $("m-inject").disabled = busy;
+  renderServices(state.services);
+  renderJob(state.job);
+  renderAlerts(state.alerts);
+  renderLog(state.log);
+  renderGroundTruth(state.ground_truth);
+}
+
+loadScenarios().then(refresh);
+setInterval(refresh, 1500);
+</script>
+</body>
+</html>

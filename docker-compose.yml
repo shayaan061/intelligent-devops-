@@ -100,6 +100,23 @@ services:
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     restart: unless-stopped
+    depends_on:
+      - gateway
+
+  # Event Gateway: Alertmanager webhook -> /ws/events. The service name must
+  # stay `gateway` (alertmanager.yml posts to http://gateway:8000/alerts).
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
 
   # Steady background traffic; HTTP alerts need requests to evaluate.
   # Web UI at :8089 (headless by default).
@@ -112,6 +129,25 @@ services:
     restart: unless-stopped
     depends_on:
       - frontend
+
+  # Browser control panel for the injector: http://localhost:8088
+  # Scenario runs log to experiments/ground_truth.csv like the CLI.
+  injector-ui:
+    build: ./injector
+    container_name: injector-ui
+    entrypoint: ["python", "web.py"]
+    command: []
+    ports:
+      - "8088:8088"
+    environment:
+      FRONTEND_URL: http://frontend:5000
+      API_SERVICE_URL: http://api-service:5000
+      PROMETHEUS_URL: http://prometheus:9090
+      GROUND_TRUTH_PATH: /experiments/ground_truth.csv
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./experiments:/experiments
+    restart: unless-stopped
 
   # Not started by `docker compose up`; run on demand:
   #   docker compose run --rm injector suite --scenarios 1-9 --shuffle

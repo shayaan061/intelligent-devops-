@@ -10,7 +10,7 @@ A final-year project (Sharda University) and patent disclosure: an "Intelligent 
 
 ## Current state
 
-The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. The gateway, ML detector, LLM analyzer, responder, verifier and dashboard are still planned.
+The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. A skeleton gateway exists (`gateway/`, port 8000: `POST /alerts` → `/ws/events`, no grouping or context yet). The ML detector, LLM analyzer, responder, verifier and dashboard are still planned.
 
 Request path: `frontend` (`app/`, host port 5001) → `GET api-service:5000/data` (`api-service/`, host port 5002) → `redis` (`INCR hits`).
 - Both Flask services contain the same fault-injection, `/health`, `/metrics`, `/inject` and `/reset` code, copied into each one (the Docker build contexts are separate). A fix to that code must be made in both files.
@@ -19,7 +19,7 @@ Request path: `frontend` (`app/`, host port 5001) → `GET api-service:5000/data
 - The `api-service` Redis client has retries **disabled** on purpose. With redis-py's default retries, Redis being down shows up as about 4 s of latency instead of an error.
 - Compose container names (`frontend`, `api-service`, `redis`, …) are the names the planned cAdvisor rules match on (`name=~"frontend|api-service"`), so don't rename them. The Prometheus job names are `frontend`, `api-service`, `redis` (the redis_exporter, port 9121) and `cadvisor`.
 
-Alerting: `prometheus/rules.yml` → Alertmanager (`alertmanager/alertmanager.yml`, port 9093) → webhook `POST http://gateway:8000/alerts`. The gateway isn't built yet, so until it is, Alertmanager logs failed deliveries.
+Alerting: `prometheus/rules.yml` → Alertmanager (`alertmanager/alertmanager.yml`, port 9093) → webhook `POST http://gateway:8000/alerts` → broadcast on `ws://localhost:8000/ws/events` (`GET /events` for the last 100).
 - Every alert has a `service` label (`frontend | api-service | redis`; `monitoring` for ExporterDown). Container rules take it from cAdvisor's `name` label and HTTP rules take it from `job`, both via `label_replace`. The gateway relies on this label.
 - Rate windows are 30 s with `for: 20s`, so detection takes about 40 s. Don't go back to the plan's 1-minute window: a 30 s CPU fault would never fire.
 - HTTP rules only look at `endpoint=~"/|/data"` (healthchecks are excluded) and need live traffic. With no requests the rate is NaN and nothing fires.
@@ -29,6 +29,7 @@ Alerting: `prometheus/rules.yml` → Alertmanager (`alertmanager/alertmanager.ym
 Evaluation tooling:
 - `load/locustfile.py` runs as the `load` service by default (`LOAD_USERS`, default 5, gives ~5 req/s). The HTTP alerts depend on it.
 - `injector/injector.py` runs the 9 scenarios from §10 of the plan. HTTP faults go to each service's `/inject` and container stops use the Docker SDK. Each run appends a row to `experiments/ground_truth.csv` with `start`, `planned_end`, the actual `end` and an `end_reason`: `expired`, `remediated` (the fault was gone before `planned_end`, so the system fixed it; this is what MTTR and auto-resolve are scored on) or `cleanup` (the injector had to undo it). The `end` time comes from polling the target's `/health` fault flags or the container status. `MIN_DURATION` forces scenario 8 to at least 300 s so the ramp completes.
+- `injector/web.py` is a browser control panel for the injector (compose service `injector-ui`, port 8088, started by default; same image, different entrypoint). Scenario runs call `run_scenario(..., cancel=Event)`. A cancelled run is undone and writes no CSV row. Manual faults and container actions are demo-only (not logged) and are refused while a run is active. "Reset all" cancels the run first, so the reset isn't scored as `remediated`.
 - The injector is a compose service under the `tools` profile, so `docker compose up` doesn't start it. Inside compose it uses service-name URLs and the mounted Docker socket. On the host it defaults to `localhost:5001/5002` (override with `FRONTEND_URL`, `API_SERVICE_URL`, `GROUND_TRUTH_PATH`).
 
 ## Commands
@@ -41,10 +42,12 @@ promtool check rules prometheus/rules.yml
 amtool check-config alertmanager/alertmanager.yml
 
 curl localhost:5001/                   # full request path
+websocat ws://localhost:8000/ws/events # live alert stream from the gateway
 curl -X POST localhost:5002/inject -H 'Content-Type: application/json' -d '{"fault":"latency","duration":30}'
 curl -X POST localhost:5002/reset
 docker stop redis                      # dependency-failure scenario
 
+open http://localhost:8088                                              # injector web UI
 docker compose run --rm injector list                                   # scenarios 1-9
 docker compose run --rm injector run 4 --duration 180                   # one scenario
 docker compose run --rm injector suite --scenarios 1-9 --repeat 3 --shuffle --seed 1 --gap 60

@@ -449,4 +449,4 @@ intellegent-devops/
 - [x] Add `api-service` + Redis + redis_exporter + cAdvisor to `docker-compose.yml`
 - [x] Write `prometheus/rules.yml` and `alertmanager/alertmanager.yml`
 - [x] Implement `injector/injector.py` with ground-truth logging
-- [ ] Build a skeleton gateway: `/alerts` → print → broadcast over WebSocket
+- [x] Build a skeleton gateway: `/alerts` → print → broadcast over WebSocket (code done; Docker end-to-end test still pending)

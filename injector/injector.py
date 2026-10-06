@@ -96,6 +96,18 @@ def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+class Cancelled(Exception):
+    """A run was cancelled from the web UI (web.py)."""
+
+
+def pause(seconds, cancel=None):
+    """Sleep, or raise Cancelled as soon as the `cancel` event is set."""
+    if cancel is None:
+        time.sleep(seconds)
+    elif cancel.wait(seconds):
+        raise Cancelled
+
+
 _docker = None
 
 
@@ -169,7 +181,7 @@ def append_ground_truth(row):
 # Running a scenario
 # -----------------------------
 
-def run_scenario(scenario, duration):
+def run_scenario(scenario, duration, cancel=None):
     duration = max(duration, MIN_DURATION.get(scenario.id, 0))
     params = ";".join(f"{f}:{p}" if p else f for f, p in scenario.faults)
 
@@ -198,16 +210,17 @@ def run_scenario(scenario, duration):
     try:
         # Poll until the fault is gone (expired or remediated) or its time is up
         while time.time() < planned_end:
-            time.sleep(1)
+            pause(1, cancel)
 
             if not fault_active(scenario):
                 break
 
         # HTTP faults clear themselves up to ~0.5s after planned_end
         while time.time() < planned_end + 3 and fault_active(scenario):
-            time.sleep(0.5)
+            pause(0.5, cancel)
 
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, Cancelled):
+        # No ground-truth row: the run didn't finish
         log(f"interrupted: undoing scenario {scenario.id}")
         cleanup(scenario)
         raise
