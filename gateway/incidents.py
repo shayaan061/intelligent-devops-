@@ -45,6 +45,9 @@ class Incident:
         self.anomalies = []     # ML anomaly dicts, newest last
         self.emitted = False    # has the "open" message gone out
         self.pending = False    # is an emit scheduled (app.py)
+        # Re-analysis (§6.6): set by the responder's verifier through app.py
+        self.attempt = 1
+        self.actions = []       # actions tried: {type, target, attempt, status, at}
 
     @property
     def resolved(self):

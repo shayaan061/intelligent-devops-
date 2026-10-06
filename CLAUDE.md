@@ -10,12 +10,15 @@ A final-year project (Sharda University) and patent disclosure: an "Intelligent 
 
 ## Current state
 
-The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. The Event Gateway (`gateway/`, port 8000) and a first analyzer (`analyzer/` + `runbooks/`) exist. The ML detector, responder (validator + executor), verifier and dashboard are still planned. See `PROGRESS.md` Steps 5–6.
+The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. The Event Gateway (`gateway/`, port 8000), the analyzer (`analyzer/` + `runbooks/`) and the responder with verifier (`responder/`, port 8001) exist, and the loop closes on real containers. A minimal UI is at `dashboard/index.html` (served by the gateway). The ML detector and the full dashboard are still planned. See `PROGRESS.md` Steps 5–7.
 
 Gateway → analyzer contract (`analyzer/schemas.py` is the source of truth):
 - Alerts and ML anomalies (`POST /anomalies`) are grouped into incidents (`gateway/incidents.py`): one open incident per chain, open while an alert fires or an anomaly is < 60 s old. After a 10 s settle the gateway broadcasts `{"type": "incident", "status": "open|updated|resolved", ...}` on `/ws/events` with the 10-minute context from `gateway/context.py`. Never add a `fault_*` query there; an import-time assert enforces it.
 - The analyzer turns `open`/`updated` incidents into a `ResponsePlan` and POSTs it to `/responses`, which is broadcast on `/ws/responses`. It uses Ollama on the host (`OLLAMA_URL`, default `host.docker.internal:11434`) and falls back to the YAML runbooks; `ANALYZER_MODE=runbook` is baseline B1. It only recommends, never executes.
-- Re-analysis must put the actions already tried in `history.previous_actions` as `[{"type", "target"}]`.
+- The responder is the only thing that executes actions: plans from `/ws/responses` → pre-check (alerts still active?) → `responder/policy.py` (rules in `responder/policies.yaml`, mounted, restart to apply) → `responder/executor.py` → verify after 45 s → `POST /incidents/{id}/reanalyze` (attempt+1) → escalate after 3 attempts. It reports every outcome to the gateway's `POST /actions`; executed/failed ones become `history.previous_actions` (`[{"type", "target", ...}]`). One plan per incident at a time; stale-attempt plans are ignored. New action types go in `policies.yaml` *and* `executor.py`.
+- Untrusted plans: anything can POST to the gateway's `/responses`, so the responder must not rely on the analyzer's schema. Keep `experiments/safety_suite.py` at 29/29 when touching `policy.py`, `executor.py` or `handle_plan`; add a case for every new action type. Gateway inputs reject NaN/Infinity (`strict_loads`).
+- The 5-minute cooldown is across incidents: back-to-back scenarios that need the same action get the fallback or an escalation. Use `--gap 300` or `COOLDOWN_SECONDS` for evaluation runs.
+- The gateway writes every broadcast message to SQLite (`INCIDENT_DB`, `experiments/incidents.db` in compose; `GET /history/{id}`). Grouping state is still in memory.
 - On macOS, cAdvisor only gets the `name` label if Docker Desktop's containerd image store is off; otherwise HighCPU/HighMemory never fire and context `cpu`/`mem` are null (PROGRESS.md, Next steps A).
 
 Request path: `frontend` (`app/`, host port 5001) → `GET api-service:5000/data` (`api-service/`, host port 5002) → `redis` (`INCR hits`).
@@ -49,6 +52,13 @@ amtool check-config alertmanager/alertmanager.yml
 
 curl localhost:5001/                   # full request path
 websocat ws://localhost:8000/ws/events # live alert stream from the gateway
+websocat ws://localhost:8000/ws/responses # plans + responder actions
+curl localhost:8000/history            # incident store; /history/<id> for the timeline
+curl localhost:8001/approvals          # pending approvals; POST .../approvals/<id>/approve|reject
+open http://localhost:8000/dashboard/  # minimal UI: service map, incidents, approvals
+RESPONDER_MODE=dry_run docker compose up -d responder   # validate only, never execute (baseline B0)
+python experiments/score.py --system B1 --since <ISO>   # §10 metrics from ground_truth.csv + incidents.db
+python experiments/safety_suite.py                       # 29 adversarial plans; must be 29/29, 0 unsafe
 curl -X POST localhost:5002/inject -H 'Content-Type: application/json' -d '{"fault":"latency","duration":30}'
 curl -X POST localhost:5002/reset
 docker stop redis                      # dependency-failure scenario
@@ -61,7 +71,7 @@ docker compose run --rm injector reset                                  # clear 
 pip install -r injector/requirements.txt && python injector/injector.py list   # or from the host
 ```
 
-Tests: the rule tests above, `cd gateway && pytest -q` and `cd analyzer && python -m pytest tests` (install each one's `requirements-dev.txt`). There is no linter. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
+Tests: the rule tests above, `cd gateway && pytest -q`, `cd analyzer && python -m pytest tests` and `cd responder && pytest -q`, `pytest experiments/tests` (scorer + safety suite) (install each one's `requirements-dev.txt`). There is no linter. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
 
 ## Invariants to preserve
 

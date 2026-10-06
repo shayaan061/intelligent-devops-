@@ -153,7 +153,8 @@ def handle_message(text, coalescer):
     if status == "resolved":
         coalescer.drop(msg["incident_id"])
         return "dropped: resolved"
-    if status not in ("open", "updated"):
+    # reanalyze: the verifier found the fix didn't work (history.attempt > 1)
+    if status not in ("open", "updated", "reanalyze"):
         return f"ignored: status {status}"
 
     coalescer.put(msg)

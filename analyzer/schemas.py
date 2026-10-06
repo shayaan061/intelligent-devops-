@@ -111,7 +111,7 @@ class History(_Tolerant):
 class IncidentEvent(_Tolerant):
     type: str = "incident"
     incident_id: str
-    status: str = "open"               # open | updated | resolved
+    status: str = "open"               # open | updated | reanalyze | resolved
     timestamp: Optional[str] = None
     opened_at: Optional[str] = None
     resolved_at: Optional[str] = None

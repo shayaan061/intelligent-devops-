@@ -6,7 +6,7 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py incidents.py context.py ./
+COPY app.py incidents.py context.py store.py ./
 
 EXPOSE 8000
 

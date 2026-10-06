@@ -5,12 +5,18 @@ Inputs:
   POST /anomalies   ML detector: {"service", "score", "top_features": [...]}
   POST /responses   ResponsePlan from the analyzer (also accepted as a
                     message on /ws/responses)
+  POST /actions     responder report (validated / executed / verified ...)
+  POST /incidents/{id}/reanalyze   verifier: fix failed, analyze again
 
 Outputs:
   /ws/events        every raw alert ("type": "alert") and every incident
-                    update ("type": "incident", status open | updated | resolved)
-  /ws/responses     every ResponsePlan ("type": "response_plan")
+                    update ("type": "incident", status open | updated |
+                    reanalyze | resolved)
+  /ws/responses     every ResponsePlan ("type": "response_plan") and every
+                    responder report ("type": "action")
   GET /events, /responses, /incidents, /incidents/{id}, /health
+  GET /history, /history/{id}   incident store (SQLite, INCIDENT_DB)
+  GET /dashboard/   minimal UI (dashboard/index.html)
 
 Flow: alerts and anomalies are grouped into incidents (incidents.py). A new
 incident waits SETTLE_SECONDS so the symptom alerts that fire with the root
@@ -42,14 +48,19 @@ from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from context import ContextBuilder, alert_value
 from incidents import TOPOLOGY, Grouper, iso
+from store import Store
 
 PROMETHEUS_URL = os.environ.get("PROMETHEUS_URL", "http://localhost:9090")
 GROUP_WINDOW = float(os.environ.get("GROUP_WINDOW", "60"))
 SETTLE_SECONDS = float(os.environ.get("SETTLE_SECONDS", "10"))
 CONTEXT_MINUTES = int(os.environ.get("CONTEXT_MINUTES", "10"))
+# SQLite file for the incident store; ":memory:" (default) keeps nothing
+INCIDENT_DB = os.environ.get("INCIDENT_DB", ":memory:")
+DASHBOARD_DIR = os.environ.get("DASHBOARD_DIR", os.path.join(os.path.dirname(__file__), "..", "dashboard"))
 SWEEP_SECONDS = 5
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -71,6 +82,7 @@ def docker_or_none():
 
 
 grouper = Grouper(window=GROUP_WINDOW)
+store = Store(INCIDENT_DB)
 builder = ContextBuilder(PROMETHEUS_URL, minutes=CONTEXT_MINUTES)
 stats = {"webhooks": 0, "alerts": 0, "anomalies": 0, "incidents": 0, "responses": 0}
 
@@ -85,6 +97,7 @@ class Hub:
 
     async def broadcast(self, msg):
         self.recent.append(msg)
+        store.add(self.name, msg, now_iso())
         text = json.dumps(msg)
         dead = []
         for ws in list(self.clients):
@@ -118,6 +131,21 @@ responses_hub = Hub("ws/responses")
 
 def now_iso():
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _reject_constant(name):
+    raise ValueError(f"{name} is not valid JSON")
+
+
+def strict_loads(raw):
+    """json.loads without NaN/Infinity. Python accepts them, but they aren't
+    JSON: once stored or replayed they make every JSON response that includes
+    them fail (FastAPI raises on NaN) and browsers can't parse them."""
+    return json.loads(raw, parse_constant=_reject_constant)
+
+
+async def read_json(request):
+    return strict_loads(await request.body())
 
 
 def without_ground_truth(d):
@@ -174,8 +202,8 @@ async def incident_message(inc, status):
         "ml_anomalies": anomalies,
         "topology": TOPOLOGY,
         "context": context,
-        # The responder/verifier will fill this in for re-analysis (§6.6)
-        "history": {"attempt": 1, "previous_actions": []},
+        # Filled in from the responder's action reports (§6.6)
+        "history": {"attempt": inc.attempt, "previous_actions": list(inc.actions)},
     }
 
 
@@ -236,7 +264,7 @@ app = FastAPI(title="Event Gateway", lifespan=lifespan)
 @app.post("/alerts")
 async def alerts(request: Request):
     try:
-        body = await request.json()
+        body = await read_json(request)
     except Exception:
         return JSONResponse({"error": "body must be JSON"}, status_code=400)
     if not isinstance(body, dict) or not isinstance(body.get("alerts"), list):
@@ -269,7 +297,7 @@ async def alerts(request: Request):
 @app.post("/anomalies")
 async def anomalies(request: Request):
     try:
-        body = await request.json()
+        body = await read_json(request)
     except Exception:
         return JSONResponse({"error": "body must be JSON"}, status_code=400)
     if not isinstance(body, dict) or body.get("service") not in TOPOLOGY:
@@ -304,10 +332,61 @@ async def accept_response(plan):
     return None
 
 
+# Action records from the responder that count as "tried" for re-analysis
+TRIED = {"executed", "failed"}
+
+
+@app.post("/actions")
+async def actions(request: Request):
+    """Responder report: validation outcome, execution, verification.
+
+    Broadcast on /ws/responses as type "action". Executed or failed actions
+    are added to the incident's history.previous_actions.
+    """
+    try:
+        rec = await read_json(request)
+    except Exception:
+        return JSONResponse({"error": "body must be JSON"}, status_code=400)
+    if not isinstance(rec, dict) or not rec.get("incident_id") or not rec.get("status"):
+        return JSONResponse({"error": "expected {incident_id, status, action, ...}"}, status_code=400)
+    inc = grouper.incidents.get(rec["incident_id"])
+    action = rec.get("action") or {}
+    if inc is not None and rec["status"] in TRIED and action.get("type"):
+        inc.actions.append({"type": action["type"], "target": action.get("target"),
+                            "attempt": rec.get("attempt"), "status": rec["status"], "at": now_iso()})
+    msg = {k: v for k, v in rec.items() if k != "replay"}
+    msg.update(type="action", received_at=now_iso())
+    log.info("ACTION %s %s %s/%s %s", msg["incident_id"], msg["status"], action.get("type"),
+             action.get("target"), msg.get("reason") or "")
+    await responses_hub.broadcast(msg)
+    return {"accepted": True}
+
+
+@app.post("/incidents/{incident_id}/reanalyze")
+async def reanalyze(incident_id: str, request: Request):
+    """Verifier: the fix didn't work. Re-send the incident with attempt + history."""
+    inc = grouper.incidents.get(incident_id)
+    if inc is None:
+        return JSONResponse({"error": "unknown incident"}, status_code=404)
+    if inc.resolved:
+        return JSONResponse({"error": "incident already resolved"}, status_code=409)
+    try:
+        body = await read_json(request)
+        attempt = int(body["attempt"])
+    except Exception:
+        return JSONResponse({"error": "expected {attempt: int}"}, status_code=400)
+    inc.attempt = max(inc.attempt, attempt)
+    msg = await incident_message(inc, "reanalyze")
+    log.info("incident %s reanalyze attempt=%d previous=%s", inc.id, inc.attempt,
+             [f'{a["type"]}/{a["target"]}' for a in inc.actions])
+    await events_hub.broadcast(msg)
+    return {"attempt": inc.attempt}
+
+
 @app.post("/responses")
 async def responses(request: Request):
     try:
-        plan = await request.json()
+        plan = await read_json(request)
     except Exception:
         return JSONResponse({"error": "body must be JSON"}, status_code=400)
     error = await accept_response(plan)
@@ -335,7 +414,7 @@ def summary(inc):
             "resolved_at": iso(inc.resolved_at) if inc.resolved else None,
             "services": inc.services(), "sources": inc.sources(),
             "firing": sorted(f'{a["alertname"]}/{a["service"]}' for a in inc.firing()),
-            "anomalies": len(inc.anomalies)}
+            "anomalies": len(inc.anomalies), "attempt": inc.attempt, "actions": list(inc.actions)}
 
 
 @app.get("/incidents")
@@ -350,6 +429,21 @@ async def incident(incident_id: str):
         return JSONResponse({"error": "unknown incident"}, status_code=404)
     status = "resolved" if inc.resolved else ("open" if inc.emitted else "pending")
     return await incident_message(inc, status)
+
+
+@app.get("/history")
+async def history():
+    """Incidents in the store, newest first (survives gateway restarts)."""
+    return store.incidents()
+
+
+@app.get("/history/{incident_id}")
+async def incident_history(incident_id: str):
+    """Full timeline: incident updates, plans, actions, verification."""
+    timeline = store.timeline(incident_id)
+    if not timeline:
+        return JSONResponse({"error": "unknown incident"}, status_code=404)
+    return timeline
 
 
 @app.get("/health")
@@ -367,9 +461,16 @@ async def ws_events(ws: WebSocket):
 async def ws_responses(ws: WebSocket):
     async def on_message(sender, text):
         try:
-            error = await accept_response(json.loads(text))
-        except json.JSONDecodeError:
-            error = "message must be JSON"
+            error = await accept_response(strict_loads(text))
+        except ValueError:  # JSONDecodeError, NaN/Infinity
+            error = "message must be valid JSON"
         if error:
             await sender.send_text(json.dumps({"type": "error", "error": error}))
     await responses_hub.serve(ws, on_message)
+
+
+# Minimal dashboard (§6.8): http://localhost:8000/dashboard/
+if os.path.isdir(DASHBOARD_DIR):
+    app.mount("/dashboard", StaticFiles(directory=DASHBOARD_DIR, html=True), name="dashboard")
+else:
+    log.info("no dashboard at %s", DASHBOARD_DIR)

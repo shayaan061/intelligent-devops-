@@ -1,0 +1,186 @@
+<!doctype html>
+<!--
+  Minimal dashboard (SUGGESTED_PLAN.md §6.8, MVP §12): http://localhost:8000/dashboard/
+
+  Service map, live incident feed with each incident's plan and actions, and
+  the approval queue. Served by the gateway; reads /ws/events and
+  /ws/responses, and the responder's /approvals (port 8001, CORS-allowed for
+  this origin). All text from the system is inserted with textContent, never
+  as HTML.
+  Query params: ?responder=http://host:8001 to point at another responder.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incident Dashboard</title>
+<style>
+  :root { --bg: #f6f7f9; --card: #fff; --text: #1c2330; --muted: #5d6778; --line: #dde1e7;
+          --ok: #1f8a4c; --bad: #c62f2f; --warn: #b7791f; --info: #2f5fc6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { padding: 12px 20px; background: var(--card); border-bottom: 1px solid var(--line);
+           display: flex; justify-content: space-between; align-items: center; }
+  h1 { font-size: 17px; margin: 0; }
+  h2 { font-size: 14px; margin: 0 0 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  main { padding: 16px 20px; display: grid; gap: 16px; grid-template-columns: 2fr 1fr; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+  #map { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .svc { padding: 10px 16px; border-radius: 8px; border: 2px solid var(--ok); min-width: 130px; }
+  .svc b { display: block; }
+  .svc small { color: var(--muted); }
+  .svc.bad { border-color: var(--bad); background: #fdf1f1; }
+  .arrow { color: var(--muted); font-size: 18px; }
+  .conn { font-size: 12px; color: var(--muted); }
+  .conn .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--bad); margin: 0 4px 0 10px; }
+  .conn .dot.on { background: var(--ok); }
+  .inc { border: 1px solid var(--line); border-radius: 6px; padding: 10px; margin-bottom: 10px; }
+  .inc-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 12px; padding: 1px 8px; border-radius: 10px; color: #fff; background: var(--muted); }
+  .open, .updated, .reanalyze, .pending_approval, .unresolved { background: var(--warn); }
+  .resolved, .verified, .executed, .approved { background: var(--ok); }
+  .escalated, .failed, .rejected { background: var(--bad); }
+  .skipped, .dry_run { background: var(--info); }
+  ul { margin: 6px 0 0; padding-left: 18px; }
+  li { margin: 2px 0; }
+  .muted { color: var(--muted); }
+  button { font: inherit; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--line); cursor: pointer; background: var(--card); }
+  button.approve { border-color: var(--ok); color: var(--ok); }
+  button.reject { border-color: var(--bad); color: var(--bad); }
+  .apr { border: 1px solid var(--line); border-radius: 6px; padding: 8px; margin-bottom: 8px; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Intelligent DevOps: incidents</h1>
+  <span class="conn">events<span id="dot-events" class="dot"></span> responses<span id="dot-responses" class="dot"></span></span>
+</header>
+<main>
+  <section id="map"></section>
+  <section><h2>Incidents</h2><div id="incidents"><p class="muted">No incidents yet.</p></div></section>
+  <section><h2>Waiting for approval</h2><div id="approvals"><p class="muted">Nothing to approve.</p></div></section>
+</main>
+<script>
+"use strict";
+const params = new URLSearchParams(location.search);
+const GATEWAY_WS = (location.protocol === "https:" ? "wss://" : "ws://") + location.host;
+const RESPONDER = params.get("responder") || location.protocol + "//" + location.hostname + ":8001";
+const SERVICES = ["frontend", "api-service", "redis"];
+
+const incidents = new Map();   // incident_id -> latest incident message
+const steps = new Map();       // incident_id -> [plan/action messages]
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") node.className = v; else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+    else node.setAttribute(k, v);
+  }
+  for (const c of children) if (c !== null && c !== undefined) node.append(c instanceof Node ? c : String(c));
+  return node;
+}
+
+function badge(status) { return el("span", { class: "badge " + String(status) }, status); }
+function fmt(v) { return v === null || v === undefined ? "–" : (typeof v === "number" ? +v.toFixed(3) : v); }
+function time(iso) { return iso ? new Date(iso).toLocaleTimeString() : ""; }
+
+function renderMap() {
+  const firing = {};
+  for (const inc of incidents.values()) {
+    if (inc.status === "resolved") continue;
+    for (const a of inc.alerts || []) if (a.status === "firing") (firing[a.service] ||= []).push(a.name);
+  }
+  const map = document.getElementById("map");
+  map.replaceChildren();
+  SERVICES.forEach((svc, i) => {
+    if (i) map.append(el("span", { class: "arrow" }, "→"));
+    const names = firing[svc] || [];
+    map.append(el("div", { class: "svc" + (names.length ? " bad" : "") },
+      el("b", {}, svc), el("small", {}, names.length ? names.join(", ") : "healthy")));
+  });
+}
+
+function stepLine(m) {
+  if (m.type === "response_plan") {
+    const a = m.recommended_action || {};
+    return el("li", {}, "plan: ", el("b", {}, `${a.type} ${a.target ?? ""}`),
+      ` · root ${m.root_cause_service ?? "?"} · conf ${fmt(m.confidence)} · ${m.source ?? ""}`,
+      m.fallback_reason ? ` (${m.fallback_reason})` : "", ` · attempt ${m.attempt ?? 1}`);
+  }
+  const a = m.action || {};
+  return el("li", {}, badge(m.status), " ", a.type ? `${a.type} ${a.target ?? ""} ` : "",
+    el("span", { class: "muted" }, [m.reason, m.mttr_seconds != null ? `MTTR ${m.mttr_seconds}s` : null]
+      .filter(Boolean).join(" · ")));
+}
+
+function renderIncidents() {
+  const box = document.getElementById("incidents");
+  if (!incidents.size) return;
+  box.replaceChildren();
+  const list = [...incidents.values()].sort((a, b) => (b.opened_at || "").localeCompare(a.opened_at || ""));
+  for (const inc of list.slice(0, 20)) {
+    const alerts = (inc.alerts || []).map(a => el("li", {}, `${a.name} on ${a.service}`,
+      a.value != null ? ` = ${fmt(a.value)} (> ${fmt(a.threshold)})` : "", " ", badge(a.status)));
+    const ctx = inc.context || {};
+    const ctxLine = ["frontend", "api-service"].filter(s => ctx[s]).map(s =>
+      `${s}: p95 ${fmt(ctx[s].p95)}s, upstream ${fmt(ctx[s].upstream_p95)}s, err ${fmt(ctx[s].err)}`).join(" | ");
+    box.append(el("div", { class: "inc" },
+      el("div", { class: "inc-head" }, el("b", {}, inc.incident_id), badge(inc.status)),
+      el("div", { class: "muted" }, `opened ${time(inc.opened_at)}`,
+        inc.resolved_at ? ` · resolved ${time(inc.resolved_at)}` : "",
+        ` · attempt ${(inc.history || {}).attempt ?? 1} · sources ${(inc.sources || []).join("+")}`),
+      el("ul", {}, ...alerts),
+      ctxLine ? el("div", { class: "muted" }, ctxLine) : null,
+      el("ul", {}, ...(steps.get(inc.incident_id) || []).map(stepLine))));
+  }
+}
+
+function connect(path, dotId, onMessage) {
+  const ws = new WebSocket(GATEWAY_WS + path);
+  const dot = document.getElementById(dotId);
+  ws.onopen = () => dot.classList.add("on");
+  ws.onmessage = e => { try { onMessage(JSON.parse(e.data)); } catch (err) { console.error(err); } };
+  ws.onclose = () => { dot.classList.remove("on"); setTimeout(() => connect(path, dotId, onMessage), 2000); };
+}
+
+connect("/ws/events", "dot-events", m => {
+  if (m.type !== "incident") return;
+  incidents.set(m.incident_id, m);
+  renderMap(); renderIncidents();
+});
+connect("/ws/responses", "dot-responses", m => {
+  if (!m.incident_id || (m.type !== "response_plan" && m.type !== "action")) return;
+  if (!steps.has(m.incident_id)) steps.set(m.incident_id, []);
+  steps.get(m.incident_id).push(m);
+  renderIncidents();
+  if (m.type === "action") loadApprovals();
+});
+
+async function decideApproval(id, verdict) {
+  try {
+    const r = await fetch(`${RESPONDER}/approvals/${encodeURIComponent(id)}/${verdict}`, { method: "POST" });
+    if (!r.ok) alert(`${verdict} failed: ${r.status}`);
+  } catch (err) { alert(`${verdict} failed: ${err}`); }
+  loadApprovals();
+}
+
+async function loadApprovals() {
+  const box = document.getElementById("approvals");
+  let items;
+  try { items = await (await fetch(`${RESPONDER}/approvals`)).json(); }
+  catch (err) { box.replaceChildren(el("p", { class: "muted" }, `Responder unreachable (${RESPONDER}).`)); return; }
+  if (!items.length) { box.replaceChildren(el("p", { class: "muted" }, "Nothing to approve.")); return; }
+  box.replaceChildren(...items.map(a => el("div", { class: "apr" },
+    el("b", {}, `${a.action.type} ${a.action.target ?? ""}`),
+    el("div", { class: "muted" }, `${a.plan.incident_id} · ${a.reason}`),
+    el("div", {}, el("button", { class: "approve", onclick: () => decideApproval(a.approval_id, "approve") }, "Approve"),
+      " ", el("button", { class: "reject", onclick: () => decideApproval(a.approval_id, "reject") }, "Reject")))));
+}
+
+renderMap();
+loadApprovals();
+setInterval(loadApprovals, 5000);
+</script>
+</body>
+</html>

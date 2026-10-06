@@ -1,8 +1,8 @@
-# Progress Log: Phases 2–4 (Monitoring, Event Gateway, Analyzer)
+# Progress Log: Phases 2–6 (Monitoring, Gateway, Analyzer, Responder, Verifier)
 
 **Date:** 3 Oct 2026 · **Last updated:** 6 Oct 2026
 **Plan:** `SUGGESTED_PLAN.md` §3 (fixes) and §15 (immediate next steps)
-**Status:** Phase 2 is complete (commit `9415a44`). Phase 3 (Event Gateway) is complete and tested end-to-end under Docker (Step 4–5). Phase 4 (analyzer + runbooks) has started (Step 6). **Open blocker:** container CPU/memory metrics on macOS (see A below).
+**Status:** Phase 2 is complete (commit `9415a44`). Phase 3 (Event Gateway) is complete and tested end-to-end under Docker (Step 4–5). Phase 4 (analyzer + runbooks) has started (Step 6). Phases 5–6 (responder, verifier, re-analysis, incident store) are built and the loop closes on real containers (Step 7). **Open blocker:** container CPU/memory metrics on macOS (see A below).
 
 | §15 item | Status |
 |---|---|
@@ -43,6 +43,19 @@ Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) belo
 - [x] Context builder: last 10 min of CPU, memory, p95, error rate and `upstream_p95` per service, through the Prometheus HTTP API
 - [x] Emit the full `IncidentEvent` JSON (§6.3), with `fault_*` metrics filtered out
 - [x] `POST /anomalies` stub for the ML detector, and the `/ws/responses` channel
+
+### E. Phases 5–6: response system + verifier ✅ (6 Oct, see Step 7). Owner: Shayaan
+- [x] Policy validator (`responder/policy.py`, `policies.yaml`): allowlist, known targets, confidence ≥ 0.7, 5-min cooldown, ≤ 3 actions per incident, approval for risky actions
+- [x] Executor: `reset_faults`, `restart_container`, `flush_cache` (approval only); `update_resources` not implemented (plans carry no limits)
+- [x] Approval flow: `GET /approvals`, `POST /approvals/{id}/approve|reject` on port 8001
+- [x] Verifier + re-analysis with history, max 3 attempts, then escalate
+- [x] Incident store (SQLite, `experiments/incidents.db`)
+- [ ] **Decide the cooldown for evaluation runs.** The 5-minute cross-incident cooldown blocks the same action in back-to-back scenarios (e.g. 4 then 5 both need `reset_faults` on api-service), so the second run is fixed by the fallback or escalated, which skews action-correctness scoring. Either run the suite with `--gap 300`, or set `COOLDOWN_SECONDS` (env on the responder) for evaluation and report it.
+- [ ] Incident *state* is in memory: a gateway restart loses open incidents (the store keeps the record). Persisting state is optional for the MVP.
+- [ ] **Riddhima:** the analyzer's Pydantic schema coerces `"0.99"` and `true` into a confidence (lax mode). The responder now rejects them, but consider `strict=True` on `confidence` in `analyzer/schemas.py`.
+- [ ] Approvals have no timeout yet; a pending approval keeps its incident waiting until a human answers.
+- [x] Minimal UI (MVP, §12): `dashboard/index.html` at `http://localhost:8000/dashboard/`: service map, incident feed with plans/actions, approval queue with Approve/Reject. Riddhima (dashboard owner, §9) can replace it with the full React dashboard in Phase 8.
+- [ ] Open the dashboard in a browser during the next scenario run; it was checked by syntax check + HTTP only, not visually.
 
 ### D. Can start in parallel
 - [x] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1). First version built 6 Oct (Step 6); Riddhima to review the prompt and runbooks.
@@ -237,3 +250,61 @@ Clients get the last 100 messages replayed on connect (`"replay": true`).
 - Compose service `analyzer`; `ANALYZER_MODE=runbook` runs baseline B1.
 
 **Tests:** `cd analyzer && pip install -r requirements-dev.txt && python -m pytest tests`: 75 pass (Ollama mocked).
+
+## Step 7: Response system + verifier, Phases 5–6 (6 Oct, session 3)
+
+Session log: `SESSION_NOTES.txt`.
+
+```
+analyzer --ResponsePlan--> gateway /ws/responses --> responder
+   responder: pre-check alerts still active -> policy validator -> execute | approval | escalate
+            -> wait 45 s -> verify (Prometheus ALERTS for the incident's alerts)
+            -> verified | unresolved -> POST gateway /incidents/{id}/reanalyze (attempt+1, previous_actions)
+            -> analyzer again (skips actions already tried) -> ... -> after 3 attempts: escalate
+   every outcome -> POST gateway /actions -> /ws/responses ("type": "action") + incident history + SQLite store
+```
+
+- `responder/policy.py` + `policies.yaml`: the validator (pure, unit-tested). Recommended action first, then the fallback; nothing valid → escalate. Low confidence or `requires_approval` → human.
+- `responder/executor.py`: the only code that changes anything; re-checks the allowlist itself. No shell commands built from plan text.
+- `responder/app.py`: one plan per incident at a time (plans while an action runs, is verified or awaits approval are skipped; plans from an earlier attempt are ignored). **Pre-check:** right before executing, the incident's alerts are re-checked and the action is skipped if they already cleared (alerts trail the fault by up to the 30 s rate window). `RESPONDER_MODE=dry_run` validates and reports without executing (baseline B0). `ESCALATION_WEBHOOK` (optional, Slack/Discord).
+- Gateway: `POST /actions` (executed/failed actions become `history.previous_actions`), `POST /incidents/{id}/reanalyze` (re-sends the incident as status `reanalyze`), `GET /history`, `GET /history/{id}` (SQLite store). The analyzer now also analyzes `reanalyze` incidents.
+
+**Tests:** gateway 17, analyzer 75, responder 27, all pass.
+
+**End-to-end on real containers (6 Oct, runbook mode because Ollama isn't installed):**
+
+| Run | Detected | Action | Result | Injector `end_reason` |
+|---|---|---|---|---|
+| Scenario 4, latency api-service | HighLatency ×2 | `reset_faults` api-service | verified | remediated after 45 s (planned 180 s) |
+| Scenario 6, redis stopped | RedisDown (+ late HighErrorRate ×2 joined) | `restart_container` redis; the late "updated" plan was skipped (verification in progress) | verified | remediated after 38 s |
+| Recurring latency (fault re-injected once after the reset) | HighLatency ×2 | `reset_faults` → still firing → re-analysis attempt 2 → analyzer chose `restart_container` → blocked by cooldown | escalated | (manual test, not logged) |
+| Scenario 7, frontend stopped | ServiceDown | `restart_container` frontend | verified | remediated after 43 s |
+| Scenario 5, errors api-service | HighErrorRate ×2 | `reset_faults` api-service; gateway restarted during verify | escalated (incident unknown after restart), no second action | remediated after 48 s |
+
+Found while testing: a plan can arrive after the fault is gone (an alert fired 30 s after a manual reset) and the responder restarted api-service for nothing. That led to the pre-check above.
+
+**Minimal UI + approval check (6 Oct):** `dashboard/index.html`, served by the gateway (`DASHBOARD_DIR`), live over both WebSockets, polls the responder's `/approvals` (responder allows CORS only from `DASHBOARD_ORIGINS`, default `localhost:8000`). All system text is inserted with `textContent`. Live check: a demo plan recommending `flush_cache` on redis was queued (`pending_approval`) and rejected through `POST /approvals/<id>/reject` with the dashboard's Origin; nothing ran and redis data was untouched.
+
+## Step 8: Evaluation scorer + adversarial safety suite (6 Oct, session 4)
+
+**`experiments/score.py`** joins `ground_truth.csv` with `incidents.db` and prints a per-run table and a summary of the §10 metrics:
+
+| Objective | Metric |
+|---|---|
+| O2 | recall, precision (false-positive incidents), MTTD |
+| O3 | root-cause accuracy (first plan) |
+| O4 | plan / executed action accuracy (acceptable actions per §10: scenarios 1–2 accept reset or restart), unsafe actions executed, collateral actions |
+| O5 | auto-resolved % (`end_reason == remediated`), verified %, escalated %, attempts |
+| O6 | MTTR (fault start → fault gone) |
+| cost | LLM share of plans, plan latency |
+
+Use one `ground_truth.csv` per system or filter with `--since/--until`, e.g. `python experiments/score.py --system B1 --since 2026-10-06T17:17:00Z --out b1.csv` (`--json` for the summary). Runs are matched to the first incident opened between the fault start and 60 s after it ended. Real data so far (scenario 5 only, the store started then): MTTD 32.5 s, root cause + action correct, MTTR 48.4 s.
+
+**`experiments/safety_suite.py`**: 29 hallucinated, malformed and malicious plans through the real `Responder.handle_plan` with a recording executor. Cases include invented actions, shell text in type/target, unknown or self targets, `reset_faults` on redis, lists instead of strings, NaN/inf/bool/string confidence, risky actions, cooldown + malicious fallback, max actions, malformed attempt/incident_id. **Result: 29/29 pass, 0 unsafe actions executed, 27/27 adversarial plans blocked or sent to a human; 7 of them only the responder caught (the analyzer schema would have accepted them).** Table for the report: `python experiments/safety_suite.py --csv safety.csv`.
+
+**Bugs the suite found, fixed:**
+- `confidence: NaN` executed without approval (`nan < 0.7` is False); `true` counted as 1.0 (bool is an int). Now confidence must be a real number in [0, 1] (`policy.valid_confidence`).
+- A list as action type/target crashed the validator; a non-int `attempt` or list `incident_id` crashed `handle_plan`. Now rejected cleanly.
+- Live test found more: the gateway accepted `NaN`/`Infinity` in JSON (Python's parser allows them). One such plan made `GET /approvals` (responder) and `GET /responses` (gateway) return 500, which breaks the dashboard's approval queue. Every gateway input (HTTP and WebSocket) now rejects them with 400, and the responder skips such messages.
+
+**Tests:** gateway 19, analyzer 75, responder 42, experiments 10 (`pytest experiments/tests`), all pass.

@@ -1,0 +1,40 @@
+# Policy validator rules (SUGGESTED_PLAN.md §6.5).
+# An action from a ResponsePlan runs only if every check passes. The LLM and
+# the runbooks only recommend; nothing else in the system executes actions.
+
+# Allowlist: action type -> the targets it may touch and whether a human must
+# approve it. No arbitrary commands: the executor implements exactly these.
+actions:
+  reset_faults:
+    targets: [frontend, api-service]      # redis has no /reset
+    requires_approval: false
+  restart_container:
+    targets: [frontend, api-service, redis]
+    requires_approval: false
+  flush_cache:
+    targets: [redis]
+    requires_approval: true               # destroys data
+  update_resources:
+    targets: [frontend, api-service, redis]
+    requires_approval: true
+  escalate:
+    targets: [frontend, api-service, redis, null]
+    requires_approval: false              # always allowed, executes nothing
+
+# Below this the plan goes to a human instead of running automatically
+min_confidence: 0.7
+
+# No repeat of the same action on the same target within this window,
+# across incidents (stops restart storms). Override with COOLDOWN_SECONDS for
+# back-to-back evaluation runs.
+cooldown_seconds: 300
+
+# Automatic actions per incident; after that the incident is escalated
+max_actions_per_incident: 3
+
+# Verifier (§6.6): wait for the system to settle, then re-check the alerts.
+# The rules use 30 s rate windows, so less than ~40 s can still see the fault.
+verify_delay_seconds: 45
+
+# Analysis attempts per incident before escalating to a human
+max_attempts: 3

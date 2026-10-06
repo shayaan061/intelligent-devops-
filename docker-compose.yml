@@ -115,9 +115,15 @@ services:
       - "8000:8000"
     environment:
       PROMETHEUS_URL: http://prometheus:9090
+      INCIDENT_DB: /experiments/incidents.db
+      DASHBOARD_DIR: /dashboard
     volumes:
       # Read-only use: container state and restart count for the context
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Incident store, next to the injector's ground_truth.csv
+      - ./experiments:/experiments
+      # Minimal UI at http://localhost:8000/dashboard/
+      - ./dashboard:/dashboard:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
       interval: 10s
@@ -143,6 +149,31 @@ services:
       - ./runbooks:/runbooks:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      - gateway
+    restart: unless-stopped
+
+  # Response System + Verifier (§6.5, §6.6): ResponsePlan -> policy validator
+  # -> executor (Docker SDK, /reset) -> verify -> re-analyze (max 3) -> escalate.
+  # The only service that changes anything. RESPONDER_MODE=dry_run validates
+  # and reports without executing (alerts-only baseline B0).
+  # Approvals: GET localhost:8001/approvals, POST .../approvals/<id>/approve|reject
+  responder:
+    build: ./responder
+    container_name: responder
+    ports:
+      - "8001:8001"
+    environment:
+      GATEWAY_URL: http://gateway:8000
+      PROMETHEUS_URL: http://prometheus:9090
+      FRONTEND_URL: http://frontend:5000
+      API_SERVICE_URL: http://api-service:5000
+      RESPONDER_MODE: ${RESPONDER_MODE:-auto}
+    volumes:
+      # Restarts containers, so it needs the socket read-write
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Edit and `docker compose restart responder`; no rebuild needed
+      - ./responder/policies.yaml:/responder/policies.yaml:ro
     depends_on:
       - gateway
     restart: unless-stopped

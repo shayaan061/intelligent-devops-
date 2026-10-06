@@ -263,3 +263,77 @@ def test_bad_webhooks(client):
     assert client.post("/alerts", json={"x": 1}).status_code == 400
     h = client.get("/health").json()
     assert h["status"] == "ok" and "open_incidents" in h
+
+
+def test_actions_feed_history_and_reanalyze(client):
+    with client.websocket_connect("/ws/events") as ws:
+        client.post("/alerts", json=webhook("firing", ("HighLatency", "api-service", "a")))
+        inc = next_of_type(ws, "incident")
+        iid = inc["incident_id"]
+
+        with client.websocket_connect("/ws/responses") as rws:
+            rec = {"incident_id": iid, "status": "executed", "attempt": 1,
+                   "action": {"type": "reset_faults", "target": "api-service"}}
+            assert client.post("/actions", json=rec).json() == {"accepted": True}
+            msg = rws.receive_json()
+            assert msg["type"] == "action" and msg["status"] == "executed"
+        # Only tried actions count as history
+        client.post("/actions", json={**rec, "status": "pending_approval"})
+        assert client.post("/actions", json={"status": "x"}).status_code == 400
+
+        r = client.post(f"/incidents/{iid}/reanalyze", json={"attempt": 2})
+        assert r.json() == {"attempt": 2}
+        again = next_of_type(ws, "incident")
+        assert again["status"] == "reanalyze"
+        assert again["history"]["attempt"] == 2
+        assert [(a["type"], a["target"]) for a in again["history"]["previous_actions"]] == \
+            [("reset_faults", "api-service")]
+
+    assert client.post("/incidents/nope/reanalyze", json={"attempt": 2}).status_code == 404
+    assert client.post(f"/incidents/{iid}/reanalyze", json={}).status_code == 400
+    client.post("/alerts", json=webhook("resolved", ("HighLatency", "api-service", "a")))
+    assert client.post(f"/incidents/{iid}/reanalyze", json={"attempt": 3}).status_code == 409
+
+
+def test_store_keeps_incident_timeline(client):
+    with client.websocket_connect("/ws/events") as ws:
+        client.post("/alerts", json=webhook("firing", ("HighLatency", "api-service", "s1")))
+        iid = next_of_type(ws, "incident")["incident_id"]
+    client.post("/responses", json={"incident_id": iid, "confidence": 0.9,
+                                    "recommended_action": {"type": "reset_faults", "target": "api-service"}})
+    client.post("/actions", json={"incident_id": iid, "status": "executed",
+                                  "action": {"type": "reset_faults", "target": "api-service"}})
+    timeline = client.get(f"/history/{iid}").json()
+    assert [(m["channel"], m["type"]) for m in timeline] == [
+        ("ws/events", "incident"), ("ws/responses", "response_plan"), ("ws/responses", "action")]
+    assert any(h["incident_id"] == iid and h["status"] == "open" for h in client.get("/history").json())
+    assert client.get("/history/nope").status_code == 404
+
+
+def test_store_survives_reopen(tmp_path):
+    from store import Store
+    path = str(tmp_path / "inc.db")
+    Store(path).add("ws/events", {"type": "incident", "incident_id": "inc-9", "status": "open"}, "t1")
+    assert Store(path).timeline("inc-9")[0]["status"] == "open"
+
+
+def test_dashboard_is_served(client):
+    r = client.get("/dashboard/")
+    assert r.status_code == 200 and "Incident Dashboard" in r.text
+
+
+def test_nan_and_infinity_are_rejected_everywhere(client):
+    nan_plan = b'{"incident_id": "inc-n", "confidence": NaN, "recommended_action": {"type": "reset_faults", "target": "api-service"}}'
+    hdr = {"Content-Type": "application/json"}
+    assert client.post("/responses", content=nan_plan, headers=hdr).status_code == 400
+    assert client.post("/actions", content=b'{"incident_id": "i", "status": "executed", "x": Infinity}',
+                       headers=hdr).status_code == 400
+    assert client.post("/anomalies", content=b'{"service": "api-service", "score": -Infinity}',
+                       headers=hdr).status_code == 400
+    assert client.post("/alerts", content=b'{"alerts": [], "v": NaN}', headers=hdr).status_code == 400
+    with client.websocket_connect("/ws/responses") as ws:
+        ws.send_text(nan_plan.decode())
+        assert ws.receive_json()["type"] == "error"
+    # Nothing poisoned the replay buffers: JSON responses still work
+    assert client.get("/responses").status_code == 200
+    assert client.get("/events").status_code == 200
