@@ -28,7 +28,7 @@ In order. Owners follow the work split in `SUGGESTED_PLAN.md` §9.
   **Fix (manual):** Docker Desktop → Settings → General → untick *Use containerd for pulling and storing images* → Apply & restart, then `docker compose up -d --build`. Check with `container_memory_working_set_bytes{name="api-service"}` at `localhost:9090/graph`. Each team member running the demo on a Mac needs this setting.
 - [ ] **Run each scenario once for real** and note the alert and detection time: `docker compose run --rm injector run <1-9> --duration 180`. Scenarios 1, 2, 3, 6 and 7 have never fired on real containers.
 - [ ] **Scenario 8 should not fire HighMemory early.** It is meant to be caught by ML only. Check how long the ramp stays under 80%.
-- [ ] **Decide scoring for scenario 3:** accept `reset_faults` as well as `restart_container`, or only the restart. Write the decision into §10 of the plan.
+- [x] **Decide scoring for scenario 3:** restart only (decided 6 Oct, written into §10 of the plan; `experiments/score.py` encodes it).
 - [ ] **Update the §6.1 table in `SUGGESTED_PLAN.md`** to the real windows (30 s rate, `for: 20s`) and fault caps (600 s, 450 MB).
 
 ### B. Phase 3, part 1: skeleton gateway (§15, last item). Owner: Shayaan
@@ -50,7 +50,7 @@ Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) belo
 - [x] Approval flow: `GET /approvals`, `POST /approvals/{id}/approve|reject` on port 8001
 - [x] Verifier + re-analysis with history, max 3 attempts, then escalate
 - [x] Incident store (SQLite, `experiments/incidents.db`)
-- [ ] **Decide the cooldown for evaluation runs.** The 5-minute cross-incident cooldown blocks the same action in back-to-back scenarios (e.g. 4 then 5 both need `reset_faults` on api-service), so the second run is fixed by the fallback or escalated, which skews action-correctness scoring. Either run the suite with `--gap 300`, or set `COOLDOWN_SECONDS` (env on the responder) for evaluation and report it.
+- [x] **Decide the cooldown for evaluation runs.** Decided 6 Oct: keep the 300 s cooldown and run suites with `--gap 300` (§10 of the plan), so back-to-back scenarios aren't blocked by the previous run's cooldown.
 - [ ] Incident *state* is in memory: a gateway restart loses open incidents (the store keeps the record). Persisting state is optional for the MVP.
 - [ ] **Riddhima:** the analyzer's Pydantic schema coerces `"0.99"` and `true` into a confidence (lax mode). The responder now rejects them, but consider `strict=True` on `confidence` in `analyzer/schemas.py`.
 - [ ] Approvals have no timeout yet; a pending approval keeps its incident waiting until a human answers.
@@ -59,7 +59,7 @@ Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) belo
 
 ### D. Can start in parallel
 - [x] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1). First version built 6 Oct (Step 6); Riddhima to review the prompt and runbooks.
-- [ ] **Install Ollama on the host** (macOS app, Metal) and `ollama pull llama3.1:8b`. Until then every plan falls back to the runbooks (`fallback_reason: unreachable`). Then compare the LLM against B1 on the samples: `python analyzer/analyzer.py analyze analyzer/samples/scenario4.json --mode llm`.
+- [x] **Install Ollama on the host.** Done 6 Oct: Homebrew `ollama` 0.35.1 as a launchd service (`brew services start ollama`), model `llama3.1:8b`. First results in Step 9.
 - [ ] **Verifier/responder must send `history.previous_actions`** as `[{"type", "target"}]` when re-analysing (§6.6); the analyzer skips actions already tried.
 - [ ] **Check scenario 8's ML feature names** against the runbook `ml-memory-anomaly` (matches any `top_features` entry containing `mem`) once the ML detector exists.
 - [ ] **Shruti:** record 1–2 hours of normal traffic under Locust now, as training data for the ML detector (Phase 7)
@@ -308,3 +308,27 @@ Use one `ground_truth.csv` per system or filter with `--since/--until`, e.g. `py
 - Live test found more: the gateway accepted `NaN`/`Infinity` in JSON (Python's parser allows them). One such plan made `GET /approvals` (responder) and `GET /responses` (gateway) return 500, which breaks the dashboard's approval queue. Every gateway input (HTTP and WebSocket) now rejects them with 400, and the responder skips such messages.
 
 **Tests:** gateway 19, analyzer 75, responder 42, experiments 10 (`pytest experiments/tests`), all pass.
+
+## Step 9: First LLM results, baseline exporter, decisions (6 Oct, session 5)
+
+**Ollama + llama3.1:8b on the host** (Homebrew, launchd service; the analyzer container reaches it via `host.docker.internal`).
+
+**Offline, 9 hand-written samples** (`python experiments/compare_analyzers.py`, runbook mode vs llm mode, scored with the §10 rules from `score.py`):
+
+| System | Root cause | Action | Latency |
+|---|---|---|---|
+| B1 runbooks | 9/9 | 9/9 | ~0 s |
+| B2 llama3.1:8b | 9/9 | 8/9 | mean 17 s, max 21 s (no fallbacks) |
+
+- The LLM's miss: scenario 5 (error fault) → `restart_container` (confidence 0.95) instead of `reset_faults`. It would also fix the fault, but it is the heavier action. **Prompt-tuning item for Riddhima.**
+- Caveats: the samples and the runbooks were written together, so B1's 100% is biased upward; scenario 4 matches a few-shot example in the prompt.
+
+**Live, first LLM-driven fix (scenario 4, real containers):** detected 30.6 s → LLM plan in 22.2 s (`source: llm`, root api-service, `reset_faults`) → executed → verified. Injector: remediated after 68.6 s, vs 45 s in runbook mode. The ~22 s gap is the LLM's analysis time, the cost metric in §10. Scored by `score.py` (`--system B2-llm --since 2026-10-06T17:41:00Z`).
+
+**`experiments/record_baseline.py`**: exports the ML detector's training data from Prometheus (the gateway's context queries, 15 s step, per service). Drops samples near injected runs *and* near any pending/firing alert (manual demo faults aren't in `ground_truth.csv`; the first test export was contaminated by one). Prometheus has no volume: export before rebuilding it.
+
+**Decisions recorded:** scenario 3 = restart only; cooldown stays 300 s, suites run with `--gap 300` (§10 of the plan).
+
+**Other:** dashboard checked visually in headless Chrome (feeds live, incident timeline, approvals). The responder's verified-record field is now `open_to_verified_s` (incident opened → verified), so it can't be confused with the evaluation's MTTR (fault start → fault gone). `PATENT_CHANGES.md` section M: dependent claims 8–13 + preliminary evidence.
+
+**Still blocked:** the Docker Desktop containerd setting (macOS denied access to Docker Desktop's settings file; it has to be changed in the UI).

@@ -110,7 +110,7 @@ function stepLine(m) {
   }
   const a = m.action || {};
   return el("li", {}, badge(m.status), " ", a.type ? `${a.type} ${a.target ?? ""} ` : "",
-    el("span", { class: "muted" }, [m.reason, m.mttr_seconds != null ? `MTTR ${m.mttr_seconds}s` : null]
+    el("span", { class: "muted" }, [m.reason, m.open_to_verified_s != null ? `verified ${m.open_to_verified_s}s after opening` : null]
       .filter(Boolean).join(" · ")));
 }
 

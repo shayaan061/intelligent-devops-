@@ -94,3 +94,44 @@ Log
        cleared the in-memory pending approval and replay buffers. All endpoints 200 again; NaN plan -> HTTP 400.
 23:00  Docs: PROGRESS.md Step 8 + open item (analyzer schema coerces "0.99"/true -> suggest strict=True,
        Riddhima's call), CLAUDE.md commands + "untrusted plans" rule. Nothing committed (not asked).
+
+=========================================================================
+SESSION 5 - 6 Oct 2026 (start 23:02) - "still open" list
+User decisions (asked 23:01): change Docker containerd setting = yes; install Ollama llama3.1:8b; cooldown keep
+300 s + suites with --gap 300; scenario 3 = restart only.
+Log
+---
+23:02  Committed sessions 3-4 on branch phase3-gateway-analyzer: 13087bd (no .pyc / .db / ground_truth.csv).
+23:02  Docker containerd setting: BLOCKED. macOS privacy protection denies reading/writing Docker Desktop's
+       settings-store.json ("Operation not permitted"). Not worked around. User must untick it in the UI.
+23:03  brew install ollama (0.35.1) OK; `brew services start ollama` (launchd, survives reboots); API on :11434.
+       Pulling llama3.1:8b (4.9 GB) in the background.
+23:03  experiments/record_baseline.py: exports ML training data (gateway context queries, 15 s step, per service)
+       from Prometheus. First test found contamination: api p95 7.4 s in "normal" data from my manual recurring
+       fault (not in ground_truth.csv). Fixed: also drops samples within --margin of any pending/firing ALERTS
+       (rule output, not fault_* ground truth). Re-test: frontend p95 max 9 ms, api 5 ms, err 0.
+       NOTE: Prometheus has no volume - recreating it loses history. Export before rebuilding prometheus.
+23:04  PATENT_CHANGES.md section M: dependent claims 8-13 from the implementation (pre-execution re-check,
+       one in-flight action + stale-attempt discard, fallback-then-escalate, untrusted-plan validation,
+       settle-window grouping, incident store for evaluation) + preliminary evidence (n=4 runs, safety 29/29).
+23:04  Decisions written into SUGGESTED_PLAN.md §10 (scoring decisions), PROGRESS.md A/E ticked, CLAUDE.md
+       suite command now --gap 300.
+23:05  Dashboard visual check (headless Chrome). First screenshot showed red WebSocket dots / no incidents ->
+       verified with Node that the WebSocket works; cause was --virtual-time-budget capturing too early.
+       Re-shot via Chrome DevTools protocol after 4 s real time: both feeds green, scenario 7 incident with
+       plan -> executed -> verified, approval card with Approve/Reject. Dashboard works.
+       Plan showed "runbook (http_404)": Ollama up but model not pulled yet -> correct fallback.
+23:06  Renamed responder's verified-record field mttr_seconds -> open_to_verified_s (incident opened ->
+       verified). It is NOT the evaluation MTTR (fault start -> fault gone, score.py); same name would have
+       confused the report. Dashboard label updated. Responder 42 / experiments 10 pass.
+       Rejected the demo approval (demo-approval-ui).
+23:08  llama3.1:8b pulled. First LLM call (scenario 4 sample): correct root cause + action, 30 s incl. model load.
+       Caveat: scenario 4 matches a few-shot example in the prompt.
+23:09  experiments/compare_analyzers.py (runbooks vs LLM on the 9 samples, §10 rules from score.py):
+       B1 runbooks 9/9 root, 9/9 action. B2 llama3.1:8b 9/9 root, 8/9 action, 0 fallbacks, mean 17 s (max 21 s).
+       LLM miss: scenario 5 (errors) -> restart_container (0.95) instead of reset_faults. Prompt item for Riddhima.
+       Caveat: samples and runbooks were written together -> B1's 100% is biased upward.
+23:12  LIVE scenario 4 with the LLM: detected 30.6 s, LLM plan 22.2 s (source llm, correct), executed, verified.
+       Injector remediated after 68.6 s (runbook mode was 45 s; the gap is LLM latency). score.py reads it all:
+       root/plan/executed action correct, verified, 100% LLM plans, 0 unsafe.
+23:13  Docs: PROGRESS.md Step 9 (+ Ollama item ticked), CLAUDE.md commands/Ollama note.

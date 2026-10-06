@@ -361,6 +361,10 @@ intellegent-devops/
 | 8 | Gradual memory rise (no rule fires early) | api-service | — | api-service (ML) | restart before limit |
 | 9 | Combined CPU + latency | api-service | multiple | api-service | single correct action |
 
+**Scoring decisions (6 Oct 2026):**
+- Scenario 3 (memory): only `restart_container` counts as correct. `experiments/score.py` encodes the accepted actions per row of this table; scenarios 1 and 2 accept reset or restart.
+- The responder's 5-minute cooldown stays at 300 s (the policy under test). Suites run with `--gap 300`, so back-to-back scenarios needing the same action aren't blocked by the previous run's cooldown: `injector suite --scenarios 1-9 --repeat 3 --shuffle --gap 300`.
+
 ### Systems compared
 | ID | System | Purpose |
 |----|--------|---------|

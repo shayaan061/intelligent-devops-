@@ -194,7 +194,10 @@ class Responder:
 
         if resolved:
             st.done = True
-            await self.report(plan, "verified", action, why, mttr_seconds=await self.time_open(plan["incident_id"]))
+            # Incident opened -> verified. Not the evaluation's MTTR (fault start ->
+            # fault gone, experiments/score.py), so it has a different name.
+            await self.report(plan, "verified", action, why,
+                              open_to_verified_s=await self.time_open(plan["incident_id"]))
             return
 
         attempt = plan.get("attempt", 1)

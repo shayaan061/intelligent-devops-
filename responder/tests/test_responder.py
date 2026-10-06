@@ -199,7 +199,7 @@ def test_fix_verified_closes_incident():
     assert run(r.handle_plan(plan())) == EXECUTE
     assert ex.calls == [("reset_faults", "api-service")]
     assert world.statuses() == ["executed", "verified"]
-    assert world.reports[-1]["mttr_seconds"] is not None
+    assert world.reports[-1]["open_to_verified_s"] is not None
     assert run(r.handle_plan(plan())).startswith("skipped")
 
 

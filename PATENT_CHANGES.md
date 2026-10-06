@@ -166,6 +166,25 @@ Optional: once evaluation is done, add measured results (MTTR reduction vs manua
 
 ---
 
+## M. Additions from the implementation (6 Oct 2026): extra dependent claims and evidence
+
+Building and testing the system produced mechanisms that the draft doesn't describe. Each one fixed a real failure seen in testing, so each is concrete and defensible. Add them to section G (working of the invention) and as dependent claims after claim 6 in section K:
+
+> 8. The system of claim 1, wherein, immediately before executing a validated action, the triggering conditions are re-evaluated and the action is withheld if they are no longer active, so that an action is not applied to a service that has already recovered. *(Alerts trail the fault by the rule's evaluation window; in testing, an alert that fired after the fault had cleared led to an unnecessary container restart before this check was added.)*
+> 9. The system of claim 2, wherein at most one action per incident is in progress (executing, being verified or awaiting approval), and a response plan whose attempt number is lower than the incident's current attempt is discarded, so that a plan produced from an outdated view of the incident cannot trigger an action.
+> 10. The system of claim 1, wherein the response plan comprises a recommended action and a fallback action; when the recommended action is rejected by the allowlist, target or cooldown constraint, the fallback action is validated in its place, and when neither passes the incident is escalated.
+> 11. The system of claim 1, wherein the policy validator operates independently of the analysis engine's output validation, treating every response plan as untrusted: non-finite or non-numeric confidence values, malformed action fields and malformed attempt identifiers are rejected, and the action executor independently re-checks the allowlist before executing.
+> 12. The system of claim 1, wherein the event gateway, on receiving a first event, waits for a configured settle interval before forwarding the incident for analysis, so that events from the root-cause service and from dependent services showing symptoms are analyzed together as one incident.
+> 13. The system of claim 1, wherein every event, response plan and action outcome is recorded in an incident store, from which detection time, root-cause accuracy, action correctness and time to resolution are computed against injected-fault ground truth.
+
+**Supporting evidence (preliminary; add to the report, and to the IDF only if the RDC wants data):**
+- Closed loop on real containers, runbook mode (scenarios 4, 5, 6, 7): faults detected in about 32–40 s and remediated 38–48 s after injection, against 180 s planned fault durations.
+- Re-analysis demonstrated live: after a failed fix, the incident was re-analyzed with the attempted action in its history, a different action was proposed, the cooldown blocked it, and the incident was escalated.
+- Adversarial safety suite (`experiments/safety_suite.py`): 29 hallucinated, malformed and malicious plans, 0 unsafe actions executed. 7 of these were caught only by the policy validator (the LLM output schema accepted them), which is the evidence for claim 11.
+- These are single runs. Use the §10 evaluation (each scenario at least 20 times, `experiments/score.py`) for the final numbers.
+
+---
+
 ### Plan checklist §14 → where it is covered
 | Checklist item | Section above |
 |---|---|
@@ -175,3 +194,4 @@ Optional: once evaluation is done, add measured results (MTTR reduction vs manua
 | ML detector + runbook fallback in Fig. 1 | F |
 | Safeguards against hallucination | G (safeguards paragraph) |
 | Email, guide details, date, typo | A, B4, L |
+| Implementation-derived claims 8–13 + evidence | M |
