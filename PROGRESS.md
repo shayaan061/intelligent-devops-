@@ -52,7 +52,7 @@ Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) belo
 - [x] Incident store (SQLite, `experiments/incidents.db`)
 - [x] **Decide the cooldown for evaluation runs.** Decided 6 Oct: keep the 300 s cooldown and run suites with `--gap 300` (§10 of the plan), so back-to-back scenarios aren't blocked by the previous run's cooldown.
 - [ ] Incident *state* is in memory: a gateway restart loses open incidents (the store keeps the record). Persisting state is optional for the MVP.
-- [ ] **Riddhima:** the analyzer's Pydantic schema coerces `"0.99"` and `true` into a confidence (lax mode). The responder now rejects them, but consider `strict=True` on `confidence` in `analyzer/schemas.py`.
+- [x] **Riddhima:** the analyzer's Pydantic schema coerced `"0.99"` and `true` into a confidence. Fixed 6 Oct: `confidence` is `strict=True` (Step 10). Riddhima to review the prompt changes in Step 10.
 - [ ] Approvals have no timeout yet; a pending approval keeps its incident waiting until a human answers.
 - [x] Minimal UI (MVP, §12): `dashboard/index.html` at `http://localhost:8000/dashboard/`: service map, incident feed with plans/actions, approval queue with Approve/Reject. Riddhima (dashboard owner, §9) can replace it with the full React dashboard in Phase 8.
 - [ ] Open the dashboard in a browser during the next scenario run; it was checked by syntax check + HTTP only, not visually.
@@ -300,7 +300,7 @@ Found while testing: a plan can arrive after the fault is gone (an alert fired 3
 
 Use one `ground_truth.csv` per system or filter with `--since/--until`, e.g. `python experiments/score.py --system B1 --since 2026-10-06T17:17:00Z --out b1.csv` (`--json` for the summary). Runs are matched to the first incident opened between the fault start and 60 s after it ended. Real data so far (scenario 5 only, the store started then): MTTD 32.5 s, root cause + action correct, MTTR 48.4 s.
 
-**`experiments/safety_suite.py`**: 29 hallucinated, malformed and malicious plans through the real `Responder.handle_plan` with a recording executor. Cases include invented actions, shell text in type/target, unknown or self targets, `reset_faults` on redis, lists instead of strings, NaN/inf/bool/string confidence, risky actions, cooldown + malicious fallback, max actions, malformed attempt/incident_id. **Result: 29/29 pass, 0 unsafe actions executed, 27/27 adversarial plans blocked or sent to a human; 7 of them only the responder caught (the analyzer schema would have accepted them).** Table for the report: `python experiments/safety_suite.py --csv safety.csv`.
+**`experiments/safety_suite.py`**: 29 hallucinated, malformed and malicious plans through the real `Responder.handle_plan` with a recording executor. Cases include invented actions, shell text in type/target, unknown or self targets, `reset_faults` on redis, lists instead of strings, NaN/inf/bool/string confidence, risky actions, cooldown + malicious fallback, max actions, malformed attempt/incident_id. **Result: 29/29 pass, 0 unsafe actions executed, 27/27 adversarial plans blocked or sent to a human; 7 of them only the responder caught (the analyzer schema would have accepted them); 5 after the schema's `confidence` was made strict (Step 10).** Table for the report: `python experiments/safety_suite.py --csv safety.csv`.
 
 **Bugs the suite found, fixed:**
 - `confidence: NaN` executed without approval (`nan < 0.7` is False); `true` counted as 1.0 (bool is an int). Now confidence must be a real number in [0, 1] (`policy.valid_confidence`).
@@ -332,3 +332,30 @@ Use one `ground_truth.csv` per system or filter with `--since/--until`, e.g. `py
 **Other:** dashboard checked visually in headless Chrome (feeds live, incident timeline, approvals). The responder's verified-record field is now `open_to_verified_s` (incident opened → verified), so it can't be confused with the evaluation's MTTR (fault start → fault gone). `PATENT_CHANGES.md` section M: dependent claims 8–13 + preliminary evidence.
 
 **Still blocked:** the Docker Desktop containerd setting (macOS denied access to Docker Desktop's settings file; it has to be changed in the UI).
+
+## Step 10: Riddhima's items, patent draft, pilot evaluation (6 Oct, session 6)
+
+**Schema:** `analyzer/schemas.py` `confidence` is now `strict=True`: rejects `true`, `"0.99"` and NaN; still accepts the integers 0 and 1 (checked). The safety suite's "caught only by the responder" count went from 7 to 5, because the schema now catches the other 2.
+
+**Prompt (`analyzer/llm.py`), two rules added, each tested on all 9 samples with 2 LLM runs per sample:**
+1. "A service is down only when up == 0; up but err 1.0 is an error_spike → reset_faults first". This fixed scenario 5, **but scenario 1 (HighCPU on frontend) regressed to api-service in both runs**: the model anchored on the few-shot examples, 2 of 3 of which have api-service as the root cause.
+2. "Any service can be the root cause, including frontend; a resource alert names its own service". After this: **LLM 18/18 root cause, 18/18 action**, mean 14.4 s per plan.
+- Caveat: the prompt was tuned on the same 9 samples, so this is optimistic. Riddhima: review both rules, and consider a frontend few-shot example and more samples that the prompt wasn't tuned on.
+
+**Patent:** `docs/IDF_revised_tracked.docx`: PATENT_CHANGES.md applied to the newer Word draft as tracked insertions, plus 12 comments on what the inventors must decide (see PATENT_CHANGES.md section N).
+
+**Pilot evaluation (6 Oct, real containers, scenarios 6, 7, 4, 5, one run each, `--gap 300`; `experiments/pilot_b1*.csv`, `pilot_b2*.csv`):**
+
+| | B1 runbooks | B2 LLM (llama3.1:8b) |
+|---|---|---|
+| Detected, MTTD mean | 4/4, 26.7 s | 4/4, 26.3 s |
+| Root cause correct | 4/4 | 4/4 |
+| Action correct (§10) | 4/4 | 3/4 |
+| Auto-resolved / verified | 4/4 / 4/4 | 4/4 / 4/4 |
+| MTTR mean (fault start → fault gone) | 46.0 s | 70.9 s |
+| Plan latency mean | 0.3 ms | 21.6 s |
+| Unsafe actions executed | 0 | 0 |
+
+- On these known, single-cause faults the runbooks beat the LLM: no ~22 s analysis time, and no heavier-than-needed action. n = 4, so this is a pilot, not a result.
+- The LLM's miss is live scenario 5 again (`restart_container` instead of `reset_faults`), even though the prompt fix got the sample right 2/2. Its plan contradicts itself: it says api-service is "down" while citing `api-service up 1.0`. The real incident differs from the sample (api-service `upstream_p95` null, `cpu`/`mem` null). Saved as a held-out case: `analyzer/samples/live/scenario5_live.json`. The prompt wasn't tuned on it.
+- **For the evaluation design (team):** the LLM can only beat the runbooks where the runbooks don't fit: combined or unseen fault patterns, conflicting signals, or cases the YAML has no rule for. Add such scenarios to §10, or the comparison will show only the LLM's cost. Also consider a faster or smaller model, since MTTR includes the LLM's latency.

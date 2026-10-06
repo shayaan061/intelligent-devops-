@@ -1,0 +1,5 @@
+run_id,scenario,name,end_reason,incident_id,detected,auto_resolved,mttr_s,mttd_s,root_cause,root_cause_ok,plan_action,plan_action_ok,executed_action,executed_action_ok,unsafe_executed,collateral_executed,verified,escalated,attempts,plan_source,fallback_reason,plan_latency_ms
+a3745a23,6,redis-stopped,remediated,inc-261006-182046-5,True,True,43.7,22.8,redis,True,restart_container/redis,True,restart_container/redis,True,0,0,True,False,1,runbook,mode=runbook,0.1
+b942f516,7,frontend-stopped,remediated,inc-261006-182631-6,True,True,44.6,24.1,frontend,True,restart_container/frontend,True,restart_container/frontend,True,0,0,True,False,1,runbook,mode=runbook,0.1
+96eeaddf,4,latency-api,remediated,inc-261006-183222-7,True,True,50.4,30.1,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,True,False,1,runbook,mode=runbook,0.6
+ab31f4f8,5,error-api,remediated,inc-261006-183807-8,True,True,45.3,29.7,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,True,False,1,runbook,mode=runbook,0.4

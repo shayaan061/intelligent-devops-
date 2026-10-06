@@ -1,0 +1,5 @@
+run_id,scenario,name,end_reason,incident_id,detected,auto_resolved,mttr_s,mttd_s,root_cause,root_cause_ok,plan_action,plan_action_ok,executed_action,executed_action_ok,unsafe_executed,collateral_executed,verified,escalated,attempts,plan_source,fallback_reason,plan_latency_ms
+56afb888,6,redis-stopped,remediated,inc-261006-175551-1,True,True,50.7,18.3,redis,True,restart_container/redis,True,restart_container/redis,True,0,0,True,False,1,llm,,11949.4
+1171fe7c,7,frontend-stopped,remediated,inc-261006-180151-2,True,True,72.8,27.6,frontend,True,restart_container/frontend,True,restart_container/frontend,True,0,0,True,False,1,llm,,24915.8
+d8bb8423,4,latency-api,remediated,inc-261006-180807-3,True,True,76.5,30.4,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,True,False,1,llm,,25842.5
+b435a518,5,error-api,remediated,inc-261006-181422-4,True,True,83.5,28.9,api-service,True,restart_container/api-service,False,restart_container/api-service,False,0,0,True,False,1,llm,,23871.4

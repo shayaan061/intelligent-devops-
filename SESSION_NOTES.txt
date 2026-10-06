@@ -135,3 +135,52 @@ Log
        Injector remediated after 68.6 s (runbook mode was 45 s; the gap is LLM latency). score.py reads it all:
        root/plan/executed action correct, verified, 100% LLM plans, 0 unsafe.
 23:13  Docs: PROGRESS.md Step 9 (+ Ollama item ticked), CLAUDE.md commands/Ollama note.
+23:14  Committed (see git log). Remaining: Docker containerd toggle (user).
+
+=========================================================================
+SESSION 6 - 6 Oct 2026 (start 23:15) - team list "do these now"
+Status at start: Docker still on the containerd store (driver-type io.containerd.snapshotter.v1) -> the
+normal-traffic recording and scenarios 1,2,3,8,9 stay blocked on the user. Full §10 evaluation (20+ reps,
+B0 needs a human) not possible now -> pilot instead (B1 vs B2, scenarios 4-7, 1 rep, --gap 300).
+Order: (1) Riddhima items: strict confidence + prompt fix, re-compare; (2) pilot in background;
+(3) patent: apply PATENT_CHANGES.md to a COPY of ~/Downloads/Shruti_IDF_Intelligent_DevOps_Monitoring.docx.
+Log
+---
+23:16  Riddhima item 1: analyzer/schemas.py confidence strict=True (verified: rejects true, "0.99", NaN; still
+       accepts ints 0/1). Analyzer 75 pass. Safety suite still 29/29; "caught only by the responder" 7 -> 5
+       (the schema now catches bool/string confidence itself).
+23:17  Riddhima item 2 (prompt): added rule "up but err 1.0 = error_spike, not down -> reset_faults first".
+       Re-compare (2 reps): scenario 5 fixed, BUT scenario 1 (HighCPU on frontend) regressed to api-service in
+       both reps (anchoring: 2 of 3 few-shot examples have root api-service). Added rule "any service can be the
+       root cause, incl. frontend; a resource alert names its own service". Re-compare: LLM 18/18 root, 18/18
+       action, mean 14.4 s. CAVEAT: prompt tuned on the same 9 samples -> optimistic; real runs are the test.
+23:24  Rebuilt analyzer (new prompt confirmed inside the image). Started pilot evaluation in background:
+       B2 (LLM) then B1 (runbooks), scenarios 6,7,4,5, 1 rep, --gap 300, separate ground truth files
+       experiments/pilot_b2.csv / pilot_b1.csv. ~1 hour wall clock.
+23:25  Patent: found the Word source ~/Downloads/Shruti_IDF_Intelligent_DevOps_Monitoring.docx. It is a NEWER
+       draft than patent .pdf (Riddhima's email already fixed; ML, safety policies, approval, verification loop
+       partly present) and it describes things NOT implemented: Grafana, Loki/Promtail, Next.js dashboard,
+       PostgreSQL, "scaling a service". The form's disclaimer declares everything true -> did NOT rewrite the
+       inventors' text. Made a COPY with PATENT_CHANGES.md edits as tracked insertions (author Claude: abstract,
+       field, prior art D1-D3, summary of invention E, validity criteria + safeguards + bounded loop, applications,
+       advantages, claims 1-13) and 12 comments on the mismatches, figures, implementation status, signatures,
+       date. Original untouched. Validator: "All validations PASSED" (+38 paragraphs, every change tracked).
+       Proofread in document order: all insertions in place, list items join the existing lists.
+       Not rendered: no Word/LibreOffice; Pages automation refused ("Connection is invalid"); not forced.
+       Saved as docs/IDF_revised_tracked.docx. PATENT_CHANGES.md section N documents it.
+23:31  Pilot B2 run 1 (scenario 6, LLM): remediated after 51 s. Pilot continues in the background.
+23:45  Pilot B2 (LLM) done, all 4 remediated: scenario 6 51 s, 7 73 s, 4 76 s, 5 83 s. score.py: recall 100%,
+       MTTD mean 26.3 s, root cause 4/4, action 3/4, 0 unsafe, auto-resolved 100%, MTTR mean 70.9 s, plan
+       latency mean 21.6 s, 100% LLM plans.
+       FINDING: live scenario 5 -> LLM chose restart_container again (the prompt fix worked 2/2 on the SAMPLE).
+       Its plan contradicts itself: cause "because it is down" while its evidence says "api-service up 1.0".
+       Real incident differs from the sample: api-service upstream_p95 null (error fault fails before calling
+       redis), cpu/mem null. Did NOT tune again on one incident (same trap as before). Saved it as a held-out
+       case: analyzer/samples/live/scenario5_live.json (compare_analyzers.py only globs samples/scenario*.json).
+00:10  Pilot B1 (runbooks) done: 6 44 s, 7 45 s, 4 50 s, 5 45 s. Analyzer switched back to llm mode (confirmed).
+       Scored (after verification finished; the first B2 score ran too early and showed scenario 5 unverified):
+         B1: root 4/4, action 4/4, auto-resolved 4/4, MTTR mean 46.0 s, plan latency 0.3 ms, 0 unsafe
+         B2: root 4/4, action 3/4, auto-resolved 4/4, MTTR mean 70.9 s, plan latency 21.6 s, 0 unsafe
+       Conclusion (pilot, n=4): on known single-cause faults runbooks beat the LLM (faster, no heavier action).
+       Recommendation recorded in PROGRESS.md: §10 needs scenarios where runbooks don't fit, or the comparison
+       only shows the LLM's cost.

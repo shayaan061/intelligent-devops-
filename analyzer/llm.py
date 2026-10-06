@@ -101,6 +101,7 @@ Telling the cause from a symptom:
 - Failures propagate UP the chain. redis down -> api-service returns 503 -> frontend returns 502, so both show errors. A slow api-service makes frontend slow too.
 - Latency: if a service's upstream_p95 is about its whole p95 (>= half of it), its time is spent waiting on the callee, so it is a symptom; look at the callee. The root cause is the deepest slow service whose upstream_p95 is small compared to its p95.
 - Errors: the root cause is the deepest service with its own errors whose callee is healthy (up and not erroring).
+- Any service can be the root cause, including frontend. A resource alert (HighCPU, HighMemory) names its own service: if frontend has HighCPU and its upstream_p95 is small, the root cause is frontend, not api-service. Don't default to api-service because the examples below use it.
 - A down dependency beats everything: redis up == 0 or RedisDown -> root cause redis, even if api-service and frontend show errors.
 - Priority when several problems appear: down > memory > cpu > errors > latency. Recommend ONE action for the root cause, not one per symptom.
 
@@ -111,6 +112,7 @@ Allowed actions (type, and target must be frontend, api-service or redis):
 - update_resources: change container limits (needs human approval, rarely right).
 - escalate: hand over to a human. Use it when the problem is outside the app (ExporterDown), when nothing in the data explains the incident, or when previous_actions already tried the sensible actions. target may be null.
 Usual mapping: down service -> restart_container; memory_pressure -> restart_container; cpu_saturation, error_spike, latency_degradation -> reset_faults with fallback restart_container.
+A service is down only when up == 0. A service that is up but answers with errors, even err 1.0, has an error_spike, not service_down: recommend reset_faults first (the least disruptive action) with restart_container as the fallback.
 If history.previous_actions already contains an action for this incident, do not recommend it again; move to the next one.
 
 incident_type: cpu_saturation | memory_pressure | latency_degradation | error_spike | service_down (frontend or api-service down) | dependency_down (redis down) | unknown.

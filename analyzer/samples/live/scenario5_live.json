@@ -1,0 +1,308 @@
+{
+  "type": "incident",
+  "incident_id": "inc-261006-181422-4",
+  "status": "open",
+  "timestamp": "2026-10-06T18:14:32Z",
+  "opened_at": "2026-10-06T18:14:22Z",
+  "resolved_at": null,
+  "sources": [
+    "rule"
+  ],
+  "services": [
+    "api-service",
+    "frontend"
+  ],
+  "alerts": [
+    {
+      "name": "HighErrorRate",
+      "service": "api-service",
+      "status": "firing",
+      "severity": "critical",
+      "category": "errors",
+      "startsAt": "2026-10-06T18:14:12.383Z",
+      "value": 1.0,
+      "threshold": 0.1
+    },
+    {
+      "name": "HighErrorRate",
+      "service": "frontend",
+      "status": "firing",
+      "severity": "critical",
+      "category": "errors",
+      "startsAt": "2026-10-06T18:14:17.383Z",
+      "value": 1.0,
+      "threshold": 0.1
+    }
+  ],
+  "ml_anomalies": [],
+  "topology": {
+    "frontend": [
+      "api-service"
+    ],
+    "api-service": [
+      "redis"
+    ],
+    "redis": []
+  },
+  "context": {
+    "frontend": {
+      "trend": {
+        "cpu": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "mem": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "p95": [
+          0.0082,
+          0.0073,
+          0.0081,
+          0.0092,
+          7.375,
+          0.0083,
+          0.0095,
+          0.0092,
+          0.0091,
+          0.0082,
+          0.005
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "rps": [
+          5.1996,
+          4.7996,
+          4.9202,
+          4.7998,
+          0.88,
+          4.88,
+          4.9196,
+          5.2796,
+          4.8804,
+          4.8,
+          4.7998
+        ],
+        "upstream_p95": [
+          0.0077,
+          0.005,
+          0.0065,
+          0.0089,
+          7.375,
+          0.0078,
+          0.0094,
+          0.0085,
+          0.0088,
+          0.0077,
+          0.0049
+        ]
+      },
+      "up": 1.0,
+      "cpu": null,
+      "mem": null,
+      "p95": 0.005,
+      "err": 1.0,
+      "rps": 4.7998,
+      "upstream_p95": 0.0049,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T18:02:26.893629878Z"
+      }
+    },
+    "api-service": {
+      "trend": {
+        "cpu": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "mem": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "p95": [
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          7.375,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047
+        ],
+        "err": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "rps": [
+          5.2,
+          4.7602,
+          4.9604,
+          4.7209,
+          0.7999,
+          4.801,
+          4.9196,
+          5.2794,
+          4.7598,
+          4.8002,
+          4.7192
+        ],
+        "upstream_p95": [
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          0.0047,
+          null
+        ]
+      },
+      "up": 1.0,
+      "cpu": null,
+      "mem": null,
+      "p95": 0.0047,
+      "err": 1.0,
+      "rps": 4.7192,
+      "upstream_p95": null,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T17:11:42.656830719Z"
+      }
+    },
+    "redis": {
+      "trend": {
+        "ops": [
+          6.7197,
+          6.3197,
+          6.4797,
+          6.2393,
+          2.32,
+          6.3203,
+          6.3987,
+          6.7597,
+          6.2805,
+          6.3197,
+          1.4802
+        ],
+        "mem_bytes": [
+          1339040.0,
+          1318568.0,
+          1318568.0,
+          1318568.0,
+          1318568.0,
+          1318568.0,
+          1339072.0,
+          1339072.0,
+          1318600.0,
+          1339072.0,
+          1298128.0
+        ],
+        "clients": [
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0
+        ],
+        "mem": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "up": 1.0,
+      "ops": 1.4802,
+      "mem_bytes": 1298128.0,
+      "clients": 3.0,
+      "mem": null,
+      "container": {
+        "status": "running",
+        "restart_count": 0,
+        "started_at": "2026-10-06T17:56:13.876883178Z"
+      }
+    }
+  },
+  "history": {
+    "attempt": 1,
+    "previous_actions": []
+  },
+  "_note": "Real incident from the pilot (6 Oct 2026, scenario 5: error fault in api-service), as the gateway sent it. Held out: the prompt was not tuned on it. llama3.1:8b recommended restart_container/api-service with confidence 0.95 and the self-contradicting cause 'because it is down' while its own evidence said 'api-service up 1.0'. Expected per \u00a710: reset_faults on api-service. Differences from samples/scenario5.json: api-service upstream_p95 is null (the error fault fails requests before calling redis) and cpu/mem are null (cAdvisor on the containerd image store)."
+}

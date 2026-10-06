@@ -180,8 +180,18 @@ Building and testing the system produced mechanisms that the draft doesn't descr
 **Supporting evidence (preliminary; add to the report, and to the IDF only if the RDC wants data):**
 - Closed loop on real containers, runbook mode (scenarios 4, 5, 6, 7): faults detected in about 32–40 s and remediated 38–48 s after injection, against 180 s planned fault durations.
 - Re-analysis demonstrated live: after a failed fix, the incident was re-analyzed with the attempted action in its history, a different action was proposed, the cooldown blocked it, and the incident was escalated.
-- Adversarial safety suite (`experiments/safety_suite.py`): 29 hallucinated, malformed and malicious plans, 0 unsafe actions executed. 7 of these were caught only by the policy validator (the LLM output schema accepted them), which is the evidence for claim 11.
+- Adversarial safety suite (`experiments/safety_suite.py`): 29 hallucinated, malformed and malicious plans, 0 unsafe actions executed. 5 of these are caught only by the policy validator (the LLM output schema accepts them; 7 before the schema's confidence field was made strict), which is the evidence for claim 11.
 - These are single runs. Use the §10 evaluation (each scenario at least 20 times, `experiments/score.py`) for the final numbers.
+
+---
+
+## N. Applied to the Word draft (6 Oct 2026)
+
+`docs/IDF_revised_tracked.docx` is a copy of `~/Downloads/Shruti_IDF_Intelligent_DevOps_Monitoring.docx` (the newer draft; the original is untouched) with these edits as **tracked insertions by "Claude"**, to accept or reject in Word (Review → Accept/Reject): B2/B3 (abstract), C (field), D1–D3 (prior art), E (summary of invention), G step 5 + safeguards and the bounded loop (overall working), J (applications, advantages), K + M (claims 1–13). Nothing existing was deleted or reworded.
+
+12 **comments** flag what only the inventors can decide, mainly where the draft describes things the implementation doesn't have: Grafana and Loki/Promtail, a Next.js dashboard, PostgreSQL (SQLite now), "scaling a service", the out-of-date Implementation Status, the figures (F, H) and the signature block (L). The disclaimer declares every statement true, so settle these before submitting. A1 (Riddhima's email) was already fixed in this draft. Figures 1 and 2 must still be redrawn by hand.
+
+Validated with the docx skill's validator (schema + every change tracked). Not opened in Word here: no Word or LibreOffice on this Mac, and Pages automation wasn't permitted. Open it in Word to review.
 
 ---
 

@@ -1,0 +1,5 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+56afb888,6,redis-stopped,stop,redis,redis,restart_container,2026-10-06T17:55:23.520Z,2026-10-06T17:58:23.520Z,2026-10-06T17:56:14.177Z,remediated,stop
+1171fe7c,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-06T18:01:14.204Z,2026-10-06T18:04:14.204Z,2026-10-06T18:02:27.011Z,remediated,stop
+d8bb8423,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-06T18:07:27.028Z,2026-10-06T18:10:27.028Z,2026-10-06T18:08:43.506Z,remediated,latency
+b435a518,5,error-api,error,api-service,api-service,reset_faults,2026-10-06T18:13:43.523Z,2026-10-06T18:16:43.523Z,2026-10-06T18:15:07.021Z,remediated,error

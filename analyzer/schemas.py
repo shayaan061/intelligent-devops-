@@ -165,7 +165,9 @@ class ResponsePlan(_Strict):
     severity: Severity
     probable_cause: str
     evidence: list[str] = Field(default_factory=list)
-    confidence: float = Field(ge=0.0, le=1.0)
+    # strict: rejects true (bool is an int) and "0.99" (lax mode would coerce
+    # them); NaN fails ge/le. Ints 0 and 1 are still accepted.
+    confidence: float = Field(ge=0.0, le=1.0, strict=True)
     recommended_action: Action
     fallback_action: Optional[Action] = None
     explanation: str = ""
