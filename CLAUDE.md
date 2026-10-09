@@ -10,7 +10,7 @@ A final-year project (Sharda University) and patent disclosure: an "Intelligent 
 
 ## Current state
 
-The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. The Event Gateway (`gateway/`, port 8000), the analyzer (`analyzer/` + `runbooks/`) and the responder with verifier (`responder/`, port 8001) exist, and the loop closes on real containers. A minimal UI is at `dashboard/index.html` (served by the gateway). The ML detector and the full dashboard are still planned. See `PROGRESS.md` Steps 5–7.
+The base layer and the 3-service demo app exist. Alert rules, Alertmanager, the fault injector and Locust load exist too. The Event Gateway (`gateway/`, port 8000), the analyzer (`analyzer/` + `runbooks/`) and the responder with verifier (`responder/`, port 8001) exist, and the loop closes on real containers. A minimal UI is at `dashboard/index.html` (served by the gateway); the full dashboard is `web/` (Next.js + Tailwind + Recharts, port 3001). The ML detector is still planned. See `PROGRESS.md` Steps 5–7.
 
 Gateway → analyzer contract (`analyzer/schemas.py` is the source of truth):
 - Alerts and ML anomalies (`POST /anomalies`) are grouped into incidents (`gateway/incidents.py`): one open incident per chain, open while an alert fires or an anomaly is < 60 s old. After a 10 s settle the gateway broadcasts `{"type": "incident", "status": "open|updated|resolved", ...}` on `/ws/events` with the 10-minute context from `gateway/context.py`. Never add a `fault_*` query there; an import-time assert enforces it.
@@ -20,6 +20,7 @@ Gateway → analyzer contract (`analyzer/schemas.py` is the source of truth):
 - Untrusted plans: anything can POST to the gateway's `/responses`, so the responder must not rely on the analyzer's schema. Keep `experiments/safety_suite.py` at 29/29 when touching `policy.py`, `executor.py` or `handle_plan`; add a case for every new action type. Gateway inputs reject NaN/Infinity (`strict_loads`).
 - The 5-minute cooldown is across incidents: back-to-back scenarios that need the same action get the fallback or an escalation. Decided 6 Oct: keep 300 s and run suites with `--gap 300` (SUGGESTED_PLAN.md §10).
 - The gateway writes every broadcast message to SQLite (`INCIDENT_DB`, `experiments/incidents.db` in compose; `GET /history/{id}`). Grouping state is still in memory.
+- Dashboard (`web/`, compose service `web`, host port **3001** because 3000 is often taken): server-side routes in `web/app/api/` read the gateway, responder (`GET /policies`), Prometheus, Alertmanager and Ollama; the browser opens `ws://<host>:8000/ws/*` directly. Prometheus is reached only through the fixed queries in `web/app/api/metrics/route.ts` (copied from `gateway/context.py`; keep them in sync, never add `fault_*`). The proxies are allowlists; approve/reject POSTs need the `x-dashboard: 1` header (CSRF guard). Its stats are operational (open → plan, open → verified); the evaluation's MTTD/MTTR still come from `experiments/score.py`.
 - On macOS, cAdvisor only gets the `name` label if Docker Desktop's containerd image store is off; otherwise HighCPU/HighMemory never fire and context `cpu`/`mem` are null (PROGRESS.md, Next steps A).
 
 Request path: `frontend` (`app/`, host port 5001) → `GET api-service:5000/data` (`api-service/`, host port 5002) → `redis` (`INCR hits`).
@@ -57,6 +58,9 @@ websocat ws://localhost:8000/ws/responses # plans + responder actions
 curl localhost:8000/history            # incident store; /history/<id> for the timeline
 curl localhost:8001/approvals          # pending approvals; POST .../approvals/<id>/approve|reject
 open http://localhost:8000/dashboard/  # minimal UI: service map, incidents, approvals
+open http://localhost:3001             # full dashboard (web/): overview, incidents, approvals, system
+cd web && npm install && npm run dev   # dashboard on the host (localhost:3001; GATEWAY_URL etc. default to localhost)
+cd web && npm run typecheck && npm run build
 RESPONDER_MODE=dry_run docker compose up -d responder   # validate only, never execute (baseline B0)
 python experiments/score.py --system B1 --since <ISO>   # §10 metrics from ground_truth.csv + incidents.db
 python experiments/safety_suite.py                       # 29 adversarial plans; must be 29/29, 0 unsafe
@@ -74,7 +78,7 @@ docker compose run --rm injector reset                                  # clear 
 pip install -r injector/requirements.txt && python injector/injector.py list   # or from the host
 ```
 
-Tests: the rule tests above, `cd gateway && pytest -q`, `cd analyzer && python -m pytest tests` and `cd responder && pytest -q`, `pytest experiments/tests` (scorer + safety suite) (install each one's `requirements-dev.txt`). There is no linter. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
+Tests: the rule tests above, `cd web && npm run build` (typecheck + build; the dashboard has no unit tests), `cd gateway && pytest -q`, `cd analyzer && python -m pytest tests` and `cd responder && pytest -q`, `pytest experiments/tests` (scorer + safety suite) (install each one's `requirements-dev.txt`). There is no linter. Get `promtool` and `amtool` from the Prometheus and Alertmanager GitHub release tarballs; they aren't installed. To smoke-test the app without Docker, run `pip install flask prometheus-client`, then drive it with `app.app.test_client()`. Run each service in its own process: both register the same metric names in prometheus_client's global registry, so importing both into one process raises `DuplicateTimeseries`.
 
 ## Results log (for the final report)
 

@@ -4,7 +4,7 @@ The record of every test, comparison and evaluation run, kept for the final repo
 
 **Keep it current.** Every new test run, comparison or evaluation gets an entry here (date, setup, numbers, source file, caveats), not only in `SESSION_NOTES.txt`. Don't delete superseded results: mark them as superseded, so the report can show how the system improved.
 
-Last updated: 6–7 Oct 2026.
+Last updated: 8 Oct 2026.
 
 ---
 
@@ -37,10 +37,10 @@ Latest run: 7 Oct 2026, all passing. Run commands are in `CLAUDE.md`.
 |---|---|---|
 | `gateway/tests` | 19 | Grouping and dedup (symptom alerts join one incident, repeats ignored, refires, monitoring alerts kept separate, ML window); context builder against a fake Prometheus (shapes, NaN → null, no `fault_` queries); endpoints and both WebSockets; `/actions` history; re-analysis; SQLite store survives reopening; dashboard served; NaN/Infinity rejected on every input |
 | `analyzer/tests` | 75 | Schemas (strict enums, allowlist, `fault_*` stripping); runbooks give the §10 answer for every sample; the LLM path falls back on connection error, timeout, invalid JSON, schema violation, `reset_faults` on redis, low confidence (Ollama mocked); coalescing |
-| `responder/tests` | 42 | Every policy rule (allowlist, targets, confidence incl. NaN/inf/bool/string, risky actions, cooldown → fallback → escalate, max actions); executor (refuses non-allowlisted actions); execute → verify → re-analyze → escalate; stale-attempt and busy skipping; pre-check skip; approve/reject; dry run; CORS |
+| `responder/tests` | 43 | Every policy rule (allowlist, targets, confidence incl. NaN/inf/bool/string, risky actions, cooldown → fallback → escalate, max actions); executor (refuses non-allowlisted actions); execute → verify → re-analyze → escalate; stale-attempt and busy skipping; pre-check skip; approve/reject; dry run; CORS; `/policies` (8 Oct) |
 | `experiments/tests` | 10 | Scorer (matching, false positives, undetected runs, symptom-as-root, scenario 1 reset-or-restart, unsafe counting, attempts, LLM share, `--since`), plus the full adversarial suite |
 | `prometheus/rules_test.yml` | (promtool) | Alert rules fire and stay quiet as expected (written in Phase 2) |
-| **Total (pytest)** | **146** | |
+| **Total (pytest)** | **147** | (146 on 7 Oct; +1 responder test on 8 Oct, rerun 43/43 and safety suite 29/29) |
 
 ---
 
@@ -226,6 +226,23 @@ None of these are final: the §10 evaluation needs all 9 scenarios × ≥ 20 run
 
 ---
 
+## 9a. Dashboard check (8 Oct 2026)
+
+Not an evaluation: a functional check of the new Next.js dashboard (`web/`) before its first Docker run. Docker was off, so the gateway and responder ran on the host against an incident store rebuilt from `experiments/results/incident_store_snapshot.jsonl` (13 real incidents from 6 Oct), and the charts were fed by a **synthetic** Prometheus/Alertmanager.
+
+| Check | Result |
+|---|---|
+| `tsc --noEmit`, `next build` | pass |
+| Stats from the real store (`/api/stats`) | 13 incidents: 10 verified, 1 escalated, 2 rejected (demo approvals); plans 6 LLM / 7 runbook; mean LLM analysis 20.2 s; mean open → plan 19.9 s; mean open → verified 69.0 s |
+| Incident page, real scenario 6 incident | RedisDown + symptom HighErrorRate shown; root cause redis; restart → verified (`docs/figures/web_incident_detail.png`) |
+| Approval round trip | test alert → incident → test plan with confidence 0.62 → held (`confidence 0.62 < 0.7`) → rejected through the dashboard route → `rejected` in the store |
+| Guards | approve without `x-dashboard` header → 403; non-allowlisted proxy paths → 404 |
+| Responder tests / safety suite after adding `GET /policies` | 43/43, 29/29 (0 unsafe) |
+
+Caveats: the overview screenshot's metrics are synthetic (`docs/figures/web_overview_synthetic_metrics.png`); the open incident and the approval in it are test data, not a scenario run. The dashboard's "open → verified" is an operational number from the store, not the evaluation's MTTR (§0 definitions).
+
+---
+
 ## 10. Raw data index
 
 | File | Contents |
@@ -240,4 +257,5 @@ None of these are final: the §10 evaluation needs all 9 scenarios × ≥ 20 run
 | `experiments/results/baseline_export_test_40min.csv` | filtered baseline export test (§6) |
 | `analyzer/samples/live/scenario5_live.json` | held-out real incident (§3) |
 | `docs/figures/dashboard_scenario7.png` | dashboard screenshot (§6) |
+| `docs/figures/web_incident_detail.png`, `web_overview_synthetic_metrics.png` | Next.js dashboard screenshots (§9a); the overview's metrics are synthetic |
 | `SESSION_NOTES.txt` | chronological work log with every finding |

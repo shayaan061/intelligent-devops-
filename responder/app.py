@@ -397,6 +397,16 @@ async def actions():
     return list(responder.records)
 
 
+@app.get("/policies")
+async def policies():
+    """Read-only view for the dashboard: the loaded rules and active cooldowns."""
+    now = responder.clock()
+    cooldowns = [{"type": t, "target": tg, "remaining_s": round(responder.policies["cooldown_seconds"] - (now - at), 1)}
+                 for (t, tg), at in responder.last_run.items()
+                 if now - at < responder.policies["cooldown_seconds"]]
+    return {"mode": MODE, **responder.policies, "cooldowns": cooldowns}
+
+
 @app.get("/approvals")
 async def approvals():
     return list(responder.approvals.values())

@@ -341,6 +341,17 @@ def test_cors_allows_only_the_dashboard_origin():
     assert "access-control-allow-origin" not in evil.headers
 
 
+def test_policies_endpoint_shows_rules_and_active_cooldowns(monkeypatch):
+    from fastapi.testclient import TestClient
+    now = rapp.responder.clock()
+    monkeypatch.setattr(rapp.responder, "last_run", {("restart_container", "redis"): now - 10,
+                                                     ("reset_faults", "api-service"): now - 10_000})
+    body = TestClient(rapp.app).get("/policies").json()
+    assert body["min_confidence"] == 0.7 and "restart_container" in body["actions"]
+    assert [(c["type"], c["target"]) for c in body["cooldowns"]] == [("restart_container", "redis")]
+    assert 0 < body["cooldowns"][0]["remaining_s"] <= body["cooldown_seconds"]
+
+
 @pytest.mark.parametrize("bad", [float("nan"), float("inf"), True, "0.99", 1.5, -0.1, None])
 def test_invalid_confidence_needs_approval(bad):
     assert decide(plan(confidence=bad), P, 0, {}, 1000).kind == APPROVAL

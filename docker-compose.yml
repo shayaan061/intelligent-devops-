@@ -178,6 +178,32 @@ services:
       - gateway
     restart: unless-stopped
 
+  # Dashboard (§6.8): Next.js + Tailwind + Recharts at http://localhost:3001
+  # (host 3000 is often taken by other dev servers). Overview (service map,
+  # live metrics, active incidents), incident timelines, approvals, system
+  # health and safety policy. Server-side routes read the gateway, responder,
+  # Prometheus (fixed queries, never fault_*), Alertmanager and Ollama; the
+  # browser opens the gateway's WebSockets on localhost:8000 directly.
+  # The minimal page at localhost:8000/dashboard/ still works.
+  web:
+    build: ./web
+    container_name: web
+    ports:
+      - "3001:3000"
+    environment:
+      GATEWAY_URL: http://gateway:8000
+      RESPONDER_URL: http://responder:8001
+      PROMETHEUS_URL: http://prometheus:9090
+      ALERTMANAGER_URL: http://alertmanager:9093
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1:8b}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - gateway
+      - responder
+    restart: unless-stopped
+
   # Steady background traffic; HTTP alerts need requests to evaluate.
   # Web UI at :8089 (headless by default).
   load:

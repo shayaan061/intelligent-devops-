@@ -56,11 +56,13 @@ Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) belo
 - [ ] Approvals have no timeout yet; a pending approval keeps its incident waiting until a human answers.
 - [x] Minimal UI (MVP, §12): `dashboard/index.html` at `http://localhost:8000/dashboard/`: service map, incident feed with plans/actions, approval queue with Approve/Reject. Riddhima (dashboard owner, §9) can replace it with the full React dashboard in Phase 8.
 - [ ] Open the dashboard in a browser during the next scenario run; it was checked by syntax check + HTTP only, not visually.
+- [x] **Full dashboard (Phase 8, started early, 8 Oct):** `web/` Next.js + Tailwind + Recharts at `localhost:3001`. See Step 11. Riddhima (dashboard owner) to review.
+- [ ] Build and run the `web` image under Docker (not done yet: Docker was off on 8 Oct; checked with `next build` on the host).
 
 ### D. Can start in parallel
 - [x] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1). First version built 6 Oct (Step 6); Riddhima to review the prompt and runbooks.
 - [x] **Install Ollama on the host.** Done 6 Oct: Homebrew `ollama` 0.35.1 as a launchd service (`brew services start ollama`), model `llama3.1:8b`. First results in Step 9.
-- [ ] **Verifier/responder must send `history.previous_actions`** as `[{"type", "target"}]` when re-analysing (§6.6); the analyzer skips actions already tried.
+- [x] **Verifier/responder must send `history.previous_actions`** as `[{"type", "target"}]` when re-analysing (§6.6); the analyzer skips actions already tried. Done: the gateway adds executed/failed actions from `POST /actions` (`gateway/app.py`).
 - [ ] **Check scenario 8's ML feature names** against the runbook `ml-memory-anomaly` (matches any `top_features` entry containing `mem`) once the ML detector exists.
 - [ ] **Shruti:** record 1–2 hours of normal traffic under Locust now, as training data for the ML detector (Phase 7)
 - [ ] **All:** apply the edits in `PATENT_CHANGES.md` to the patent draft
@@ -359,3 +361,15 @@ Use one `ground_truth.csv` per system or filter with `--since/--until`, e.g. `py
 - On these known, single-cause faults the runbooks beat the LLM: no ~22 s analysis time, and no heavier-than-needed action. n = 4, so this is a pilot, not a result.
 - The LLM's miss is live scenario 5 again (`restart_container` instead of `reset_faults`), even though the prompt fix got the sample right 2/2. Its plan contradicts itself: it says api-service is "down" while citing `api-service up 1.0`. The real incident differs from the sample (api-service `upstream_p95` null, `cpu`/`mem` null). Saved as a held-out case: `analyzer/samples/live/scenario5_live.json`. The prompt wasn't tuned on it.
 - **For the evaluation design (team):** the LLM can only beat the runbooks where the runbooks don't fit: combined or unseen fault patterns, conflicting signals, or cases the YAML has no rule for. Add such scenarios to §10, or the comparison will show only the LLM's cost. Also consider a faster or smaller model, since MTTR includes the LLM's latency.
+
+## Step 11: Full dashboard (`web/`), 8 Oct
+
+Matches the IDF's client layer (Next.js, TypeScript, Tailwind, Recharts) and §6.8 of the plan. Compose service `web`, host port 3001.
+
+- **Overview:** stat tiles (open incidents, auto-resolved %, escalated, awaiting approval, mean open → verified, LLM share of plans), service map with live values and the latest plan's root cause marked, active incidents with the plan and actions, approval queue, six live metric charts (p95, error rate, req/s, upstream p95, CPU, memory; 5 min – 1 h).
+- **Incidents:** the store's last 50 with root cause, type, action, analysis source and outcome, filterable; each incident's page shows detection → the context the analyzer saw (10-minute trend charts) → every plan with evidence and explanation → every policy decision and action → verification.
+- **Approvals:** reason each action was held; approve (confirm dialog) or reject.
+- **System:** health of Prometheus (scrape targets), Alertmanager (firing alerts), gateway, analyzer (last plan's source and fallback reason), Ollama (model present), responder (mode, Docker access); the allowlist, thresholds and active cooldowns (new `GET /policies` on the responder, 1 test); outcome counts.
+- Safety: no generic Prometheus passthrough (fixed queries, import-time `fault_` check); gateway proxy is GET-only on an allowlist; the only write is approve/reject, which needs an `x-dashboard` header so another site can't trigger it.
+
+**Checked 8 Oct (Docker off):** `tsc` and `next build` pass; gateway and responder run on the host with an incident store rebuilt from `experiments/results/incident_store_snapshot.jsonl`, plus a synthetic Prometheus/Alertmanager for the charts; screenshots in light, dark and narrow widths; test alert → incident → low-confidence test plan → held for approval → rejected through the dashboard route. Responder tests 43/43, safety suite 29/29. **Not yet checked:** the Docker image and a live scenario run.
