@@ -439,11 +439,11 @@ intellegent-devops/
 ---
 
 ## 14. Patent Revision Checklist
-- [ ] Add a **Claims** section built on the four novel elements in §1
-- [ ] Define the "Valid Response?" criteria in Fig. 2 (allowlist, confidence, cooldown)
+- [x] Add a **Claims** section built on the four novel elements in §1 (claims 1–15, `docs/PATENT_CHANGES_FINAL.txt` K)
+- [ ] Define the "Valid Response?" criteria in Fig. 2 (allowlist, confidence, cooldown) (text done in step 5; the figure still needs redrawing)
 - [ ] Add a maximum-attempts limit and an escalation step to the re-analyze loop in Fig. 2
 - [ ] Add the ML detector and runbook fallback to Fig. 1
-- [ ] Describe the safeguards against the LLM making things up
+- [x] Describe the safeguards against the LLM making things up (`docs/PATENT_CHANGES_FINAL.txt` G, step 4)
 - [ ] Fix Riddhima's email (`ug.sharda.ac.in`), fill in the guide's email and address and the date, and fix the "alertanalysis" typo
 
 ---

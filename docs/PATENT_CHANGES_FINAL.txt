@@ -1,0 +1,512 @@
+PATENT CHANGES - FINAL
+Invention Disclosure Form: "Intelligent DevOps Monitoring & Incident Response System"
+Sharda University. Final version: 8 Oct 2026.
+
+Source: PATENT_CHANGES.md (sections A-N), checked against the implementation and
+experiments/RESULTS.md on 8 Oct 2026. The tracked-changes Word copy is
+docs/IDF_revised_tracked.docx; this file is the final, paste-ready text plus the items only the
+inventors can decide.
+
+How to use this file
+- Part 1 lists what changed in this final pass compared with the earlier draft.
+- Part 2 is the final text for each IDF section, in page order. Text between the
+  ----- lines can be pasted as is.
+- Part 3 lists the decisions the inventors must make before signing. The form's disclaimer
+  declares every statement true, so settle Part 3 first.
+
+
+=====================================================================================
+PART 1. WHAT CHANGED IN THE FINAL PASS
+=====================================================================================
+
+1. Claim 1 no longer requires the ML detector. The ML detector is not built yet, and an
+   independent claim should be as broad as the invention allows. Claim 1 now requires "one or
+   more detectors" with a common incident format. Dual detection (rules + ML) moved to new
+   dependent claim 2, and the ML persistence rule is claim 7. Claims were renumbered (1-15).
+2. The method claim is written out in full (it used to say "a method corresponding to claims
+   1-6", which a patent office will not accept as written).
+3. Evidence numbers corrected against experiments/RESULTS.md. The earlier draft said detection
+   took "about 32-40 s"; the logged runs show 18.3-34.7 s (mean 27.9 s, n = 16). Pilot B1/B2
+   results (6 Oct) added.
+4. Step 6/7 action list matches the executor: reset faults and restart container run
+   automatically; flush cache and resource changes need human approval. "Update resource
+   limits" is allowlisted for approval but the executor does not implement it yet, so the text
+   says "require human approval" and does not claim it is carried out automatically.
+5. Recommended wording added for each of the 12 comments in the Word copy (Part 3).
+
+
+=====================================================================================
+PART 2. FINAL TEXT, BY SECTION
+=====================================================================================
+
+-------------------------------------------------------------------------------------
+A. PAGE 1: PARTICULARS OF INVENTORS
+-------------------------------------------------------------------------------------
+A1. Riddhima's email: 2023567320.riddhima@ug.sharda.ac.in
+    (already fixed in the newer Word draft; still wrong in patent .pdf)
+A2. Ashish Kumar: fill in the guide's official email.
+A3. Ashish Kumar: official address, e.g. "Dept. of CSE, Sharda University, Greater Noida".
+A4. Address column: "Student, Greater Noida, Sharda University" (add spaces).
+
+------------------------------------------------------------------------------------
+B. PAGE 2: ABSTRACT
+-------------------------------------------------------------------------------------
+B1. After "...using Prometheus", add:
+-----
+Abnormal behaviour is detected by two complementary detectors: configured rule-based alert
+conditions for known failure patterns, and a machine-learning anomaly detector (for example,
+Isolation Forest combined with rolling statistical scoring) for deviations that no predefined
+rule covers. Both detectors emit events in a single, common incident format.
+-----
+
+B2. After "...to an intelligent analysis component", add:
+-----
+Before analysis, a context builder automatically collects the related metrics of every service
+in the dependency chain of the affected service over a time window around the event, so that
+the analysis can separate the root-cause service from services that only show symptoms.
+-----
+
+B3. Replace "The generated response is subsequently passed to a response/incident handling
+system, which can execute or initiate predefined remediation actions..." with:
+-----
+The LLM produces a structured, schema-validated response plan and never executes actions
+directly. A policy validator placed between the LLM and the executor checks every proposed
+action against an action allowlist, a known-target list, a confidence threshold, cooldown rules
+and approval requirements before it runs. After execution, a verifier re-evaluates the
+triggering conditions; if the incident is unresolved, it is re-analyzed together with the
+record of actions already attempted, up to a configured maximum number of attempts, after
+which it is escalated to a human operator. When the LLM is unavailable, times out, returns
+invalid output or reports low confidence, deterministic runbooks provide a fallback response.
+-----
+
+B4. "alertanalysis": in the PDF it is "alert-" + line break + "analysis". If the Word source
+has it as one word, change it to "alert-analysis".
+
+-------------------------------------------------------------------------------------
+C. PAGE 2: FIELD OF INVENTION
+-------------------------------------------------------------------------------------
+Replace the "More particularly..." paragraph with:
+-----
+More particularly, the invention relates to an intelligent monitoring and incident-response
+mechanism that combines Prometheus-based metric collection, rule-based and
+machine-learning-based anomaly detection, dependency-aware context building across multiple
+services, real-time event communication, Large Language Model-based root-cause analysis, a
+policy-based safety validation layer between the analysis engine and the action executor, and a
+verification and bounded re-analysis loop for detecting and handling operational issues in
+software and computing infrastructure.
+-----
+
+-------------------------------------------------------------------------------------
+D. PAGES 2-4: PRIOR ART
+-------------------------------------------------------------------------------------
+D1. New subsection "6) Existing AI-assisted operations tools":
+-----
+Recent tools such as k8sgpt, HolmesGPT and Datadog Bits AI apply LLMs to diagnose
+infrastructure problems. These tools mainly explain or summarize issues, and either leave
+remediation to the engineer or carry out actions without a separate, deterministic safety
+layer. They also do not combine rule-based and ML-based detection into a common incident format
+with runbook fallback, or bound re-analysis using the history of attempted actions. Statistical
+anomaly detection methods (e.g., Isolation Forest, Liu et al., ICDM 2008) and graph-based
+root-cause methods (e.g., MicroRCA, Wu et al., NOMS 2020) detect or localize faults, but do not
+generate and safely execute a verified remediation.
+-----
+
+D2. Add to "4) Limitations of Existing Systems":
+-----
+- Threshold rules cannot detect gradual or multi-metric deviations (for example, a slow memory
+  rise) before a hard limit is reached.
+- In multi-service systems, the alerting service is often only a downstream symptom, not the
+  root cause.
+- Applying LLM output directly to infrastructure is unsafe without validation, because LLMs can
+  produce incorrect or hallucinated actions.
+-----
+
+D3. Add to "5) Gap and Motivation":
+-----
+There is a need to use LLM reasoning for incident response while guaranteeing that no
+unvalidated action reaches the infrastructure, and that remediation attempts are bounded and
+verified.
+-----
+
+-------------------------------------------------------------------------------------
+E. NEW SECTION BEFORE "DISCLOSE WORKING OF INVENTION" (PAGE 5)
+-------------------------------------------------------------------------------------
+-----
+Summary of the Invention and Technical Advancement
+
+The invention provides the following technical advancements over existing systems:
+
+1. Dependency-aware context builder. When an event is received, the system automatically
+   collects the metrics, container states, restart counts and recent actions of all services in
+   the dependency chain of the affected service over a time window around the event, together
+   with the service topology. This lets the analysis engine tell the root-cause service apart
+   from services that only show the symptom.
+
+2. Policy-based safety validator between the LLM and the executor. The LLM outputs a structured
+   response plan that is validated against a schema. An action is executed only if it is on an
+   action allowlist, its target is a known service, its confidence is at or above a configured
+   threshold, it does not violate a cooldown period, and the per-incident action limit has not
+   been reached. Otherwise it is routed for human approval or escalated. The LLM never executes
+   commands directly.
+
+3. History-aware, bounded re-analysis loop. If verification shows the incident is unresolved,
+   the incident is re-analyzed with the attempt number and the list of previously attempted
+   actions and their outcomes, so a failed action is not repeated. After a maximum number of
+   attempts (e.g., 3), the incident is escalated to a human.
+
+4. Dual detection with a unified incident format and deterministic fallback. Rule-based alerts
+   and ML-detected anomalies are converted into one common incident event. Deterministic
+   runbooks provide a fallback response, which keeps the system working when the LLM fails, and
+   also serve as a non-LLM baseline for comparison.
+-----
+
+-------------------------------------------------------------------------------------
+F. PAGE 5: FIG. 1, SYSTEM ARCHITECTURE (REDRAW BY HAND)
+-------------------------------------------------------------------------------------
+Current: Infrastructure -> Prometheus -> WebSocket -> LLM Engine -> Response System ->
+Infrastructure. Redraw with:
+1. "Alert Rules / Alertmanager" block after Prometheus (rule path).
+2. "ML Anomaly Detector" block in parallel, reading from Prometheus (Isolation Forest + z-score).
+3. Both feed "Event Gateway: dedup / grouping / context builder", which feeds the WebSocket
+   layer.
+4. "Fallback: Deterministic Runbooks" inside or beside the LLM Engine.
+5. "Response System" split into "Policy / Safety Validator" -> "Action Executor", with a side
+   branch "Human Approval".
+6. "Verifier" after remediation: "not resolved" arrow back to the LLM Analysis Engine (with
+   attempt history); "attempts exhausted" arrow to "Escalation".
+7. Optional: "Incident Store + Dashboard".
+8. Relabel the feedback arrow "Prometheus" as "Continuous monitoring / verification metrics".
+Base it on the diagram in SUGGESTED_PLAN.md section 5.
+
+-------------------------------------------------------------------------------------
+G. PAGES 5-8: WORKING OF THE INVENTION
+-------------------------------------------------------------------------------------
+Step 1, Monitoring Data Collection. Add:
+-----
+In addition to application metrics, the system collects container-level metrics (via a
+container metrics exporter such as cAdvisor), dependency metrics (e.g., cache or database
+exporters), and the latency of each call from one service to the next (upstream call latency).
+-----
+
+Step 2. Rename to "Detection (Rule-based and ML-based)". Keep the rule text and add:
+-----
+In parallel, a machine-learning anomaly detector polls per-service features (CPU usage, memory
+usage ratio, 95th-percentile latency, error rate, request rate and upstream call latency) at
+fixed intervals and scores them with a model trained on normal behaviour. It raises an event
+only when the anomaly persists for at least two consecutive evaluation windows. Each event
+carries the event source (rule or ML), the anomaly score where applicable, the top contributing
+features and an incident identifier.
+-----
+
+New Step 2a, Event Correlation and Context Building:
+-----
+Events that arrive within a time window and share a dependency chain are grouped into one
+incident. After the first event, the gateway waits for a short settle interval so that events
+from the root-cause service and from dependent services showing symptoms are analyzed together.
+The context builder then attaches the service topology, the last N minutes of key metrics for
+every service in the chain, container state and restart counts, recent actions and the history
+of attempts. Ground-truth or fault-labelling signals, where present, are excluded from the
+analysis context.
+-----
+
+Step 3, Real-Time Event Transmission. Add:
+-----
+Separate channels are used for incident events and for response plans and action outcomes
+(e.g., /ws/events and /ws/responses).
+-----
+
+Step 4, Intelligent Incident Analysis. Add:
+-----
+The prompt includes the service topology and the list of allowed actions. The output is a
+structured response plan (root-cause service, incident type, severity, probable cause,
+evidence, confidence score, recommended action, fallback action and explanation) and is
+validated against a schema. If the LLM times out, is unreachable, returns output that fails
+validation or reports a confidence below the threshold, deterministic runbooks produce the
+response plan instead.
+
+Safeguards against incorrect or fabricated LLM output include: a constrained action vocabulary
+supplied in the prompt; strict schema validation of the output; rejection of unknown services
+or actions; a confidence threshold; required evidence fields that cite metrics from the
+supplied context; deterministic runbook fallback; and human approval for risky actions.
+-----
+
+Step 5, Incident Classification / Decision. Add the criteria (this defines Fig. 2's
+"Valid Response?"):
+-----
+A proposed action is executed automatically only if: (a) the response plan passes schema
+validation; (b) the action type is on the allowlist; (c) the target is a known service;
+(d) the confidence is a number at or above the threshold (e.g., 0.7); (e) the same action on
+the same target has not been taken within the cooldown period (e.g., 5 minutes); (f) the
+per-incident action limit (e.g., 3) has not been reached; and (g) the action is not classed as
+risky. Risky actions and low-confidence plans are routed for human approval. If the recommended
+action is rejected, the plan's fallback action is validated in its place; if neither passes,
+the incident is escalated. Immediately before execution, the triggering conditions are checked
+again, and the action is withheld if they are no longer active.
+-----
+
+Step 6, Response Generation. Remove "Commands or operational actions." Replace with:
+-----
+Selection of a predefined operational action from an allowlist (e.g., reset a faulty
+component, restart a container, flush a cache, change resource limits, escalate to an
+operator). Arbitrary shell commands are never executed.
+-----
+
+Step 7, Response System. Replace the description with:
+-----
+The response system has two parts. The policy validator applies the criteria of step 5 to
+every response plan, treating each plan as untrusted input regardless of its source. The
+executor carries out only allowlisted actions and checks the allowlist again itself. Execution
+modes: resetting a faulty component and restarting a container run automatically; flushing a
+cache and changing resource limits require human approval; escalation is always allowed and
+changes nothing.
+-----
+
+Step 8. Rename to "Verification and Re-analysis":
+-----
+After a settling period (30-60 seconds), the verifier re-evaluates the conditions that fired
+and, where applicable, the anomaly score for the root-cause service and the services that
+depend on it. If resolved, the incident is closed and its time to resolution recorded. If not
+resolved, the incident is re-analyzed with the attempt number increased by one and the list of
+previous actions and their outcomes. Only one action per incident is in progress at a time,
+and a plan produced for an earlier attempt is discarded. After the maximum number of attempts
+(e.g., 3), the incident is escalated to a human operator.
+-----
+
+Step 9, Continuous Monitoring. Update the pipeline line to:
+-----
+Prometheus -> Rules + ML Detector -> Gateway / Context Builder -> WebSocket -> LLM Analysis
+(with runbook fallback) -> Policy Validator -> Executor -> Verifier.
+-----
+
+-------------------------------------------------------------------------------------
+H. PAGE 8: FIG. 2, PROJECT WORKFLOW (REDRAW BY HAND)
+-------------------------------------------------------------------------------------
+1. Split "Alert / Anomaly Detected" into "Rule Alert" and "ML Anomaly", merging into "Build
+   Incident Context" before "Event Sent via WebSocket".
+2. After "Generate Response", add decision "LLM output valid / confident?"; No -> "Apply
+   Runbook Fallback".
+3. Relabel "Valid Response?" as "Passes Policy Validator?" (criteria from step 5). Add a third
+   branch "Risky -> Human Approval": approve -> execute, reject -> escalate.
+4. Fix the loop: "Re-analyze" must return to "LLM Receives Context" (with attempt history), not
+   to "Monitor System Again".
+5. Before "Re-analyze", add decision "Attempts < Max (3)?"; No -> "Escalate to Human" -> END.
+6. On "Incident Resolved? -> Yes", add "Record Resolution Time / Store Incident" before END.
+
+-------------------------------------------------------------------------------------
+I. PAGE 9: "HOW IT WORKS" PARAGRAPH
+-------------------------------------------------------------------------------------
+-----
+The system continuously monitors the infrastructure. Abnormal behaviour is detected either by
+a rule-based alert or by the ML anomaly detector, and both produce an event in the same format.
+The gateway groups related events into one incident and builds its context from every service
+in the dependency chain. The LLM analysis engine receives the context and produces a structured
+response plan; if the LLM fails or is not confident, a deterministic runbook produces the plan
+instead. The policy validator then checks the proposed action against the allowlist, the known
+targets, the confidence threshold, the cooldown and the per-incident action limit; risky
+actions go to a human for approval. Approved actions are executed and the verifier checks
+whether the incident has been resolved. If it has not, the incident is re-analyzed together
+with the actions already attempted, up to a maximum number of attempts, after which it is
+escalated to a human operator.
+-----
+
+-------------------------------------------------------------------------------------
+J. PAGES 9-10: APPLICATIONS AND ADVANTAGES
+-------------------------------------------------------------------------------------
+Applications, add:
+-----
+- Microservice environments in which faults propagate across dependent services and the
+  alerting service differs from the root-cause service.
+-----
+
+Advantages, add:
+-----
+- Detects both known failures (rules) and unknown or gradual anomalies (ML) before hard
+  thresholds are crossed.
+- Identifies the root-cause service, not just the service showing the symptom, by using
+  dependency-aware context.
+- No unvalidated LLM output reaches the infrastructure: actions pass an allowlist, schema
+  validation, a confidence threshold, a cooldown and, for risky actions, human approval.
+- Bounded remediation with no infinite loops: a maximum number of attempts, then escalation.
+- Keeps working when the LLM is unavailable, through deterministic runbook fallback.
+- Each incident's evidence, reasoning, action and verification result is recorded, giving an
+  auditable trail.
+-----
+Do not add measured numbers here until the full evaluation is done (see Part 2, N).
+
+-------------------------------------------------------------------------------------
+K. NEW SECTION BEFORE THE DISCLAIMER (PAGE 11): CLAIMS
+-------------------------------------------------------------------------------------
+-----
+Claims
+
+1. A system for intelligent monitoring and incident response, comprising:
+   a metrics collection module configured to collect metrics of a plurality of services;
+   one or more detectors, including a rule-based detector, each configured to emit events in a
+   common incident format;
+   an event gateway comprising a context builder configured to, on receipt of an event
+   concerning a first service, retrieve metrics of the first service and of every service in
+   its dependency chain over a time window associated with the event;
+   a real-time communication layer;
+   an analysis engine based on a large language model (LLM), configured to output a structured
+   response plan comprising a root-cause service, a confidence score and a recommended action;
+   a policy validator, interposed between the analysis engine and an action executor,
+   configured to permit execution only of actions satisfying an allowlist of action types, a
+   known-target constraint, a confidence threshold and a cooldown constraint; and
+   a verifier configured to re-evaluate the triggering conditions after an action is executed.
+
+2. The system of claim 1, wherein the one or more detectors further comprise a
+   machine-learning anomaly detector configured to score per-service metrics with a model
+   trained on normal behaviour, and wherein events from the rule-based detector and the
+   machine-learning anomaly detector are converted into the common incident format.
+
+3. The system of claim 1, wherein, when the verifier determines that the incident is
+   unresolved, the incident is resubmitted to the analysis engine together with an attempt
+   count and a record of previously attempted actions, and the incident is escalated to a human
+   operator when the attempt count reaches a configured maximum.
+
+4. The system of claim 1, further comprising deterministic runbooks applied when the analysis
+   engine times out, is unreachable, returns output that fails schema validation, or returns a
+   confidence below the threshold.
+
+5. The system of claim 1, wherein actions classed as risky, and response plans whose
+   confidence is below the threshold, are routed to a human approval interface instead of being
+   executed automatically.
+
+6. The system of claim 1, wherein fault-labelling or ground-truth signals are excluded from
+   the context supplied to the analysis engine and to any detector.
+
+7. The system of claim 2, wherein the machine-learning anomaly detector emits an event only
+   after an anomaly persists for a configured number of consecutive evaluation windows, and the
+   event includes an anomaly score and top contributing features.
+
+8. The system of claim 1, wherein, immediately before executing a validated action, the
+   triggering conditions are re-evaluated and the action is withheld if they are no longer
+   active, so that an action is not applied to a service that has already recovered.
+
+9. The system of claim 3, wherein at most one action per incident is in progress (executing,
+   being verified or awaiting approval), and a response plan whose attempt number is lower than
+   the incident's current attempt is discarded, so that a plan produced from an outdated view
+   of the incident cannot trigger an action.
+
+10. The system of claim 1, wherein the response plan further comprises a fallback action;
+    when the recommended action is rejected by the allowlist, known-target or cooldown
+    constraint, the fallback action is validated in its place, and when neither passes the
+    incident is escalated.
+
+11. The system of claim 1, wherein the policy validator operates independently of any
+    validation of the analysis engine's output, treating every response plan as untrusted:
+    non-finite or non-numeric confidence values, malformed action fields and malformed attempt
+    identifiers are rejected, and the action executor independently re-checks the allowlist
+    before executing.
+
+12. The system of claim 1, wherein the event gateway, on receiving a first event, waits for a
+    configured settle interval before forwarding the incident for analysis, so that events from
+    the root-cause service and from dependent services showing symptoms are analyzed together as
+    one incident.
+
+13. The system of claim 1, wherein every event, response plan and action outcome is recorded in
+    an incident store, from which detection time, root-cause accuracy, action correctness and
+    time to resolution are computed against injected-fault ground truth.
+
+14. A method for intelligent monitoring and incident response, comprising:
+    (a) collecting metrics of a plurality of services;
+    (b) detecting abnormal behaviour with one or more detectors, including a rule-based
+        detector, and emitting an event in a common incident format;
+    (c) on receipt of an event concerning a first service, building a context comprising
+        metrics of the first service and of every service in its dependency chain over a time
+        window associated with the event;
+    (d) generating, with an LLM-based analysis engine, a structured response plan comprising a
+        root-cause service, a confidence score and a recommended action;
+    (e) validating the recommended action, by a policy validator separate from the analysis
+        engine, against an allowlist of action types, a known-target constraint, a confidence
+        threshold and a cooldown constraint;
+    (f) executing the action only if it passes step (e);
+    (g) re-evaluating the triggering conditions after execution; and
+    (h) when the incident is unresolved, repeating steps (d) to (g) with an attempt count and a
+        record of previously attempted actions, and escalating the incident to a human operator
+        when the attempt count reaches a configured maximum.
+
+15. The method of claim 14, wherein step (b) further comprises detecting abnormal behaviour with
+    a machine-learning anomaly detector, and step (d) is performed by deterministic runbooks
+    when the analysis engine fails, returns invalid output or returns a confidence below the
+    threshold.
+
+(The patent attorney or RDC will reformat these. Claims 8-13 come from behaviour found while
+testing the implementation.)
+-----
+
+-------------------------------------------------------------------------------------
+L. PAGE 11: SIGNATURE BLOCK
+-------------------------------------------------------------------------------------
+- Fill in the date when submitting.
+- The block only has Muhammad Shayaan Ali. Add signature, name and date lines for Riddhima
+  Sharma, Shruti Tyagi and Ashish Kumar (all four are listed inventors). Confirm with the RDC.
+
+-------------------------------------------------------------------------------------
+M. IMPLEMENTATION STATUS (replaces the out-of-date paragraph in the Word draft)
+-------------------------------------------------------------------------------------
+-----
+A working prototype has been built and tested end-to-end on Docker Compose with a three-service
+application (frontend, API service, Redis). It implements rule-based detection with Prometheus
+and Alertmanager, an event gateway with dependency-aware context building, an LLM analysis
+engine (a locally hosted 8-billion-parameter model) with deterministic runbook fallback, the
+policy validator, the action executor, the verifier with bounded re-analysis, an incident store
+and a monitoring dashboard. The machine-learning anomaly detector is under development.
+-----
+
+-------------------------------------------------------------------------------------
+N. SUPPORTING EVIDENCE (for the report; add to the IDF only if the RDC asks for data)
+-------------------------------------------------------------------------------------
+All numbers from experiments/RESULTS.md (6-7 Oct 2026). Preliminary: one run per scenario.
+- Detection: 16 of 16 logged injected faults detected, in 18.3-34.7 s (mean 27.9 s).
+- Without automated response a fault lasted its full duration (90-120 s in those runs). With
+  it, single faults were fixed in 37.6-48.4 s in development runs (runbook mode).
+- Pilot, scenarios 4-7 (latency, errors, Redis stopped, frontend stopped):
+    runbooks (B1): root cause 4/4, action correct 4/4, auto-resolved 4/4, mean MTTR 46.0 s
+    LLM (B2):      root cause 4/4, action correct 3/4, auto-resolved 4/4, mean MTTR 70.9 s
+    unsafe actions executed: 0 in both. The LLM's extra time is its plan latency (about 22 s).
+- Offline analyzer comparison on 9 sample incidents, 2 runs each: LLM root cause and action
+  18/18 after prompt tuning (optimistic: the prompt was tuned on these samples).
+- Re-analysis shown live: after a failed fix the incident was re-analyzed with the attempted
+  action in its history, a different action was proposed, the cooldown blocked it, and the
+  incident was escalated.
+- Pre-execution re-check (claim 8): added after a live run where an alert fired after the fault
+  had cleared and caused an unnecessary restart.
+- Adversarial safety suite: 29 hallucinated, malformed and malicious plans, 29/29 passed,
+  0 unsafe actions executed; 5 are caught only by the policy validator (the LLM output schema
+  accepts them), which is the evidence for claim 11.
+- Final numbers must come from the full evaluation (all 9 scenarios, at least 20 runs each,
+  with the ML detector and a manual baseline). Do not put the pilot numbers in the IDF as
+  results.
+
+
+=====================================================================================
+PART 3. DECISIONS FOR THE INVENTORS BEFORE SIGNING
+=====================================================================================
+These cover the 12 comments in docs/IDF_revised_tracked.docx. The disclaimer declares every
+statement true, so each needs an answer.
+
+1. Grafana and Loki/Promtail (abstract and body). Not implemented. Recommended: keep them only
+   as optional, e.g. "and may additionally include dashboards such as Grafana and log
+   aggregation such as Loki", or remove them.
+2. Next.js dashboard. The current UI is a minimal HTML/JS page. Fine as "the intended
+   embodiment" if the team will build it; otherwise say "a web dashboard".
+3. "Scaling a service" / adjusting configuration. Not implemented. Recommended wording:
+   "such as resetting a faulty component or restarting a container; resource changes require
+   human approval".
+4. PostgreSQL. The implementation uses SQLite. Recommended: "a database (e.g., SQLite or
+   PostgreSQL)".
+5. Implementation Status paragraph. Replace with Part 2, M.
+6. Fig. 1 and Fig. 2. Must be redrawn by hand (Part 2, F and H). Not done.
+7. "How it works" paragraph. Replace with Part 2, I.
+8. Claims. Use Part 2, K (supersedes the claims 1-13 inserted in the Word copy; it adds the
+   broader claim 1 and the written-out method claim).
+9. Signature block and date. Part 2, L.
+10. Ashish Kumar's email and address. Part 2, A2-A3.
+11. ML detector. Claims 2, 7 and 15 and several descriptions cover it. Claiming it is fine as
+    the intended embodiment, but the team should build it before the final report.
+
+Status of the Word copy: docs/IDF_revised_tracked.docx has sections B2/B3, C, D1-D3, E, G step 5
++ safeguards + bounded loop, J and the earlier claims 1-13 as tracked insertions. It does not yet
+have the Part 1 changes (claim restructure, method claim, step 7 wording, implementation
+status). Apply those from this file when accepting the tracked changes in Word.

@@ -178,7 +178,7 @@ Building and testing the system produced mechanisms that the draft doesn't descr
 > 13. The system of claim 1, wherein every event, response plan and action outcome is recorded in an incident store, from which detection time, root-cause accuracy, action correctness and time to resolution are computed against injected-fault ground truth.
 
 **Supporting evidence (preliminary; add to the report, and to the IDF only if the RDC wants data):**
-- Closed loop on real containers, runbook mode (scenarios 4, 5, 6, 7): faults detected in about 32–40 s and remediated 38–48 s after injection, against 180 s planned fault durations.
+- Closed loop on real containers, runbook mode (scenarios 4, 5, 6, 7): faults detected in 22–33 s and remediated 38–48 s after injection, against 180 s planned fault durations.
 - Re-analysis demonstrated live: after a failed fix, the incident was re-analyzed with the attempted action in its history, a different action was proposed, the cooldown blocked it, and the incident was escalated.
 - Adversarial safety suite (`experiments/safety_suite.py`): 29 hallucinated, malformed and malicious plans, 0 unsafe actions executed. 5 of these are caught only by the policy validator (the LLM output schema accepts them; 7 before the schema's confidence field was made strict), which is the evidence for claim 11.
 - These are single runs. Use the §10 evaluation (each scenario at least 20 times, `experiments/score.py`) for the final numbers.
@@ -205,3 +205,13 @@ Validated with the docx skill's validator (schema + every change tracked). Not o
 | Safeguards against hallucination | G (safeguards paragraph) |
 | Email, guide details, date, typo | A, B4, L |
 | Implementation-derived claims 8–13 + evidence | M |
+
+---
+
+## O. Final version (8 Oct 2026)
+
+`docs/PATENT_CHANGES_FINAL.txt` is the final, paste-ready text of every change above, checked against the code and `experiments/RESULTS.md`. It **supersedes sections K and M for the claims**: claim 1 now needs only "one or more detectors, including a rule-based detector" (the ML detector isn't built; dual detection is dependent claim 2), the method claim is written out in full (claims 14–15), and claims are renumbered 1–15. It also corrects the evidence numbers, adds the pilot B1/B2 results, gives a new Implementation Status paragraph and recommended wording for each of the 12 Word comments. The Word copy does not have these final-pass changes yet.
+
+## P. Complete revised IDF (8 Oct 2026)
+
+`docs/IDF_final.docx` and `docs/IDF_final.txt` are the whole disclosure form, word for word, revised from the Pages draft so that it matches the built system: Grafana, Loki/Promtail, PostgreSQL-with-users, "scaling a service" and "worker processes" removed or reworded; the Next.js dashboard kept (now built); claims 1–15 from section O; new Implementation Status with preliminary results; the old "continuous feedback loop" replaced by the bounded loop; Fig. 1 and Fig. 2 redrawn (`docs/figures/idf_fig*.png`). Still for the inventors: dates and signatures, Ashish Kumar's email (the draft has a Gmail address), and the ML detector, which the text describes as under development.

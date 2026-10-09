@@ -13,7 +13,7 @@ Last updated: 7 Oct 2026.
 | The plan: architecture, schemas, scenarios, timeline, checklist | `SUGGESTED_PLAN.md` |
 | What happened in each work session, in time order | `SESSION_NOTES.txt` |
 | How to run things, and the project rules | `CLAUDE.md` |
-| Patent edits and the revised patent draft | `PATENT_CHANGES.md`, `docs/IDF_revised_tracked.docx` |
+| Patent edits and the revised patent draft | `PATENT_CHANGES.md`, `docs/PATENT_CHANGES_FINAL.txt`, `docs/IDF_revised_tracked.docx` |
 
 ---
 
@@ -31,7 +31,7 @@ Last updated: 7 Oct 2026.
 | `PATENT_ALIGNED_PLAN.md` | Plan B: the base plan aligned with the patent draft (input to `SUGGESTED_PLAN.md`) |
 | `PROJECT_PLAN.md` | Plan A: the ML-centric alternative plan (input to `SUGGESTED_PLAN.md`) |
 | `PLAN_COMPARISON.md` | Why the suggested plan combines Plan A and Plan B |
-| `PATENT_CHANGES.md` | Edits for the patent disclosure form, by page (sections A–L), extra dependent claims 8–13 with evidence (M), and what was applied to the Word draft (N) |
+| `PATENT_CHANGES.md` | Edits for the patent disclosure form, by page (sections A–L), extra dependent claims 8–13 with evidence (M), what was applied to the Word draft (N), and the final pass (O) |
 | `patent .pdf` | The original Invention Disclosure Form, the older PDF version |
 | `README.md` | Only the repo title |
 
@@ -68,7 +68,14 @@ Last updated: 7 Oct 2026.
 | File | Contents |
 |---|---|
 | `docs/IDF_revised_tracked.docx` | The newer Word patent draft with the `PATENT_CHANGES.md` edits as **tracked insertions** and 12 comments for the inventors (the original is in `~/Downloads`, untouched) |
+| `docs/IDF_final.docx`, `docs/IDF_final.txt` | **The complete revised Invention Disclosure Form** (8 Oct 2026), word for word, aligned with the built system; the .docx has the new Fig. 1 and Fig. 2. Supersedes the Pages draft and `IDF_revised_tracked.docx` |
+| `docs/idf_source/` | Sources for the two files above: `content.js` (the text), `build.js` (docx + txt), `figures.js` (Fig. 1, Fig. 2), README with the rebuild steps |
+| `docs/figures/idf_fig1_architecture.png`, `idf_fig2_workflow.png` | The new IDF figures: architecture (detectors, gateway/context builder, LLM + runbooks, validator, executor, verifier loop, store, dashboard, approval) and workflow (validity and policy decisions, approval, bounded re-analysis, escalation) |
+| `docs/Intelligent DevOps Monitoring and Incident Response System Invention Disclosure.pages` | The team's Pages draft (tracked changes accepted) that `IDF_final` revises |
+| `docs/PATENT_CHANGES_FINAL.txt` | Final, paste-ready patent changes (8 Oct 2026), by IDF section: abstract, field, prior art, summary, figures, working steps, claims 1–15, implementation status, evidence, and the decisions left to the inventors |
 | `docs/figures/dashboard_scenario7.png` | Screenshot of the dashboard: service map, one incident (scenario 7) with plan → executed → verified, an approval card |
+| `docs/figures/web_incident_detail.png` | Next.js dashboard, incident page for the real scenario 6 incident (redis down → restart → verified): detection, context, plans, actions |
+| `docs/figures/web_overview_synthetic_metrics.png` | Next.js dashboard overview (light mode). **Metrics are synthetic** (a fake Prometheus, Docker was off); the stats come from the real incident snapshot, and the open incident and approval are test data |
 
 ## 4. System code, by component
 
@@ -122,13 +129,20 @@ Last updated: 7 Oct 2026.
 | `policies.yaml` | **The safety rules**: action allowlist and targets, approval-required actions, confidence ≥ 0.7, 300 s cooldown, max 3 actions and 3 attempts, 45 s verify delay |
 | `policy.py` | Policy validator (pure functions): execute / approval / escalate |
 | `executor.py` | The only code that changes anything: reset faults, restart container, flush cache |
-| `app.py` | Plan intake, pre-check, verifier, re-analysis requests, approval API (`/approvals`), dry-run mode, reports to the gateway |
-| `tests/test_responder.py` | 42 tests |
+| `app.py` | Plan intake, pre-check, verifier, re-analysis requests, approval API (`/approvals`), read-only `/policies` (rules + active cooldowns, for the dashboard), dry-run mode, reports to the gateway |
+| `tests/test_responder.py` | 43 tests |
 
 ### Dashboard and tools
 | File | Contents |
 |---|---|
-| `dashboard/index.html` | Minimal UI at `localhost:8000/dashboard/`: service map, incident feed with plans and actions, approval buttons |
+| `dashboard/index.html` | Minimal UI at `localhost:8000/dashboard/`: service map, incident feed with plans and actions, approval buttons (kept as a fallback) |
+| `web/` | **Full dashboard** (Next.js 15 + TypeScript + Tailwind + Recharts) at `localhost:3001`, compose service `web` |
+| `web/app/page.tsx` | Overview: stat tiles, service map with live values, active incidents with the plan, approval queue, live metric charts (5 min – 1 h) |
+| `web/app/incidents/page.tsx`, `incidents/[id]/page.tsx` | Incident list from the store (filter by outcome); one incident end to end: detection → context charts → plans → actions → verification |
+| `web/app/approvals/page.tsx`, `web/app/system/page.tsx` | Approval queue with reasons; pipeline health, scrape targets, firing alerts, safety policy, active cooldowns, outcome counts |
+| `web/app/api/*` | Server-side routes: `metrics` (fixed PromQL from `gateway/context.py`, asserts no `fault_*`), `stats` (from `/history`), `system` (health probes), `gateway/*` and `responder/*` allowlisted proxies (approve/reject needs the `x-dashboard` header) |
+| `web/lib/live.tsx`, `web/lib/types.ts` | Live state from both WebSockets (de-duplicated replays); message types |
+| `web/components/` | Charts (one metric per chart, fixed colour per service), service map, plan/action views, approval queue |
 | `injector/injector.py` | Fault injector: the 9 §10 scenarios, suites, ground-truth CSV logging |
 | `injector/web.py`, `injector/static/index.html` | Injector control panel at `localhost:8088` |
 | `docker-compose.yml` | The whole stack: services, ports, environment variables, mounts |
