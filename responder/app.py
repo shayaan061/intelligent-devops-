@@ -6,12 +6,14 @@ the policy validator (policy.py) and then:
   approval  -> queued for a human: GET /approvals, POST /approvals/{id}/approve|reject
   escalate  -> recorded, nothing runs (optional ESCALATION_WEBHOOK)
 
-Pre-check: right before executing, the incident's alerts are re-checked;
+Pre-check: right before executing, the incident's alerts (and any ML
+anomaly the detector still reports, gateway `ml_active`) are re-checked;
 if they have already cleared the action is skipped ("skipped"), so a late
 plan never restarts a healthy service.
 
 Verifier: verify_delay_seconds after an action, the incident's alerts are
-re-checked in Prometheus (ALERTS, pending or firing). Resolved -> "verified"
+re-checked in Prometheus (ALERTS, pending or firing) along with the
+gateway's `ml_active` (an ML-only incident has no alerts). Resolved -> "verified"
 with the time since the incident opened. Not resolved -> the gateway re-sends
 the incident with attempt + 1 and the actions already tried, so the analyzer
 proposes something else. After max_attempts -> escalate.
@@ -233,14 +235,16 @@ class Responder:
         return next((i for i in r.json() if i["incident_id"] == incident_id), None)
 
     async def check_resolved(self, incident_id):
-        """(resolved, reason). Re-checks the alerts that were firing (§6.6)."""
+        """(resolved, reason). Re-checks the alerts that were firing (§6.6),
+        and the ML anomalies the detector still reports (gateway ml_active)."""
         try:
             summary = await self.incident_summary(incident_id)
             if summary is None:
                 return False, "incident unknown to the gateway"
             if summary["resolved_at"]:
                 return True, "incident resolved"
-            still = []
+            ml = summary.get("ml_active") or []
+            still = [f"ml/{svc}" for svc in ml if isinstance(svc, str)] if isinstance(ml, list) else []
             async with self.client() as c:
                 for item in summary["firing"]:
                     name, service = item.split("/", 1)
@@ -253,7 +257,7 @@ class Responder:
             return False, f"verification failed: {e.__class__.__name__}"
         if still:
             return False, "still firing: " + ", ".join(still)
-        return True, "alerts no longer firing"
+        return True, "alerts no longer firing, no active ML anomaly"
 
     async def time_open(self, incident_id):
         try:

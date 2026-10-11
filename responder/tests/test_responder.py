@@ -147,6 +147,7 @@ class FakeExecutor(Executor):
         self.calls.append((action["type"], action["target"]))
         if self.ok and self.world.fixed_by_action:
             self.world.still_firing = False
+            self.world.ml_active = []
         return self.ok, "done" if self.ok else "boom"
 
 
@@ -160,6 +161,7 @@ class FakeWorld:
         self.reports = []
         self.reanalyze = []
         self.resolved_at = None
+        self.ml_active = []           # gateway: services with a fresh ML anomaly
 
     def handler(self, request):
         path = request.url.path
@@ -171,7 +173,8 @@ class FakeWorld:
             return httpx.Response(200, json={})
         if path == "/incidents":
             return httpx.Response(200, json=[{"incident_id": "inc-1", "opened_at": "2026-10-06T10:00:00Z",
-                                              "resolved_at": self.resolved_at, "firing": self.firing}])
+                                              "resolved_at": self.resolved_at, "firing": self.firing,
+                                              "ml_active": self.ml_active}])
         if path == "/api/v1/query":
             result = [{"metric": {}, "value": [0, "1"]}] if self.still_firing else []
             return httpx.Response(200, json={"status": "success", "data": {"result": result}})
@@ -191,6 +194,27 @@ def make(ok=True):
     r = rapp.Responder(P, ex, clock=lambda: 1_791_000_000.0, sleep=no_sleep,
                        transport=httpx.MockTransport(world.handler))
     return r, ex, world
+
+
+def test_ml_only_incident_is_executed_and_verified():
+    # Scenario 8: no alert fires, only the ML detector. Without ml_active the
+    # pre-check would see nothing firing and skip the restart.
+    r, ex, world = make()
+    world.firing, world.still_firing = [], False
+    world.ml_active = ["api-service"]
+    world.fixed_by_action = True
+    assert run(r.handle_plan(plan(rec=("restart_container", "api-service")))) == EXECUTE
+    assert ex.calls == [("restart_container", "api-service")]
+    assert world.statuses()[-1] == "verified"
+
+
+def test_ml_anomaly_still_active_is_unresolved():
+    r, ex, world = make()
+    world.firing, world.still_firing = [], False
+    world.ml_active = ["api-service"]
+    run(r.handle_plan(plan()))
+    assert "unresolved" in world.statuses() and world.reanalyze == [2]
+    assert "ml/api-service" in world.reports[-1]["reason"]
 
 
 def test_fix_verified_closes_incident():
