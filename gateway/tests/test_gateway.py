@@ -85,6 +85,27 @@ def test_ml_anomaly_keeps_incident_open_for_window():
     assert g.sweep() == [inc]
 
 
+def test_repeat_anomaly_refreshes_without_change():
+    clock = Clock()
+    g = Grouper(window=60, clock=clock)
+    inc, _ = g.add_anomaly({"service": "api-service", "score": 0.6, "top_features": ["mem"],
+                            "detected_at": "first"})
+    for _ in range(6):  # 90 s of re-posts every 15 s
+        clock.t += 15
+        again, change = g.add_anomaly({"service": "api-service", "score": 0.8, "top_features": ["mem", "cpu"],
+                                       "detected_at": "later"})
+        assert again is inc and change is None
+    assert len(inc.anomalies) == 1 and inc.anomalies[0]["score"] == 0.8
+    assert inc.anomalies[0]["detected_at"] == "first"
+    assert g.sweep() == [] and inc.ml_active(clock.t, 20) == ["api-service"]
+    _, change = g.add_anomaly({"service": "frontend", "score": 0.7, "top_features": ["p95"]})
+    assert change == "changed"  # a new service is news
+    clock.t += 30
+    assert inc.ml_active(clock.t, 20) == []
+    clock.t += 31
+    assert g.sweep() == [inc]
+
+
 def test_refire_in_same_open_incident_is_a_change():
     g = Grouper(clock=Clock())
     inc, _ = g.add_alert(alert("HighLatency", "api-service", "a"))
@@ -240,6 +261,8 @@ def test_anomaly_endpoint(client):
         assert inc["incident_id"] == r.json()["incident_id"]
         assert inc["sources"] == ["ml"]
         assert inc["ml_anomalies"][0]["top_features"] == ["mem"]
+    summ = client.get("/incidents").json()[0]
+    assert summ["ml_active"] == ["api-service"] and summ["anomalies"] == 1
 
 
 def test_responses_post_and_ws(client):

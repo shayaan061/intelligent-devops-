@@ -10,6 +10,11 @@ Rules:
   lands in one incident.
 - An incident resolves once none of its alerts is firing and its ML
   anomalies are older than `window`. A later alert opens a new incident.
+- The ML detector re-posts an anomaly every poll while it lasts. A repeat
+  from a service that already has an anomaly in the open incident only
+  refreshes it (like an Alertmanager repeat), so it keeps the incident open
+  without triggering a new analysis. `ml_active()` lists the services whose
+  anomaly was refreshed in the last `fresh` seconds; the verifier uses it.
 
 Pure and synchronous (the clock is injectable) so it can be unit-tested;
 app.py does the I/O.
@@ -59,6 +64,9 @@ class Incident:
     def services(self):
         svcs = {a["service"] for a in self.alerts.values()} | {m["service"] for m in self.anomalies}
         return sorted(s for s in svcs if s)
+
+    def ml_active(self, now, fresh):
+        return sorted({m["service"] for m in self.anomalies if now - m["_at"] < fresh})
 
     def sources(self):
         out = []
@@ -125,9 +133,15 @@ class Grouper:
         return None
 
     def add_anomaly(self, anomaly):
-        """An ML anomaly. Returns (incident, "new" | "changed")."""
+        """An ML anomaly. Returns (incident, "new" | "changed" | None)."""
         now = self.clock()
         inc, change = self._join_or_open(anomaly["service"], now)
+        known = next((m for m in inc.anomalies if m["service"] == anomaly["service"]), None)
+        if change == "changed" and known is not None:
+            # Repeat while the anomaly lasts: keep the first detected_at (MTTD)
+            known.update({k: v for k, v in anomaly.items() if k != "detected_at"}, _at=now)
+            inc.last_activity = now
+            return inc, None
         inc.anomalies.append({**anomaly, "_at": now})
         inc.last_activity = now
         return inc, change

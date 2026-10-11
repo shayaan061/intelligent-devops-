@@ -57,6 +57,12 @@ from store import Store
 PROMETHEUS_URL = os.environ.get("PROMETHEUS_URL", "http://localhost:9090")
 GROUP_WINDOW = float(os.environ.get("GROUP_WINDOW", "60"))
 SETTLE_SECONDS = float(os.environ.get("SETTLE_SECONDS", "10"))
+# An ML anomaly refreshed within this many seconds counts as still active.
+# The detector re-posts every 15 s while it lasts, so 20 s is one poll plus
+# margin. Kept short because the 30 s rate windows keep a fixed fault looking
+# anomalous for one more poll: with 25 s, a refresh 22 s after a CPU reset was
+# still "active" at the 45 s verify (9 Oct, scenario 2). See summary()["ml_active"]
+ML_FRESH_SECONDS = float(os.environ.get("ML_FRESH_SECONDS", "20"))
 CONTEXT_MINUTES = int(os.environ.get("CONTEXT_MINUTES", "10"))
 # SQLite file for the incident store; ":memory:" (default) keeps nothing
 INCIDENT_DB = os.environ.get("INCIDENT_DB", ":memory:")
@@ -414,7 +420,9 @@ def summary(inc):
             "resolved_at": iso(inc.resolved_at) if inc.resolved else None,
             "services": inc.services(), "sources": inc.sources(),
             "firing": sorted(f'{a["alertname"]}/{a["service"]}' for a in inc.firing()),
-            "anomalies": len(inc.anomalies), "attempt": inc.attempt, "actions": list(inc.actions)}
+            "anomalies": len(inc.anomalies),
+            "ml_active": [] if inc.resolved else inc.ml_active(grouper.clock(), ML_FRESH_SECONDS),
+            "attempt": inc.attempt, "actions": list(inc.actions)}
 
 
 @app.get("/incidents")
