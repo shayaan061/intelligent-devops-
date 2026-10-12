@@ -1,0 +1,13 @@
+2026-10-09 14:53:38,992 ml-detector INFO ANOMALY api-service score=0.637 z={'cpu': 17.81}
+2026-10-09 14:53:54,026 ml-detector INFO ANOMALY api-service score=0.639 z={'cpu': 19.6}
+2026-10-09 14:54:09,019 ml-detector INFO ANOMALY api-service score=0.692 z={'cpu': 19.59}
+2026-10-09 14:54:24,054 ml-detector INFO ANOMALY api-service score=0.666 z={'cpu': 15.57}
+2026-10-09 14:54:39,068 ml-detector INFO ANOMALY api-service score=0.64 z={'cpu': 4.16}
+2026-10-09 15:00:09,371 ml-detector INFO ANOMALY api-service score=0.656 z={'mem': 9.81}
+2026-10-09 15:00:24,397 ml-detector INFO ANOMALY api-service score=0.563 z={'mem': 11.79}
+2026-10-09 15:00:39,409 ml-detector INFO ANOMALY api-service score=0.568 z={'mem': 14.74}
+2026-10-09 15:00:54,427 ml-detector INFO ANOMALY api-service score=0.661 z={'mem': 17.62}
+2026-10-09 15:07:09,778 ml-detector INFO ANOMALY api-service score=0.724 z={'cpu': 19.58}
+2026-10-09 15:07:24,793 ml-detector INFO ANOMALY api-service score=0.712 z={'cpu': 19.6}
+2026-10-09 15:07:39,816 ml-detector INFO ANOMALY api-service score=0.699 z={'cpu': 19.59}
+2026-10-09 15:07:54,834 ml-detector INFO ANOMALY api-service score=0.687 z={'cpu': 13.71}

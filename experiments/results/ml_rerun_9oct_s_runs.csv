@@ -1,0 +1,4 @@
+run_id,scenario,name,end_reason,incident_id,detected,auto_resolved,mttr_s,mttd_s,root_cause,root_cause_ok,plan_action,plan_action_ok,executed_action,executed_action_ok,unsafe_executed,collateral_executed,verified,escalated,attempts,plan_source,fallback_reason,plan_latency_ms
+961c8825,2,cpu-api,remediated,inc-261009-145338-1,True,True,63.2,23.4,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,False,False,2,llm,,28489.6
+fb4fd3c2,8,gradual-memory-api,remediated,inc-261009-150009-2,True,True,99.6,51.3,api-service,True,restart_container/api-service,True,restart_container/api-service,True,0,0,True,False,1,llm,,27341.6
+1ea9f2f0,2,cpu-api,remediated,inc-261009-150709-1,True,True,72.3,34.7,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,True,False,1,llm,,25703.7

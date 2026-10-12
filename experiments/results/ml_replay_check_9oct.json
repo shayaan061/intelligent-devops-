@@ -1,0 +1,135 @@
+{
+  "per_run": [
+    {
+      "run_id": "1572b730",
+      "scenario": 1,
+      "name": "cpu-frontend",
+      "target": "frontend",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 32,
+      "first_service": "frontend",
+      "first_features": [
+        "cpu"
+      ],
+      "target_flagged": true
+    },
+    {
+      "run_id": "8f736c8f",
+      "scenario": 2,
+      "name": "cpu-api",
+      "target": "api-service",
+      "end_reason": "expired",
+      "detected": true,
+      "delay_s": 33,
+      "first_service": "api-service",
+      "first_features": [
+        "cpu"
+      ],
+      "target_flagged": true
+    },
+    {
+      "run_id": "5ea25046",
+      "scenario": 3,
+      "name": "memory-api",
+      "target": "api-service",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 31,
+      "first_service": "api-service",
+      "first_features": [
+        "mem"
+      ],
+      "target_flagged": true
+    },
+    {
+      "run_id": "76ce4c39",
+      "scenario": 4,
+      "name": "latency-api",
+      "target": "api-service",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 38,
+      "first_service": "api-service",
+      "first_features": [
+        "p95"
+      ],
+      "target_flagged": true
+    },
+    {
+      "run_id": "5bacf57d",
+      "scenario": 5,
+      "name": "error-api",
+      "target": "api-service",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 35,
+      "first_service": "api-service",
+      "first_features": [
+        "err"
+      ],
+      "target_flagged": true
+    },
+    {
+      "run_id": "a4797a2c",
+      "scenario": 6,
+      "name": "redis-stopped",
+      "target": "redis",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 27,
+      "first_service": "api-service",
+      "first_features": [
+        "err"
+      ],
+      "target_flagged": false
+    },
+    {
+      "run_id": "e4905dd2",
+      "scenario": 7,
+      "name": "frontend-stopped",
+      "target": "frontend",
+      "end_reason": "remediated",
+      "detected": false,
+      "delay_s": null,
+      "first_service": null,
+      "first_features": null,
+      "target_flagged": false
+    },
+    {
+      "run_id": "1be32f93",
+      "scenario": 8,
+      "name": "gradual-memory-api",
+      "target": "api-service",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 57,
+      "first_service": "api-service",
+      "first_features": [
+        "mem"
+      ],
+      "target_flagged": true
+    },
+    {
+      "run_id": "7d99ff9b",
+      "scenario": 9,
+      "name": "cpu-latency-api",
+      "target": "api-service",
+      "end_reason": "remediated",
+      "detected": true,
+      "delay_s": 23,
+      "first_service": "api-service",
+      "first_features": [
+        "p95",
+        "cpu"
+      ],
+      "target_flagged": true
+    }
+  ],
+  "false_positive_episodes": [],
+  "window": [
+    "2026-10-09T12:30:00Z",
+    "2026-10-09T13:34:00Z"
+  ],
+  "hours": 1.07
+}

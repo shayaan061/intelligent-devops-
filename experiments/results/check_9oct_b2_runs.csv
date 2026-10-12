@@ -1,0 +1,10 @@
+run_id,scenario,name,end_reason,incident_id,detected,auto_resolved,mttr_s,mttd_s,root_cause,root_cause_ok,plan_action,plan_action_ok,executed_action,executed_action_ok,unsafe_executed,collateral_executed,verified,escalated,attempts,plan_source,fallback_reason,plan_latency_ms
+1572b730,1,cpu-frontend,remediated,inc-261009-123304-1,True,True,89.8,47.0,frontend,True,reset_faults/frontend,True,reset_faults/frontend,True,0,0,True,False,1,llm,,26954.8
+8f736c8f,2,cpu-api,expired,inc-261009-123935-2,True,False,,47.2,api-service,True,reset_faults/api-service,True,,False,0,0,False,False,1,llm,,41332.2
+5ea25046,3,memory-api,remediated,inc-261009-124918-3,True,True,82.5,25.3,api-service,True,restart_container/api-service,True,restart_container/api-service,True,0,0,True,False,1,llm,,27249.0
+76ce4c39,4,latency-api,remediated,inc-261009-125546-4,True,True,78.5,30.5,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,True,False,1,llm,,28390.5
+5bacf57d,5,error-api,remediated,inc-261009-130201-5,True,True,82.5,27.0,api-service,True,restart_container/api-service,False,restart_container/api-service,False,0,0,True,False,1,llm,,25692.6
+a4797a2c,6,redis-stopped,remediated,inc-261009-130815-6,True,True,62.8,18.9,redis,True,restart_container/redis,True,restart_container/redis,True,0,0,True,False,1,llm,,24469.3
+e4905dd2,7,frontend-stopped,remediated,inc-261009-131425-7,True,True,71.9,26.1,frontend,True,restart_container/frontend,True,restart_container/frontend,True,0,0,True,False,1,llm,,25754.2
+1be32f93,8,gradual-memory-api,remediated,inc-261009-132403-8,True,True,289.8,231.9,api-service,True,restart_container/api-service,True,restart_container/api-service,True,0,0,True,False,1,llm,,28119.8
+7d99ff9b,9,cpu-latency-api,remediated,inc-261009-133031-9,True,True,94.9,29.9,api-service,True,reset_faults/api-service,True,reset_faults/api-service,True,0,0,False,False,1,llm,,30275.4

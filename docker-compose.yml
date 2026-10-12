@@ -153,6 +153,31 @@ services:
       - gateway
     restart: unless-stopped
 
+  # ML Anomaly Detector (§6.2): every 15 s, robust z-scores + Isolation Forest
+  # on the gateway's context features -> POST gateway /anomalies once a service
+  # is anomalous for 2 polls in a row (re-posted while it lasts). Only reports.
+  # Train first (normal traffic, no faults):
+  #   python experiments/record_baseline.py --last 2h
+  #   docker compose run --rm ml-detector python train.py /experiments/baseline_<stamp>.csv
+  # Waits for ml/models/detector.joblib. Stop it for the no-ML baselines
+  # (B0-B2): docker compose stop ml-detector
+  ml-detector:
+    build:
+      context: .
+      dockerfile: ml/Dockerfile
+    container_name: ml-detector
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - GATEWAY_URL=http://gateway:8000
+      - MODEL_PATH=/app/ml/models/detector.joblib
+    volumes:
+      - ./ml/models:/app/ml/models
+      - ./experiments:/experiments:ro
+    depends_on:
+      - gateway
+      - prometheus
+    restart: unless-stopped
+
   # Response System + Verifier (§6.5, §6.6): ResponsePlan -> policy validator
   # -> executor (Docker SDK, /reset) -> verify -> re-analyze (max 3) -> escalate.
   # The only service that changes anything. RESPONDER_MODE=dry_run validates

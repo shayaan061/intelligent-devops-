@@ -1,0 +1,6 @@
+# Only the ml-detector image is built from the repo root (ml/Dockerfile).
+# Everything else uses its own directory as the build context.
+*
+!ml/requirements.txt
+!ml/*.py
+!gateway/context.py

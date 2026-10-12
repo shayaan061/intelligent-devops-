@@ -1,0 +1,99 @@
+{
+  "trained_at": "2026-10-09T14:52:35+00:00",
+  "sources": [
+    "baseline_20261009_1334.csv"
+  ],
+  "window": [
+    "2026-10-09T13:34:00Z",
+    "2026-10-09T14:52:30Z"
+  ],
+  "z_threshold": 4.0,
+  "z_soft": 2.0,
+  "if_quantile": 0.995,
+  "sustain": 2,
+  "sklearn": "1.9.1",
+  "holdout": {
+    "frontend": {
+      "holdout_samples": 63,
+      "flagged": 0,
+      "flagged_sustained": 0,
+      "fp_rate": 0.0,
+      "fp_rate_sustained": 0.0
+    },
+    "api-service": {
+      "holdout_samples": 63,
+      "flagged": 0,
+      "flagged_sustained": 0,
+      "fp_rate": 0.0,
+      "fp_rate_sustained": 0.0
+    },
+    "redis": {
+      "holdout_samples": 63,
+      "flagged": 0,
+      "flagged_sustained": 0,
+      "fp_rate": 0.0,
+      "fp_rate_sustained": 0.0
+    }
+  },
+  "models": {
+    "frontend": {
+      "service": "frontend",
+      "n_train": 315,
+      "if_threshold": 0.772,
+      "median": {
+        "cpu": 0.025,
+        "mem": 0.08,
+        "p95": 0.0056,
+        "err": 0.0,
+        "rps": 4.9208,
+        "upstream_p95": 0.0049
+      },
+      "scale": {
+        "cpu": 0.05,
+        "mem": 0.02,
+        "p95": 0.05,
+        "err": 0.02,
+        "rps": 0.5,
+        "upstream_p95": 0.05
+      }
+    },
+    "api-service": {
+      "service": "api-service",
+      "n_train": 315,
+      "if_threshold": 0.764,
+      "median": {
+        "cpu": 0.0162,
+        "mem": 0.0938,
+        "p95": 0.0047,
+        "err": 0.0,
+        "rps": 4.9205,
+        "upstream_p95": 0.0047
+      },
+      "scale": {
+        "cpu": 0.05,
+        "mem": 0.02,
+        "p95": 0.05,
+        "err": 0.02,
+        "rps": 0.5,
+        "upstream_p95": 0.05
+      }
+    },
+    "redis": {
+      "service": "redis",
+      "n_train": 315,
+      "if_threshold": 0.732,
+      "median": {
+        "mem": 0.0394,
+        "mem_bytes": 1320896.0,
+        "clients": 4.0,
+        "ops": 6.44
+      },
+      "scale": {
+        "mem": 0.02,
+        "mem_bytes": 2097152.0,
+        "clients": 2.0,
+        "ops": 0.5
+      }
+    }
+  }
+}

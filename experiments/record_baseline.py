@@ -18,6 +18,9 @@ history. Export before `docker compose down` or a rebuild of prometheus.
 Prometheus caps a range query at 11,000 points, so long windows are
 fetched in chunks.
 
+--keep-all exports everything (no dropping), for replaying the detector
+over fault windows (ml/replay.py). Never train on a --keep-all export.
+
 Usage:
   python experiments/record_baseline.py --last 2h
   python experiments/record_baseline.py --start 2026-10-06T18:00:00Z --end 2026-10-06T20:00:00Z
@@ -89,14 +92,15 @@ def fetch(client, prom, query, start, end):
     return points
 
 
-def export(prom, start, end, out, ground_truth, margin):
+def export(prom, start, end, out, ground_truth, margin, keep_all=False):
     start = math.floor(start / STEP) * STEP
-    windows = fault_windows(ground_truth, margin)
+    windows = [] if keep_all else fault_windows(ground_truth, margin)
     features = sorted({m for qs in SERVICE_QUERIES.values() for m in qs})
     rows, dropped = [], 0
     with httpx.Client(timeout=30) as client:
-        alerting = fetch(client, prom, "count(ALERTS)", start - margin, end + margin)
-        windows += [(t - margin, t + margin) for t, v in alerting.items() if v]
+        if not keep_all:
+            alerting = fetch(client, prom, "count(ALERTS)", start - margin, end + margin)
+            windows += [(t - margin, t + margin) for t, v in alerting.items() if v]
         for svc, queries in SERVICE_QUERIES.items():
             series = {m: fetch(client, prom, q.format(s=svc), start, end) for m, q in queries.items()}
             t = start
@@ -122,6 +126,7 @@ def main(argv=None):
     ap.add_argument("--end")
     ap.add_argument("--ground-truth", default=os.path.join(HERE, "ground_truth.csv"))
     ap.add_argument("--margin", type=float, default=120, help="seconds dropped around each injected run")
+    ap.add_argument("--keep-all", action="store_true", help="drop nothing (for ml/replay.py, not training)")
     ap.add_argument("--out")
     args = ap.parse_args(argv)
 
@@ -133,7 +138,7 @@ def main(argv=None):
     else:
         ap.error("give --last or --start")
     out = args.out or os.path.join(HERE, f"baseline_{datetime.now().strftime('%Y%m%d_%H%M')}.csv")
-    n, dropped = export(args.prometheus, start, end, out, args.ground_truth, args.margin)
+    n, dropped = export(args.prometheus, start, end, out, args.ground_truth, args.margin, args.keep_all)
     print(f"{n} rows -> {out} ({dropped} samples dropped near injected faults or alerts)")
 
 
