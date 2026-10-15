@@ -178,4 +178,6 @@ class ResponsePlan(_Strict):
     fallback_reason: Optional[str] = None   # why the LLM wasn't used
     attempt: int = Field(default=1, ge=1)
     latency_ms: float = Field(default=0.0, ge=0.0)
+    prompt_tokens: Optional[int] = Field(default=None, ge=0)       # Ollama's counts; null without an LLM call
+    completion_tokens: Optional[int] = Field(default=None, ge=0)
     created_at: str

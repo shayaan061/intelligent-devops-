@@ -18,7 +18,7 @@ GOOD_ANSWER = {
 }
 
 
-def client_returning(content=None, status=200, exc=None, seen=None):
+def client_returning(content=None, status=200, exc=None, seen=None, extra=None):
     def handler(request):
         if seen is not None:
             seen.append(json.loads(request.content))
@@ -28,7 +28,7 @@ def client_returning(content=None, status=200, exc=None, seen=None):
             body = {"message": {"role": "assistant", "content": json.dumps(content)}}
         else:
             body = {"message": {"role": "assistant", "content": content}}
-        return httpx.Response(status, json=body)
+        return httpx.Response(status, json={**body, **(extra or {})})
     return httpx.Client(transport=httpx.MockTransport(handler))
 
 
@@ -121,6 +121,32 @@ def test_runbook_mode_never_calls_llm():
     client = httpx.Client(transport=httpx.MockTransport(boom))
     plan = analyze(load_sample(4), "runbook", client=client)
     assert plan.source == "runbook" and plan.fallback_reason == "mode=runbook"
+
+
+def test_token_counts_on_llm_plan():
+    plan = run(client_returning(GOOD_ANSWER, extra={"prompt_eval_count": 2310, "eval_count": 187}))
+    assert (plan.prompt_tokens, plan.completion_tokens) == (2310, 187)
+
+
+def test_token_counts_kept_on_fallback():
+    # The model answered (tokens spent) but the answer was unusable
+    plan = run(client_returning({**GOOD_ANSWER, "confidence": 0.55},
+                                extra={"prompt_eval_count": 2000, "eval_count": 150}))
+    assert plan.source == "runbook" and plan.fallback_reason == "low_confidence"
+    assert (plan.prompt_tokens, plan.completion_tokens) == (2000, 150)
+
+
+@pytest.mark.parametrize("extra", [{}, {"prompt_eval_count": "12", "eval_count": True},
+                                   {"prompt_eval_count": -1}])
+def test_missing_or_bad_token_counts_are_null(extra):
+    plan = run(client_returning(GOOD_ANSWER, extra=extra))
+    assert plan.source == "llm"
+    assert plan.prompt_tokens is None and plan.completion_tokens is None
+
+
+def test_no_tokens_without_llm_call():
+    assert run(client_returning(exc=httpx.ConnectError("refused"))).prompt_tokens is None
+    assert analyze(load_sample(4), "runbook").prompt_tokens is None
 
 
 def test_bad_mode_rejected():

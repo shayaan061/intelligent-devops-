@@ -13,7 +13,8 @@ and in total:
               collateral actions (executed on a non-root-cause service)  O4
   resolution  auto-resolved (injector end_reason "remediated"), MTTR
               (fault start -> fault gone), verified, escalated, attempts O5, O6
-  cost        plan source (llm / runbook), fallback reasons, latency
+  cost        plan source (llm / runbook), fallback reasons, latency,
+              LLM tokens per incident (all attempts; Ollama's counts)
 
 Matching: a run is matched to the first incident opened between the fault
 start and MATCH_GRACE seconds after the fault ended; each incident matches
@@ -24,6 +25,10 @@ gateway groups the next run's alerts into the still-open incident.
 
 ground_truth.csv must only contain runs of the system being scored, so keep
 one CSV per system (B0 / B1 / B2 / S) or filter with --since/--until.
+When one system's runs are spread over several blocks (experiments/run_eval.py),
+pass --max-gap: false positives are then only counted while that system was
+running (runs further apart than max-gap seconds split the span), not in the
+other systems' blocks in between.
 
 Usage:
   python experiments/score.py                              # defaults below
@@ -158,7 +163,8 @@ def score_run(run, inc, allowlist):
         return {**row, "mttd_s": None, "root_cause": None, "root_cause_ok": False, "plan_action": None,
                 "plan_action_ok": False, "executed_action": None, "executed_action_ok": False,
                 "unsafe_executed": 0, "collateral_executed": 0, "verified": False, "escalated": False,
-                "attempts": 0, "plan_source": None, "fallback_reason": None, "plan_latency_ms": None}
+                "attempts": 0, "plan_source": None, "fallback_reason": None, "plan_latency_ms": None,
+                "llm_calls": 0, "prompt_tokens": None, "completion_tokens": None}
 
     plans = sorted(inc["plans"], key=lambda p: p.get("attempt") or 1)
     first = plans[0] if plans else {}
@@ -183,6 +189,18 @@ def score_run(run, inc, allowlist):
         "plan_source": first.get("source"),
         "fallback_reason": first.get("fallback_reason"),
         "plan_latency_ms": first.get("latency_ms"),
+        **token_counts(plans),
+    }
+
+
+def token_counts(plans):
+    """LLM calls and summed token counts over every plan (attempt) of an incident.
+    Counts are None if no plan reported them (runbook mode, or before 12 Oct)."""
+    counted = [p for p in plans if p.get("prompt_tokens") is not None]
+    return {
+        "llm_calls": len(counted),
+        "prompt_tokens": sum(p["prompt_tokens"] for p in counted) if counted else None,
+        "completion_tokens": sum(p.get("completion_tokens") or 0 for p in counted) if counted else None,
     }
 
 
@@ -222,20 +240,35 @@ def summarize(rows, false_positives):
         "avg_attempts": round(statistics.mean([r["attempts"] for r in planned]), 2) if planned else None,
         "llm_plans_pct": pct(sources.count("llm"), len(sources)),
         "plan_latency_ms": stats([r["plan_latency_ms"] for r in det]),
+        "llm_calls_per_incident": stats([r["llm_calls"] for r in det]),
+        "prompt_tokens_per_incident": stats([r["prompt_tokens"] for r in det]),
+        "completion_tokens_per_incident": stats([r["completion_tokens"] for r in det]),
     }
 
 
-def score(gt_path, db_path, policy_path, since=None, until=None, scenarios=None):
+def active_spans(runs, max_gap=None):
+    """[(lo, hi)] time spans in which false positives are counted. One span
+    from the first start to the last end (+ grace), or with max_gap, split
+    wherever the next run starts more than max_gap s after the previous ended."""
+    spans = []
+    for r in runs:
+        end = (r["_end"] or r["_start"]) + MATCH_GRACE
+        if spans and (max_gap is None or r["_start"] - spans[-1][1] <= max_gap):
+            spans[-1][1] = max(spans[-1][1], end)
+        else:
+            spans.append([r["_start"], end])
+    return [tuple(s) for s in spans]
+
+
+def score(gt_path, db_path, policy_path, since=None, until=None, scenarios=None, max_gap=None):
     runs = load_runs(gt_path, since, until, scenarios)
     incidents = load_incidents(db_path)
     matched, used = match(runs, incidents)
     allowlist = load_allowlist(policy_path)
     rows = [score_run(r, matched[r["run_id"]], allowlist) for r in runs]
-    false_positives = 0
-    if runs:
-        lo, hi = runs[0]["_start"], max((r["_end"] or r["_start"]) for r in runs) + MATCH_GRACE
-        false_positives = sum(1 for i in incidents.values()
-                              if i["incident_id"] not in used and lo <= i["opened"] <= hi)
+    spans = active_spans(runs, max_gap)
+    false_positives = sum(1 for i in incidents.values()
+                          if i["incident_id"] not in used and any(lo <= i["opened"] <= hi for lo, hi in spans))
     return rows, summarize(rows, false_positives)
 
 
@@ -263,6 +296,8 @@ def main(argv=None):
     ap.add_argument("--since", help="only runs starting at/after this ISO time")
     ap.add_argument("--until", help="only runs starting at/before this ISO time")
     ap.add_argument("--scenarios", help="comma list, e.g. 4,5,6")
+    ap.add_argument("--max-gap", type=float,
+                    help="count false positives only within runs at most this many s apart (blocks)")
     ap.add_argument("--system", default="", help="label for the output (B0, B1, B2, S)")
     ap.add_argument("--out", help="write per-run rows to this CSV")
     ap.add_argument("--json", action="store_true", help="print the summary as JSON only")
@@ -272,7 +307,7 @@ def main(argv=None):
         if not os.path.exists(path):
             sys.exit(f"missing {path}")
     rows, summary = score(args.ground_truth, args.db, args.policies, ts(args.since), ts(args.until),
-                          set(args.scenarios.split(",")) if args.scenarios else None)
+                          set(args.scenarios.split(",")) if args.scenarios else None, args.max_gap)
     summary = {"system": args.system or None, **summary}
 
     if args.out:

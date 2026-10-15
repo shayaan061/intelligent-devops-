@@ -77,19 +77,22 @@ def analyze(incident, mode="llm", runbooks=None, client=None):
         runbooks = load_runbooks()
 
     t0 = time.perf_counter()
+    usage = None
     if mode == "runbook":
         plan, reason = None, "mode=runbook"
     else:
         try:
             plan, reason = llm.llm_plan(incident, client), None
         except llm.LLMError as e:
-            plan, reason = None, str(e)
+            plan, reason, usage = None, str(e), e.usage
         except Exception as e:  # a bug in the LLM path must not lose the incident
             log.exception("LLM path failed")
             plan, reason = None, f"error: {type(e).__name__}"
 
     if plan is None:
         plan = run_runbooks(incident, runbooks, fallback_reason=reason)
+        if usage:
+            plan = plan.model_copy(update=usage)
 
     latency = round((time.perf_counter() - t0) * 1000, 1)
     return plan.model_copy(update={"latency_ms": latency})

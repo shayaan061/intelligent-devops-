@@ -40,10 +40,13 @@ def incident(iid, opened, alert_at, status="open", resolved=None):
                               "ml_anomalies": []})
 
 
-def plan(iid, root, a_type, target, attempt=1, source="runbook", latency=5.0):
-    return ("response_plan", iid, {"type": "response_plan", "incident_id": iid, "root_cause_service": root,
-                                   "recommended_action": {"type": a_type, "target": target}, "attempt": attempt,
-                                   "source": source, "latency_ms": latency})
+def plan(iid, root, a_type, target, attempt=1, source="runbook", latency=5.0, tokens=None):
+    body = {"type": "response_plan", "incident_id": iid, "root_cause_service": root,
+            "recommended_action": {"type": a_type, "target": target}, "attempt": attempt,
+            "source": source, "latency_ms": latency}
+    if tokens:
+        body["prompt_tokens"], body["completion_tokens"] = tokens
+    return ("response_plan", iid, body)
 
 
 def action(iid, status, a_type, target):
@@ -53,7 +56,7 @@ def action(iid, status, a_type, target):
 
 @pytest.fixture
 def world(tmp_path):
-    def build(runs, messages):
+    def build(runs, messages, **kwargs):
         gt = tmp_path / "gt.csv"
         with open(gt, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(runs[0]))
@@ -67,7 +70,7 @@ def world(tmp_path):
                         ("x", "c", type_, iid, body.get("status"), json.dumps(body)))
         con.commit()
         con.close()
-        return score.score(str(gt), str(db), POLICIES)
+        return score.score(str(gt), str(db), POLICIES, **kwargs)
     return build
 
 
@@ -142,3 +145,39 @@ def test_since_filter(world, tmp_path):
            gt_row("r2", 5, "api-service", "reset_faults", 300, 350)], [])
     rows, _ = score.score(str(tmp_path / "gt.csv"), str(tmp_path / "inc.db"), POLICIES, since=score.ts(t(200)))
     assert [r["run_id"] for r in rows] == ["r2"]
+
+
+def test_token_counts_summed_over_attempts(world):
+    rows, s = world([gt_row("r1", 4, "api-service", "reset_faults", 0, 180, "expired")],
+                    [incident("i1", 45, 40),
+                     plan("i1", "api-service", "reset_faults", "api-service", 1, "llm", tokens=(2000, 150)),
+                     plan("i1", "api-service", "restart_container", "api-service", 2, "llm", tokens=(2200, 170))])
+    r = rows[0]
+    assert (r["llm_calls"], r["prompt_tokens"], r["completion_tokens"]) == (2, 4200, 320)
+    assert s["prompt_tokens_per_incident"]["mean"] == 4200 and s["llm_calls_per_incident"]["mean"] == 2
+
+
+def test_runbook_plans_have_no_token_counts(world):
+    rows, s = world([gt_row("r1", 4, "api-service", "reset_faults", 0, 50)],
+                    [incident("i1", 45, 40), plan("i1", "api-service", "reset_faults", "api-service")])
+    assert rows[0]["llm_calls"] == 0 and rows[0]["prompt_tokens"] is None
+    assert s["prompt_tokens_per_incident"]["n"] == 0
+
+
+def test_max_gap_ignores_incidents_between_blocks(world, tmp_path):
+    # Two blocks of this system 50 min apart; another system's incident in between (1500 s)
+    runs = [gt_row("r1", 4, "api-service", "reset_faults", 0, 50),
+            gt_row("r2", 5, "api-service", "reset_faults", 3000, 3050)]
+    msgs = [incident("i1", 45, 40), incident("fp", 100, 95), incident("other", 1500, 1495),
+            incident("i2", 3040, 3035)]
+    _, s = world(runs, msgs)
+    assert s["false_positive_incidents"] == 2
+    _, s = score.score(str(tmp_path / "gt.csv"), str(tmp_path / "inc.db"), POLICIES, max_gap=600)
+    assert s["false_positive_incidents"] == 1
+
+
+def test_active_spans():
+    runs = [{"_start": 0, "_end": 50}, {"_start": 400, "_end": 450}, {"_start": 2000, "_end": None}]
+    assert score.active_spans(runs) == [(0, 2060)]
+    assert score.active_spans(runs, max_gap=600) == [(0, 510), (2000, 2060)]
+    assert score.active_spans([]) == []

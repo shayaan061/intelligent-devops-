@@ -11,6 +11,10 @@ then falls back to the runbooks and reports that reason as fallback_reason:
   unreachable, timeout, http_<status>, bad_response, invalid_json,
   invalid_action: <detail>, schema_error, low_confidence
 
+Ollama's token counts (prompt_eval_count, eval_count) go into the plan's
+prompt_tokens / completion_tokens, also on a fallback plan when the model
+answered but the answer was unusable (the tokens were spent anyway).
+
 Nothing named fault_* reaches the prompt (ground truth for scoring only).
 
 Env:
@@ -42,7 +46,12 @@ LLM_FIELDS = ("root_cause_service", "incident_type", "severity", "probable_cause
 
 
 class LLMError(Exception):
-    """The LLM answer can't be used; str(e) is the fallback_reason."""
+    """The LLM answer can't be used; str(e) is the fallback_reason.
+    usage: token counts if the model answered, else None."""
+
+    def __init__(self, reason, usage=None):
+        super().__init__(reason)
+        self.usage = usage
 
 
 def now_iso():
@@ -184,6 +193,19 @@ def build_messages(incident):
 
 def call_ollama(messages, client=None):
     """Raw content string of the model's answer."""
+    return call_ollama_usage(messages, client)[0]
+
+
+def token_usage(body):
+    """{"prompt_tokens", "completion_tokens"} from an Ollama /api/chat body."""
+    def count(key):
+        v = body.get(key)
+        return v if isinstance(v, int) and not isinstance(v, bool) and v >= 0 else None
+    return {"prompt_tokens": count("prompt_eval_count"), "completion_tokens": count("eval_count")}
+
+
+def call_ollama_usage(messages, client=None):
+    """(content, token usage) of the model's answer."""
     body = {
         "model": OLLAMA_MODEL,
         "messages": messages,
@@ -204,12 +226,14 @@ def call_ollama(messages, client=None):
     if r.status_code != 200:
         raise LLMError(f"http_{r.status_code}")
     try:
-        content = r.json()["message"]["content"]
+        body = r.json()
+        content = body["message"]["content"]
     except (ValueError, KeyError, TypeError):
         raise LLMError("bad_response")
+    usage = token_usage(body) if isinstance(body, dict) else None
     if not isinstance(content, str):
-        raise LLMError("bad_response")
-    return content
+        raise LLMError("bad_response", usage)
+    return content, usage
 
 
 def action_problem(action, field):
@@ -266,5 +290,11 @@ def parse_answer(content, incident):
 
 
 def llm_plan(incident, client=None):
-    """ResponsePlan from the model, or LLMError(reason)."""
-    return parse_answer(call_ollama(build_messages(incident), client), incident)
+    """ResponsePlan from the model (with token counts), or LLMError(reason)."""
+    content, usage = call_ollama_usage(build_messages(incident), client)
+    try:
+        plan = parse_answer(content, incident)
+    except LLMError as e:
+        e.usage = usage
+        raise
+    return plan.model_copy(update=usage or {})

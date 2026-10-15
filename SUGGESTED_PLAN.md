@@ -145,14 +145,17 @@ Prometheus rules + ML detector → WebSocket layer → LLM Analysis Engine
 ### 6.1 Monitoring & Rule-Based Detection
 `prometheus/rules.yml` (one rule per service where it applies):
 
-| Alert | Example expression | For |
+| Alert | Expression (simplified; full text in `rules.yml`) | For |
 |-------|--------------------|-----|
-| HighCPU | `rate(container_cpu_usage_seconds_total{name=~"frontend\|api-service"}[1m]) > 0.8` | 30s |
-| HighMemory | `container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.8` | 30s |
-| HighLatency | `histogram_quantile(0.95, sum by (le, job) (rate(http_request_duration_seconds_bucket[1m]))) > 1` | 30s |
-| HighErrorRate | `sum by (job) (rate(http_requests_total{status=~"5.."}[1m])) / sum by (job) (rate(http_requests_total[1m])) > 0.1` | 30s |
-| ServiceDown | `up == 0` | 15s |
+| HighCPU | `sum by (name) (rate(container_cpu_usage_seconds_total{name=~"frontend\|api-service"}[30s])) > 0.8` (1 CPU limit) | 20s |
+| HighMemory | `container_memory_working_set_bytes / container_spec_memory_limit_bytes > 0.8` (512 MB limit) | 20s |
+| HighLatency | `histogram_quantile(0.95, sum by (le, job) (rate(http_request_duration_seconds_bucket{endpoint=~"/\|/data"}[30s]))) > 1` | 20s |
+| HighErrorRate | `sum by (job) (rate(http_requests_total{endpoint=~"/\|/data", status=~"5.."}[30s])) / sum by (job) (rate(http_requests_total{endpoint=~"/\|/data"}[30s])) > 0.1` | 20s |
+| ServiceDown | `up{job=~"frontend\|api-service"} == 0` | 15s |
 | RedisDown | `redis_up == 0` | 15s |
+| ExporterDown | `up{job=~"cadvisor\|redis"} == 0` | 30s |
+
+30 s rate windows with `for: 20s` detect a fault in about 40 s (a 1-minute window would never fire on a 30 s CPU fault). Every alert carries a `service` label. Fault caps in the demo app: `duration` 1–600 s, memory `size_mb` 10–450 (the limit is 512 MB, so a fault can cross 80%).
 
 Alertmanager sends each alert to the gateway as a `POST /alerts` webhook.
 

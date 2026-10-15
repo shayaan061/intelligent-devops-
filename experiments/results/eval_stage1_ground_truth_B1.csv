@@ -1,0 +1,30 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+46c5978a,5,error-api,error,api-service,api-service,reset_faults,2026-10-11T20:27:00.984Z,2026-10-11T20:30:00.984Z,2026-10-11T20:27:48.342Z,remediated,error
+64d19472,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-11T20:32:48.377Z,2026-10-11T20:35:48.377Z,2026-10-11T20:33:54.678Z,remediated,cpu
+9935a750,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-11T20:38:54.332Z,2026-10-11T20:41:54.332Z,2026-10-11T20:39:36.903Z,remediated,stop
+4051baf5,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-11T20:44:37.284Z,2026-10-11T20:49:37.284Z,2026-10-11T20:48:50.274Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+0c7e58e0,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-11T20:53:50.329Z,2026-10-11T20:56:50.329Z,2026-10-11T20:54:54.756Z,remediated,cpu
+4c5449b5,6,redis-stopped,stop,redis,redis,restart_container,2026-10-11T20:59:54.324Z,2026-10-11T21:02:54.324Z,2026-10-11T21:00:31.901Z,remediated,stop
+625441f0,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-11T21:05:32.276Z,2026-10-11T21:08:32.276Z,2026-10-11T21:06:23.194Z,remediated,cpu;latency
+5ed951c3,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-11T21:11:23.362Z,2026-10-11T21:14:23.362Z,2026-10-11T21:12:12.764Z,remediated,latency
+d49eee6b,3,memory-api,memory,api-service,api-service,restart_container,2026-10-11T21:17:12.382Z,2026-10-11T21:20:12.382Z,2026-10-11T21:18:10.873Z,remediated,memory:{'size_mb': 420}
+6c002446,3,memory-api,memory,api-service,api-service,restart_container,2026-10-11T23:18:58.450Z,2026-10-11T23:21:58.450Z,2026-10-11T23:19:55.931Z,remediated,memory:{'size_mb': 420}
+99c96cf6,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-11T23:24:56.312Z,2026-10-11T23:29:56.312Z,2026-10-11T23:29:15.497Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+d7905d9f,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-11T23:34:15.356Z,2026-10-11T23:37:15.356Z,2026-10-11T23:34:56.984Z,remediated,stop
+a8412ac0,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-11T23:39:57.300Z,2026-10-11T23:42:57.300Z,2026-10-11T23:40:47.481Z,remediated,cpu;latency
+069da54d,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-11T23:45:47.376Z,2026-10-11T23:48:47.376Z,2026-10-11T23:46:37.785Z,remediated,latency
+98d0c8e6,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-11T23:51:37.316Z,2026-10-11T23:54:37.316Z,2026-10-11T23:52:44.827Z,remediated,cpu
+6b22cdf6,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-11T23:57:44.323Z,2026-10-12T00:00:44.323Z,2026-10-11T23:58:49.688Z,remediated,cpu
+d68df72d,5,error-api,error,api-service,api-service,reset_faults,2026-10-12T00:03:49.336Z,2026-10-12T00:06:49.336Z,2026-10-12T00:04:37.716Z,remediated,error
+959d5c5b,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T00:09:37.304Z,2026-10-12T00:12:37.304Z,2026-10-12T00:10:16.928Z,remediated,stop
+a23079b5,3,memory-api,memory,api-service,api-service,restart_container,2026-10-12T02:10:52.423Z,2026-10-12T02:13:52.423Z,2026-10-12T02:11:50.882Z,remediated,memory:{'size_mb': 420}
+91b1c36c,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-12T02:16:51.291Z,2026-10-12T02:19:51.291Z,2026-10-12T02:17:42.716Z,remediated,latency
+c73af89a,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-12T02:22:42.331Z,2026-10-12T02:27:42.331Z,2026-10-12T02:26:55.557Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+990df09e,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-12T02:31:55.319Z,2026-10-12T02:34:55.319Z,2026-10-12T02:32:42.382Z,remediated,cpu;latency
+b202d6e2,5,error-api,error,api-service,api-service,reset_faults,2026-10-12T02:37:42.325Z,2026-10-12T02:40:42.325Z,2026-10-12T02:38:27.689Z,remediated,error
+d1809dde,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-12T02:43:27.309Z,2026-10-12T02:46:27.309Z,2026-10-12T02:44:12.046Z,remediated,stop
+afc64e65,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-12T02:49:12.286Z,2026-10-12T02:52:12.286Z,2026-10-12T02:50:19.611Z,remediated,cpu
+02b81849,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-12T02:55:19.329Z,2026-10-12T02:58:19.329Z,2026-10-12T02:56:24.691Z,remediated,cpu
+7aa875af,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T03:01:24.338Z,2026-10-12T03:04:24.338Z,2026-10-12T03:02:01.946Z,remediated,stop
+4d45d91d,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T05:03:13.075Z,2026-10-12T05:06:13.075Z,2026-10-12T05:03:51.874Z,remediated,stop
+74a93060,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T05:08:52.310Z,2026-10-12T05:11:52.310Z,2026-10-12T05:09:31.962Z,remediated,stop

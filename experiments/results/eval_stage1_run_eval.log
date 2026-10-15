@@ -1,0 +1,299 @@
+2026-10-11T20:25:57Z stage 1: 81 runs to do for B1, B2, S (~8.8 h)
+2026-10-11T20:25:57Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-11T20:25:57Z analyzer -> ANALYZER_MODE=runbook
+2026-10-11T20:25:59Z stopping ml-detector
+2026-10-11T20:26:00Z waiting 60s for the switch to settle
+2026-10-11T20:27:00Z B1 round 1 slot 1/9: scenario 5
+2026-10-11T20:27:48Z B1 round 1 scenario 5: run 46c5978a remediated
+2026-10-11T20:27:48Z waiting 299s (gap since the previous run)
+2026-10-11T20:32:48Z B1 round 1 slot 2/9: scenario 2
+2026-10-11T20:33:54Z B1 round 1 scenario 2: run 64d19472 remediated
+2026-10-11T20:33:54Z waiting 299s (gap since the previous run)
+2026-10-11T20:38:54Z B1 round 1 slot 3/9: scenario 7
+2026-10-11T20:39:37Z B1 round 1 scenario 7: run 9935a750 remediated
+2026-10-11T20:39:37Z waiting 300s (gap since the previous run)
+2026-10-11T20:44:37Z B1 round 1 slot 4/9: scenario 8
+2026-10-11T20:48:50Z B1 round 1 scenario 8: run 4051baf5 remediated
+2026-10-11T20:48:50Z waiting 300s (gap since the previous run)
+2026-10-11T20:53:50Z B1 round 1 slot 5/9: scenario 1
+2026-10-11T20:54:54Z B1 round 1 scenario 1: run 0c7e58e0 remediated
+2026-10-11T20:54:54Z waiting 299s (gap since the previous run)
+2026-10-11T20:59:54Z B1 round 1 slot 6/9: scenario 6
+2026-10-11T21:00:32Z B1 round 1 scenario 6: run 4c5449b5 remediated
+2026-10-11T21:00:32Z waiting 300s (gap since the previous run)
+2026-10-11T21:05:32Z B1 round 1 slot 7/9: scenario 9
+2026-10-11T21:06:23Z B1 round 1 scenario 9: run 625441f0 remediated
+2026-10-11T21:06:23Z waiting 300s (gap since the previous run)
+2026-10-11T21:11:23Z B1 round 1 slot 8/9: scenario 4
+2026-10-11T21:12:12Z B1 round 1 scenario 4: run 5ed951c3 remediated
+2026-10-11T21:12:12Z waiting 299s (gap since the previous run)
+2026-10-11T21:17:12Z B1 round 1 slot 9/9: scenario 3
+2026-10-11T21:18:11Z B1 round 1 scenario 3: run d49eee6b remediated
+2026-10-11T21:18:11Z analyzer -> ANALYZER_MODE=llm
+2026-10-11T21:18:12Z waiting 60s for the switch to settle
+2026-10-11T21:19:12Z waiting 239s (gap since the previous run)
+2026-10-11T21:23:11Z B2 round 1 slot 1/9: scenario 3
+2026-10-11T21:24:39Z B2 round 1 scenario 3: run 960e28de remediated
+2026-10-11T21:24:39Z waiting 300s (gap since the previous run)
+2026-10-11T21:29:39Z B2 round 1 slot 2/9: scenario 8
+2026-10-11T21:34:29Z B2 round 1 scenario 8: run 47428453 remediated
+2026-10-11T21:34:29Z waiting 300s (gap since the previous run)
+2026-10-11T21:39:29Z B2 round 1 slot 3/9: scenario 4
+2026-10-11T21:40:50Z B2 round 1 scenario 4: run d2e5d25a remediated
+2026-10-11T21:40:50Z waiting 300s (gap since the previous run)
+2026-10-11T21:45:50Z B2 round 1 slot 4/9: scenario 6
+2026-10-11T21:46:57Z B2 round 1 scenario 6: run 109071ff remediated
+2026-10-11T21:46:57Z waiting 299s (gap since the previous run)
+2026-10-11T21:51:57Z B2 round 1 slot 5/9: scenario 1
+2026-10-11T21:53:30Z B2 round 1 scenario 1: run 2a8de8c7 remediated
+2026-10-11T21:53:30Z waiting 299s (gap since the previous run)
+2026-10-11T21:58:30Z B2 round 1 slot 6/9: scenario 7
+2026-10-11T21:59:35Z B2 round 1 scenario 7: run 18209587 remediated
+2026-10-11T21:59:35Z waiting 300s (gap since the previous run)
+2026-10-11T22:04:35Z B2 round 1 slot 7/9: scenario 5
+2026-10-11T22:05:59Z B2 round 1 scenario 5: run 9f954034 remediated
+2026-10-11T22:05:59Z waiting 300s (gap since the previous run)
+2026-10-11T22:10:59Z B2 round 1 slot 8/9: scenario 9
+2026-10-11T22:12:15Z B2 round 1 scenario 9: run 8714ac7d remediated
+2026-10-11T22:12:15Z waiting 300s (gap since the previous run)
+2026-10-11T22:17:15Z B2 round 1 slot 9/9: scenario 2
+2026-10-11T22:18:45Z B2 round 1 scenario 2: run 38ffe64c remediated
+2026-10-11T22:18:45Z starting ml-detector
+2026-10-11T22:18:45Z waiting 60s for the switch to settle
+2026-10-11T22:19:45Z waiting 239s (gap since the previous run)
+2026-10-11T22:23:45Z S round 1 slot 1/9: scenario 8
+2026-10-11T22:25:18Z S round 1 scenario 8: run 6d27df08 remediated
+2026-10-11T22:25:18Z waiting 300s (gap since the previous run)
+2026-10-11T22:30:18Z S round 1 slot 2/9: scenario 3
+2026-10-11T22:31:34Z S round 1 scenario 3: run ea74af6b remediated
+2026-10-11T22:31:34Z waiting 300s (gap since the previous run)
+2026-10-11T22:36:34Z S round 1 slot 3/9: scenario 6
+2026-10-11T22:37:38Z S round 1 scenario 6: run e178b379 remediated
+2026-10-11T22:37:38Z waiting 300s (gap since the previous run)
+2026-10-11T22:42:38Z S round 1 slot 4/9: scenario 9
+2026-10-11T22:43:39Z S round 1 scenario 9: run 1a42f1b2 remediated
+2026-10-11T22:43:39Z waiting 299s (gap since the previous run)
+2026-10-11T22:48:39Z S round 1 slot 5/9: scenario 2
+2026-10-11T22:49:37Z S round 1 scenario 2: run 74358e25 remediated
+2026-10-11T22:49:37Z waiting 299s (gap since the previous run)
+2026-10-11T22:54:37Z S round 1 slot 6/9: scenario 5
+2026-10-11T22:55:40Z S round 1 scenario 5: run 208a0224 remediated
+2026-10-11T22:55:40Z waiting 300s (gap since the previous run)
+2026-10-11T23:00:40Z S round 1 slot 7/9: scenario 7
+2026-10-11T23:01:46Z S round 1 scenario 7: run de1b4e4d remediated
+2026-10-11T23:01:46Z waiting 300s (gap since the previous run)
+2026-10-11T23:06:46Z S round 1 slot 8/9: scenario 1
+2026-10-11T23:07:55Z S round 1 scenario 1: run 98e298f4 remediated
+2026-10-11T23:07:55Z waiting 299s (gap since the previous run)
+2026-10-11T23:12:55Z S round 1 slot 9/9: scenario 4
+2026-10-11T23:13:58Z S round 1 scenario 4: run 5821659a remediated
+2026-10-11T23:13:58Z analyzer -> ANALYZER_MODE=runbook
+2026-10-11T23:13:59Z stopping ml-detector
+2026-10-11T23:14:00Z waiting 60s for the switch to settle
+2026-10-11T23:15:00Z waiting 237s (gap since the previous run)
+2026-10-11T23:18:58Z B1 round 2 slot 1/9: scenario 3
+2026-10-11T23:19:56Z B1 round 2 scenario 3: run 6c002446 remediated
+2026-10-11T23:19:56Z waiting 300s (gap since the previous run)
+2026-10-11T23:24:56Z B1 round 2 slot 2/9: scenario 8
+2026-10-11T23:29:15Z B1 round 2 scenario 8: run 99c96cf6 remediated
+2026-10-11T23:29:15Z waiting 299s (gap since the previous run)
+2026-10-11T23:34:15Z B1 round 2 slot 3/9: scenario 7
+2026-10-11T23:34:57Z B1 round 2 scenario 7: run d7905d9f remediated
+2026-10-11T23:34:57Z waiting 300s (gap since the previous run)
+2026-10-11T23:39:57Z B1 round 2 slot 4/9: scenario 9
+2026-10-11T23:40:47Z B1 round 2 scenario 9: run a8412ac0 remediated
+2026-10-11T23:40:47Z waiting 299s (gap since the previous run)
+2026-10-11T23:45:47Z B1 round 2 slot 5/9: scenario 4
+2026-10-11T23:46:37Z B1 round 2 scenario 4: run 069da54d remediated
+2026-10-11T23:46:37Z waiting 299s (gap since the previous run)
+2026-10-11T23:51:37Z B1 round 2 slot 6/9: scenario 2
+2026-10-11T23:52:44Z B1 round 2 scenario 2: run 98d0c8e6 remediated
+2026-10-11T23:52:44Z waiting 299s (gap since the previous run)
+2026-10-11T23:57:44Z B1 round 2 slot 7/9: scenario 1
+2026-10-11T23:58:49Z B1 round 2 scenario 1: run 6b22cdf6 remediated
+2026-10-11T23:58:49Z waiting 299s (gap since the previous run)
+2026-10-12T00:03:49Z B1 round 2 slot 8/9: scenario 5
+2026-10-12T00:04:37Z B1 round 2 scenario 5: run d68df72d remediated
+2026-10-12T00:04:37Z waiting 299s (gap since the previous run)
+2026-10-12T00:09:37Z B1 round 2 slot 9/9: scenario 6
+2026-10-12T00:10:17Z B1 round 2 scenario 6: run 959d5c5b remediated
+2026-10-12T00:10:17Z analyzer -> ANALYZER_MODE=llm
+2026-10-12T00:10:18Z waiting 60s for the switch to settle
+2026-10-12T00:11:18Z waiting 239s (gap since the previous run)
+2026-10-12T00:15:17Z B2 round 2 slot 1/9: scenario 7
+2026-10-12T00:16:29Z B2 round 2 scenario 7: run 481f287a remediated
+2026-10-12T00:16:29Z waiting 299s (gap since the previous run)
+2026-10-12T00:21:29Z B2 round 2 slot 2/9: scenario 2
+2026-10-12T00:22:59Z B2 round 2 scenario 2: run 0ba8a54c remediated
+2026-10-12T00:22:59Z waiting 299s (gap since the previous run)
+2026-10-12T00:27:59Z B2 round 2 slot 3/9: scenario 8
+2026-10-12T00:32:41Z B2 round 2 scenario 8: run 4ba44b80 remediated
+2026-10-12T00:32:41Z waiting 299s (gap since the previous run)
+2026-10-12T00:37:41Z B2 round 2 slot 4/9: scenario 5
+2026-10-12T00:38:53Z B2 round 2 scenario 5: run 8da1d203 remediated
+2026-10-12T00:38:53Z waiting 300s (gap since the previous run)
+2026-10-12T00:43:53Z B2 round 2 slot 5/9: scenario 4
+2026-10-12T00:45:09Z B2 round 2 scenario 4: run 58f933c3 remediated
+2026-10-12T00:45:09Z waiting 300s (gap since the previous run)
+2026-10-12T00:50:09Z B2 round 2 slot 6/9: scenario 1
+2026-10-12T00:51:40Z B2 round 2 scenario 1: run 5c96710b remediated
+2026-10-12T00:51:40Z waiting 299s (gap since the previous run)
+2026-10-12T00:56:40Z B2 round 2 slot 7/9: scenario 3
+2026-10-12T00:58:07Z B2 round 2 scenario 3: run 5b0092e4 remediated
+2026-10-12T00:58:07Z waiting 300s (gap since the previous run)
+2026-10-12T01:03:07Z B2 round 2 slot 8/9: scenario 9
+2026-10-12T01:04:25Z B2 round 2 scenario 9: run e2384f44 remediated
+2026-10-12T01:04:25Z waiting 300s (gap since the previous run)
+2026-10-12T01:09:25Z B2 round 2 slot 9/9: scenario 6
+2026-10-12T01:10:31Z B2 round 2 scenario 6: run 04c0e910 remediated
+2026-10-12T01:10:31Z starting ml-detector
+2026-10-12T01:10:31Z waiting 60s for the switch to settle
+2026-10-12T01:11:31Z waiting 239s (gap since the previous run)
+2026-10-12T01:15:31Z S round 2 slot 1/9: scenario 6
+2026-10-12T01:16:26Z S round 2 scenario 6: run 099d2120 remediated
+2026-10-12T01:16:26Z waiting 299s (gap since the previous run)
+2026-10-12T01:21:26Z S round 2 slot 2/9: scenario 3
+2026-10-12T01:22:35Z S round 2 scenario 3: run ac4e84c2 remediated
+2026-10-12T01:22:35Z waiting 300s (gap since the previous run)
+2026-10-12T01:27:35Z S round 2 slot 3/9: scenario 9
+2026-10-12T01:28:40Z S round 2 scenario 9: run 90c0a351 remediated
+2026-10-12T01:28:40Z waiting 300s (gap since the previous run)
+2026-10-12T01:33:40Z S round 2 slot 4/9: scenario 1
+2026-10-12T01:34:39Z S round 2 scenario 1: run 4678e2f8 remediated
+2026-10-12T01:34:39Z waiting 300s (gap since the previous run)
+2026-10-12T01:39:39Z S round 2 slot 5/9: scenario 4
+2026-10-12T01:40:42Z S round 2 scenario 4: run bd206222 remediated
+2026-10-12T01:40:42Z waiting 300s (gap since the previous run)
+2026-10-12T01:45:42Z S round 2 slot 6/9: scenario 5
+2026-10-12T01:46:51Z S round 2 scenario 5: run 3175f996 remediated
+2026-10-12T01:46:51Z waiting 300s (gap since the previous run)
+2026-10-12T01:51:51Z S round 2 slot 7/9: scenario 2
+2026-10-12T01:52:56Z S round 2 scenario 2: run 222f8174 remediated
+2026-10-12T01:52:56Z waiting 300s (gap since the previous run)
+2026-10-12T01:57:56Z S round 2 slot 8/9: scenario 7
+2026-10-12T01:59:05Z S round 2 scenario 7: run 664575ab remediated
+2026-10-12T01:59:05Z waiting 299s (gap since the previous run)
+2026-10-12T02:04:05Z S round 2 slot 9/9: scenario 8
+2026-10-12T02:05:52Z S round 2 scenario 8: run b154b2fe remediated
+2026-10-12T02:05:52Z analyzer -> ANALYZER_MODE=runbook
+2026-10-12T02:05:53Z stopping ml-detector
+2026-10-12T02:05:55Z waiting 60s for the switch to settle
+2026-10-12T02:06:55Z waiting 237s (gap since the previous run)
+2026-10-12T02:10:52Z B1 round 3 slot 1/9: scenario 3
+2026-10-12T02:11:51Z B1 round 3 scenario 3: run a23079b5 remediated
+2026-10-12T02:11:51Z waiting 300s (gap since the previous run)
+2026-10-12T02:16:51Z B1 round 3 slot 2/9: scenario 4
+2026-10-12T02:17:42Z B1 round 3 scenario 4: run 91b1c36c remediated
+2026-10-12T02:17:42Z waiting 299s (gap since the previous run)
+2026-10-12T02:22:42Z B1 round 3 slot 3/9: scenario 8
+2026-10-12T02:26:55Z B1 round 3 scenario 8: run c73af89a remediated
+2026-10-12T02:26:55Z waiting 299s (gap since the previous run)
+2026-10-12T02:31:55Z B1 round 3 slot 4/9: scenario 9
+2026-10-12T02:32:42Z B1 round 3 scenario 9: run 990df09e remediated
+2026-10-12T02:32:42Z waiting 299s (gap since the previous run)
+2026-10-12T02:37:42Z B1 round 3 slot 5/9: scenario 5
+2026-10-12T02:38:27Z B1 round 3 scenario 5: run b202d6e2 remediated
+2026-10-12T02:38:27Z waiting 299s (gap since the previous run)
+2026-10-12T02:43:27Z B1 round 3 slot 6/9: scenario 7
+2026-10-12T02:44:12Z B1 round 3 scenario 7: run d1809dde remediated
+2026-10-12T02:44:12Z waiting 300s (gap since the previous run)
+2026-10-12T02:49:12Z B1 round 3 slot 7/9: scenario 2
+2026-10-12T02:50:19Z B1 round 3 scenario 2: run afc64e65 remediated
+2026-10-12T02:50:19Z waiting 299s (gap since the previous run)
+2026-10-12T02:55:19Z B1 round 3 slot 8/9: scenario 1
+2026-10-12T02:56:24Z B1 round 3 scenario 1: run 02b81849 remediated
+2026-10-12T02:56:24Z waiting 299s (gap since the previous run)
+2026-10-12T03:01:24Z B1 round 3 slot 9/9: scenario 6
+2026-10-12T03:02:02Z B1 round 3 scenario 6: run 7aa875af remediated
+2026-10-12T03:02:02Z analyzer -> ANALYZER_MODE=llm
+2026-10-12T03:02:03Z waiting 60s for the switch to settle
+2026-10-12T03:03:03Z waiting 239s (gap since the previous run)
+2026-10-12T03:07:02Z B2 round 3 slot 1/9: scenario 8
+2026-10-12T03:11:44Z B2 round 3 scenario 8: run a34ecf51 remediated
+2026-10-12T03:11:44Z waiting 299s (gap since the previous run)
+2026-10-12T03:16:44Z B2 round 3 slot 2/9: scenario 5
+2026-10-12T03:17:59Z B2 round 3 scenario 5: run 00ca0bc9 remediated
+2026-10-12T03:17:59Z waiting 300s (gap since the previous run)
+2026-10-12T03:22:59Z B2 round 3 slot 3/9: scenario 1
+2026-10-12T03:24:30Z B2 round 3 scenario 1: run 58ca7da4 remediated
+2026-10-12T03:24:30Z waiting 300s (gap since the previous run)
+2026-10-12T03:29:30Z B2 round 3 slot 4/9: scenario 3
+2026-10-12T03:30:51Z B2 round 3 scenario 3: run a0c01962 remediated
+2026-10-12T03:30:51Z waiting 300s (gap since the previous run)
+2026-10-12T03:35:51Z B2 round 3 slot 5/9: scenario 6
+2026-10-12T03:36:57Z B2 round 3 scenario 6: run f28dffe4 remediated
+2026-10-12T03:36:57Z waiting 299s (gap since the previous run)
+2026-10-12T03:41:57Z B2 round 3 slot 6/9: scenario 7
+2026-10-12T03:43:05Z B2 round 3 scenario 7: run 607f47a7 remediated
+2026-10-12T03:43:05Z waiting 300s (gap since the previous run)
+2026-10-12T03:48:05Z B2 round 3 slot 7/9: scenario 2
+2026-10-12T03:49:40Z B2 round 3 scenario 2: run 94faeb1b remediated
+2026-10-12T03:49:40Z waiting 299s (gap since the previous run)
+2026-10-12T03:54:40Z B2 round 3 slot 8/9: scenario 9
+2026-10-12T03:55:54Z B2 round 3 scenario 9: run 341d9c06 remediated
+2026-10-12T03:55:54Z waiting 300s (gap since the previous run)
+2026-10-12T04:00:54Z B2 round 3 slot 9/9: scenario 4
+2026-10-12T04:02:09Z B2 round 3 scenario 4: run 5e1bb6e9 remediated
+2026-10-12T04:02:09Z starting ml-detector
+2026-10-12T04:02:09Z waiting 60s for the switch to settle
+2026-10-12T04:03:09Z waiting 240s (gap since the previous run)
+2026-10-12T04:07:09Z S round 3 slot 1/9: scenario 6
+2026-10-12T04:08:01Z S round 3 scenario 6: run 9f35bdf2 remediated
+2026-10-12T04:08:01Z waiting 300s (gap since the previous run)
+2026-10-12T04:13:01Z S round 3 slot 2/9: scenario 2
+2026-10-12T04:14:17Z S round 3 scenario 2: run cf36463e remediated
+2026-10-12T04:14:17Z waiting 300s (gap since the previous run)
+2026-10-12T04:19:17Z S round 3 slot 3/9: scenario 4
+2026-10-12T04:20:34Z S round 3 scenario 4: run c3f4df82 remediated
+2026-10-12T04:20:34Z waiting 300s (gap since the previous run)
+2026-10-12T04:25:34Z S round 3 slot 4/9: scenario 9
+2026-10-12T04:26:31Z S round 3 scenario 9: run caad4d22 remediated
+2026-10-12T04:26:31Z waiting 299s (gap since the previous run)
+2026-10-12T04:31:31Z S round 3 slot 5/9: scenario 8
+2026-10-12T04:32:47Z S round 3 scenario 8: run fd915fdc remediated
+2026-10-12T04:32:47Z waiting 300s (gap since the previous run)
+2026-10-12T04:37:47Z S round 3 slot 6/9: scenario 5
+2026-10-12T04:38:50Z S round 3 scenario 5: run 52802448 remediated
+2026-10-12T04:38:50Z waiting 300s (gap since the previous run)
+2026-10-12T04:43:50Z S round 3 slot 7/9: scenario 3
+2026-10-12T04:44:57Z S round 3 scenario 3: run f045d2f1 remediated
+2026-10-12T04:44:57Z waiting 300s (gap since the previous run)
+2026-10-12T04:49:57Z S round 3 slot 8/9: scenario 1
+2026-10-12T04:51:02Z S round 3 scenario 1: run 55495ba0 remediated
+2026-10-12T04:51:02Z waiting 299s (gap since the previous run)
+2026-10-12T04:56:02Z S round 3 slot 9/9: scenario 7
+2026-10-12T04:57:10Z S round 3 scenario 7: run 967cbf41 remediated
+2026-10-12T04:57:10Z stage 1: done for B1, B2, S
+2026-10-12T04:57:10Z block over. If you disabled sleep: sudo pmset -a disablesleep 0
+2026-10-12T05:00:18Z voided 959d5c5b (B1 round 2 scenario 6): runner switched systems before this run's incident finished (fixed 12 Oct)
+2026-10-12T05:00:18Z voided 7aa875af (B1 round 3 scenario 6): runner switched systems before this run's incident finished (fixed 12 Oct)
+2026-10-12T05:00:18Z voided 5821659a (S round 1 scenario 4): runner switched systems before this run's incident finished (fixed 12 Oct)
+2026-10-12T05:00:18Z voided b154b2fe (S round 2 scenario 8): runner switched systems before this run's incident finished (fixed 12 Oct)
+2026-10-12T05:00:18Z stage 1: 4 runs to do for B1, B2, S (~0.4 h)
+2026-10-12T05:00:23Z stage 1: 2 runs to do for B1 (~0.2 h)
+2026-10-12T05:00:23Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-12T05:00:23Z waiting 106s (gap since the previous run)
+2026-10-12T05:02:10Z analyzer -> ANALYZER_MODE=runbook
+2026-10-12T05:02:11Z stopping ml-detector
+2026-10-12T05:02:12Z waiting 60s for the switch to settle
+2026-10-12T05:03:12Z B1 round 2 slot 9/9: scenario 6
+2026-10-12T05:03:52Z B1 round 2 scenario 6: run 4d45d91d remediated
+2026-10-12T05:03:52Z waiting 300s (gap since the previous run)
+2026-10-12T05:08:52Z B1 round 3 slot 9/9: scenario 6
+2026-10-12T05:09:32Z B1 round 3 scenario 6: run 74a93060 remediated
+2026-10-12T05:09:32Z stage 1: done for B1
+2026-10-12T05:09:32Z block over. If you disabled sleep: sudo pmset -a disablesleep 0
+2026-10-12T05:09:32Z stage 1: 2 runs to do for S (~0.2 h)
+2026-10-12T05:09:32Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-12T05:09:32Z waiting 300s (gap since the previous run)
+2026-10-12T05:14:32Z analyzer -> ANALYZER_MODE=llm
+2026-10-12T05:14:33Z starting ml-detector
+2026-10-12T05:14:33Z waiting 60s for the switch to settle
+2026-10-12T05:15:33Z S round 1 slot 9/9: scenario 4
+2026-10-12T05:16:45Z S round 1 scenario 4: run 7580459d remediated
+2026-10-12T05:16:45Z waiting 299s (gap since the previous run)
+2026-10-12T05:21:45Z S round 2 slot 9/9: scenario 8
+2026-10-12T05:23:24Z S round 2 scenario 8: run 3563f9ca remediated
+2026-10-12T05:23:24Z stage 1: done for S
+2026-10-12T05:23:24Z waiting 300s (gap since the previous run)
+2026-10-12T05:28:24Z block over. If you disabled sleep: sudo pmset -a disablesleep 0

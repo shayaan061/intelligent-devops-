@@ -41,7 +41,7 @@ Last updated: 7 Oct 2026.
 |---|---|
 | `RESULTS.md` | **Report-ready results**: environment, the 146 automated tests, development runs D1–D10, pilot B1 vs B2, analyzer comparisons C0–C3, safety suite, timings, 14 problems found by testing, objectives status, caveats, and an index of the raw data |
 | `pilot_b1.csv`, `pilot_b2.csv` | Pilot ground truth from the injector, one row per run (4 each). Columns: `run_id, scenario, name, fault, target_service, expected_root_cause, expected_action, start, planned_end, end, end_reason, params` |
-| `pilot_b1_scored.csv`, `pilot_b2_scored.csv` | `score.py` output per pilot run. Columns: `run_id, scenario, name, end_reason, incident_id, detected, auto_resolved, mttr_s, mttd_s, root_cause, root_cause_ok, plan_action, plan_action_ok, executed_action, executed_action_ok, unsafe_executed, collateral_executed, verified, escalated, attempts, plan_source, fallback_reason, plan_latency_ms` |
+| `pilot_b1_scored.csv`, `pilot_b2_scored.csv` | `score.py` output per pilot run. Columns: `run_id, scenario, name, end_reason, incident_id, detected, auto_resolved, mttr_s, mttd_s, root_cause, root_cause_ok, plan_action, plan_action_ok, executed_action, executed_action_ok, unsafe_executed, collateral_executed, verified, escalated, attempts, plan_source, fallback_reason, plan_latency_ms` (from 12 Oct also `llm_calls, prompt_tokens, completion_tokens`; `results/eval_stage<N>_<system>_runs.csv` from `run_eval.py score` have the same columns, `eval_stage<N>_summary.json` the summaries per system) |
 | `results/ground_truth_dev_runs.csv` | Ground truth of the 8 logged development runs on 6 Oct (same columns as `pilot_b1.csv`); the runs behind RESULTS.md §2 |
 | `results/compare_1_original_prompt.csv` | Analyzer comparison C1: 9 samples × (runbook + 1 LLM run) = 18 rows. Columns: `scenario, mode, rep, source, fallback_reason, root, root_ok, action, action_ok, confidence, latency_s` |
 | `results/compare_2_rule_error_spike.csv` | C2: after the "error_spike → reset first" prompt rule; 9 × (runbook + 2 LLM runs). Shows the scenario 1 regression |
@@ -49,6 +49,15 @@ Last updated: 7 Oct 2026.
 | `results/safety_suite.csv` | Adversarial suite, 29 cases. Columns: `id, case, expected, outcome, schema_rejects, executed, unsafe_executed, crashed, pass` |
 | `results/incident_store_snapshot.jsonl` | Every gateway message from 17:17 UTC on 6 Oct, one JSON per line (107 lines: 42 raw alerts, 23 incident updates with full context, 15 response plans, 27 responder actions). No `fault_*` data. Use it for incident timelines and examples in the report |
 | `results/pilot_run.log` | Pilot runner log: start/end times, the scenario lines, the analyzer mode switches |
+| `baseline_20261009_1334.csv` | ML training data: 78 min of normal traffic (945 rows). Columns as below |
+| `results/ground_truth_check_9oct.csv`, `results/check_9oct_b2_runs.csv`, `results/incident_store_check_9oct.jsonl` | 9-scenario B2 run on real containers (RESULTS §11) |
+| `results/ml_detector_report_9oct.json`, `results/ml_replay_check_9oct.json`, `results/ml_rerun_9oct_s_runs.csv`, `results/incident_store_ml_9oct.jsonl`, `results/ml_detector_anomalies_9oct.log` | ML detector training report, offline replay, live runs with ML (RESULTS §12) |
+| `results/eval_stage1_{B1,B2,S}_runs.csv`, `results/eval_stage1_summary.json` | §10 evaluation stage 1 scores per run (score.py columns) and per system (RESULTS.md §13) |
+| `results/eval_stage1_before_redo_*` | The same, before 4 runs spoiled by a runner bug were voided and redone |
+| `results/eval_stage1_manifest.csv` | Copy of `eval/runs.csv` after stage 1 (81 done + 4 void) |
+| `results/eval_stage1_ground_truth_{B1,B2,S}.csv` | Injector ground truth per system for stage 1 (same columns as `ground_truth.csv`; includes the voided runs) |
+| `results/eval_stage1_run_eval.log`, `results/eval_stage1_console.log` | Runner log and runner + injector console output for stage 1 |
+| `results/incident_store_eval_stage1.jsonl` | Every gateway message from 11 Oct 20:25 UTC (stage 1 + redo), one JSON per line; no `fault_*` data |
 | `results/baseline_export_test_40min.csv` | 192 rows of normal-traffic features (test of `record_baseline.py`). Columns: `timestamp, service, clients, cpu, err, mem, mem_bytes, ops, p95, rps, up, upstream_p95` |
 | `ground_truth.csv` *(not in git)* | Live injector log; every new run is appended here. Copy runs worth keeping into `results/` |
 | `incidents.db` *(not in git)* | The gateway's SQLite incident store (table `messages`). Export with a query, as for `results/incident_store_snapshot.jsonl` |
@@ -57,11 +66,13 @@ Last updated: 7 Oct 2026.
 
 | File | Purpose |
 |---|---|
-| `score.py` | Scores runs: joins a ground-truth CSV with `incidents.db` and prints §10 metrics (recall, MTTD, root cause, action, unsafe actions, auto-resolved, MTTR, latency). `--system`, `--since`, `--out`, `--json` |
+| `score.py` | Scores runs: joins a ground-truth CSV with `incidents.db` and prints §10 metrics (recall, MTTD, root cause, action, unsafe actions, auto-resolved, MTTR, latency, LLM calls and tokens per incident). `--system`, `--since`, `--max-gap` (count false positives only within a system's blocks), `--out`, `--json` |
+| `run_eval.py` | §10 evaluation runner: B1/B2/S in resumable blocks (stage 1/2/3 = 3/10/20 rounds of the 9 scenarios per system, shuffled, systems interleaved); switches the analyzer mode and ml-detector, checks health/quiet, keeps the 300 s gap, caffeinate. `run`, `status`, `void`, `score` |
+| `eval/` *(not in git until results are kept)* | Runner state: `runs.csv` (columns `system, round, slot, scenario, run_id, status, started, ended, end_reason, note`; status `done` or `void`), `gt_B1.csv` / `gt_B2.csv` / `gt_S.csv` (injector ground truth per system, same columns as `ground_truth.csv`), `run_eval.log` |
 | `safety_suite.py` | The 29 adversarial plans through the real responder; prints the table, `--csv` |
 | `compare_analyzers.py` | Runbooks vs LLM on `analyzer/samples/scenario*.json`; `--repeat`, `--model`, `--out` |
-| `record_baseline.py` | Exports ML training data from Prometheus (no fault or alert periods); `--last 2h` |
-| `tests/test_score.py`, `tests/test_safety_suite.py` | Tests for the scorer (9) and the safety suite (1) |
+| `record_baseline.py` | Exports ML training data from Prometheus (no fault or alert periods); `--last 2h`; `--keep-all` keeps everything, for `ml/replay.py` |
+| `tests/test_score.py`, `tests/test_safety_suite.py`, `tests/test_run_eval.py` | Tests for the scorer (13), the safety suite (1) and the evaluation runner (11) |
 
 ## 3. Figures and drafts (`docs/`)
 
@@ -99,10 +110,10 @@ Last updated: 7 Oct 2026.
 | File | Contents |
 |---|---|
 | `app.py` | Endpoints: `/alerts`, `/anomalies`, `/responses`, `/actions`, `/incidents/{id}/reanalyze`, `/history`, WebSockets `/ws/events` and `/ws/responses`, the dashboard mount; rejects NaN/Infinity JSON |
-| `incidents.py` | Dedup and grouping of alerts and anomalies into incidents (60 s window, dependency chain) |
+| `incidents.py` | Dedup and grouping of alerts and anomalies into incidents (60 s window, dependency chain); a repeat anomaly from the same service only refreshes it; `ml_active()` for the verifier |
 | `context.py` | Context builder: PromQL queries for the last 10 minutes per service; asserts there are no `fault_*` queries |
 | `store.py` | SQLite incident store (every broadcast message) |
-| `tests/test_gateway.py` | 19 tests |
+| `tests/test_gateway.py` | 20 tests |
 
 ### LLM Analysis Engine (`analyzer/`)
 | File | Contents |
@@ -129,8 +140,19 @@ Last updated: 7 Oct 2026.
 | `policies.yaml` | **The safety rules**: action allowlist and targets, approval-required actions, confidence ≥ 0.7, 300 s cooldown, max 3 actions and 3 attempts, 45 s verify delay |
 | `policy.py` | Policy validator (pure functions): execute / approval / escalate |
 | `executor.py` | The only code that changes anything: reset faults, restart container, flush cache |
-| `app.py` | Plan intake, pre-check, verifier, re-analysis requests, approval API (`/approvals`), read-only `/policies` (rules + active cooldowns, for the dashboard), dry-run mode, reports to the gateway |
-| `tests/test_responder.py` | 43 tests |
+| `app.py` | Plan intake, pre-check and verifier (firing alerts + the gateway's `ml_active`), re-analysis requests, approval API (`/approvals`), read-only `/policies` (rules + active cooldowns, for the dashboard), dry-run mode, reports to the gateway |
+| `tests/test_responder.py` | 45 tests |
+
+### ML Anomaly Detector (`ml/`, compose service `ml-detector`)
+| File | Contents |
+|---|---|
+| `model.py` | Per-service model: robust z-scores against the training baseline (only the "worse" direction counts) + Isolation Forest over the z-vector; `FEATURES`, `HIGH_IS_BAD`, scale floors |
+| `train.py` | Trains on `record_baseline.py` CSVs; reports the false-positive rate on a held-out last 20%; writes `models/detector.joblib` + `_report.json` |
+| `detector.py` | Service: every 15 s reads the gateway's context queries from Prometheus, scores, POSTs `/anomalies` after 2 anomalous polls in a row (re-posted while it lasts). Only reports |
+| `replay.py` | Offline: steps the detector through a `--keep-all` export and scores it against `ground_truth.csv` (recall, delay, false-positive episodes) |
+| `Dockerfile` | Built from the repo root (copies `gateway/context.py`); root `.dockerignore` limits that context |
+| `models/` | Trained model (`detector.joblib`) and its report |
+| `tests/test_ml.py` | 10 tests (synthetic data) |
 
 ### Dashboard and tools
 | File | Contents |
@@ -152,5 +174,5 @@ Last updated: 7 Oct 2026.
 | File | Contents |
 |---|---|
 | `*/requirements-dev.txt` | Test dependencies (pytest) per component |
-| `.gitignore` | Ignores `__pycache__`, `.pyc`, `.pytest_cache`, `.venv`, `experiments/incidents.db*` |
-| `.DS_Store` | macOS folder metadata, committed by accident; safe to delete and ignore |
+| `.gitignore` | Ignores `__pycache__`, `.pyc`, `.pytest_cache`, `.venv`, `experiments/incidents.db*`, `.DS_Store` |
+| `.dockerignore` | Build context filter for `ml/Dockerfile` (the only image built from the repo root) |

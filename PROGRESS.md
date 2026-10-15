@@ -22,14 +22,14 @@ In order. Owners follow the work split in `SUGGESTED_PLAN.md` §9.
 
 ### A. Close out Phase 2 (before starting the gateway)
 - [x] **Run the stack under Docker for the first time.** Done 6 Oct: all 4 targets UP.
-- [ ] **⚠️ Blocker: cAdvisor has no `name` label on this Mac, so HighCPU/HighMemory can never fire** (scenarios 1, 2, 3, 8, 9 and the context's `cpu`/`mem`, which are `null`). Checked 6 Oct:
+- [x] **Fixed 9 Oct (containerd image store turned off, stack rebuilt; cAdvisor reports `name`).** ~~Blocker: cAdvisor has no `name` label on this Mac,~~ so HighCPU/HighMemory can never fire** (scenarios 1, 2, 3, 8, 9 and the context's `cpu`/`mem`, which are `null`). Checked 6 Oct:
   1. v0.49.1 couldn't talk to Docker 29 at all (API too old) and the socket wasn't visible through the `/var/run` mount. **Fixed in compose:** image → `ghcr.io/google/cadvisor:v0.53.0`, plus an explicit `/var/run/docker.sock` mount. The Docker factory now registers.
   2. Remaining cause: Docker Desktop's **containerd image store** (`docker info` → `driver-type io.containerd.snapshotter.v1`). cAdvisor logs `failed to identify the read-write layer ID … mount-id: no such file or directory` for every container.
   **Fix (manual):** Docker Desktop → Settings → General → untick *Use containerd for pulling and storing images* → Apply & restart, then `docker compose up -d --build`. Check with `container_memory_working_set_bytes{name="api-service"}` at `localhost:9090/graph`. Each team member running the demo on a Mac needs this setting.
-- [ ] **Run each scenario once for real** and note the alert and detection time: `docker compose run --rm injector run <1-9> --duration 180`. Scenarios 1, 2, 3, 6 and 7 have never fired on real containers.
-- [ ] **Scenario 8 should not fire HighMemory early.** It is meant to be caught by ML only. Check how long the ramp stays under 80%.
+- [x] **Run each scenario once for real.** Done 9 Oct (`experiments/RESULTS.md` §11): 9/9 detected, MTTD median 30 s, 8/9 auto-resolved. Scenario 2 must be rerun (the Docker VM stalled during it).
+- [x] **Scenario 8 should not fire HighMemory early.** Checked 9 Oct: HighMemory fires only at the end of the 240 s ramp (MTTD 232 s, peak 427 MB = 83%). The ML detector should catch it well before that.
 - [x] **Decide scoring for scenario 3:** restart only (decided 6 Oct, written into §10 of the plan; `experiments/score.py` encodes it).
-- [ ] **Update the §6.1 table in `SUGGESTED_PLAN.md`** to the real windows (30 s rate, `for: 20s`) and fault caps (600 s, 450 MB).
+- [x] **Update the §6.1 table in `SUGGESTED_PLAN.md`** to the real windows (30 s rate, `for: 20s`) and fault caps (600 s, 450 MB). Done 12 Oct.
 
 ### B. Phase 3, part 1: skeleton gateway (§15, last item). Owner: Shayaan
 Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) below. Summary:
@@ -57,14 +57,14 @@ Detailed checklist in [Step 4](#step-4-skeleton-event-gateway--to-do-later) belo
 - [x] Minimal UI (MVP, §12): `dashboard/index.html` at `http://localhost:8000/dashboard/`: service map, incident feed with plans/actions, approval queue with Approve/Reject. Riddhima (dashboard owner, §9) can replace it with the full React dashboard in Phase 8.
 - [ ] Open the dashboard in a browser during the next scenario run; it was checked by syntax check + HTTP only, not visually.
 - [x] **Full dashboard (Phase 8, started early, 8 Oct):** `web/` Next.js + Tailwind + Recharts at `localhost:3001`. See Step 11. Riddhima (dashboard owner) to review.
-- [ ] Build and run the `web` image under Docker (not done yet: Docker was off on 8 Oct; checked with `next build` on the host).
+- [x] Build and run the `web` image under Docker. Done 9 Oct (`localhost:3001` → 200).
 
 ### D. Can start in parallel
 - [x] **Riddhima:** LLM prompt and `ResponsePlan` schema (§6.4), using hand-written `IncidentEvent` samples; YAML runbooks for scenarios 1–9 (these are also baseline B1). First version built 6 Oct (Step 6); Riddhima to review the prompt and runbooks.
 - [x] **Install Ollama on the host.** Done 6 Oct: Homebrew `ollama` 0.35.1 as a launchd service (`brew services start ollama`), model `llama3.1:8b`. First results in Step 9.
 - [x] **Verifier/responder must send `history.previous_actions`** as `[{"type", "target"}]` when re-analysing (§6.6); the analyzer skips actions already tried. Done: the gateway adds executed/failed actions from `POST /actions` (`gateway/app.py`).
-- [ ] **Check scenario 8's ML feature names** against the runbook `ml-memory-anomaly` (matches any `top_features` entry containing `mem`) once the ML detector exists.
-- [ ] **Shruti:** record 1–2 hours of normal traffic under Locust now, as training data for the ML detector (Phase 7)
+- [x] **Check scenario 8's ML feature names** against the runbook `ml-memory-anomaly`. Done 9 Oct: the detector reports `top_features: ["mem"]`, which the runbook matches.
+- [x] **Record normal traffic for the ML detector.** Done 9 Oct: 78 min (`experiments/baseline_20261009_1334.csv`). Shruti (ML owner) to review the model and record more traffic levels.
 - [ ] **All:** apply the edits in `PATENT_CHANGES.md` to the patent draft
 
 ---
@@ -373,3 +373,37 @@ Matches the IDF's client layer (Next.js, TypeScript, Tailwind, Recharts) and §6
 - Safety: no generic Prometheus passthrough (fixed queries, import-time `fault_` check); gateway proxy is GET-only on an allowlist; the only write is approve/reject, which needs an `x-dashboard` header so another site can't trigger it.
 
 **Checked 8 Oct (Docker off):** `tsc` and `next build` pass; gateway and responder run on the host with an incident store rebuilt from `experiments/results/incident_store_snapshot.jsonl`, plus a synthetic Prometheus/Alertmanager for the charts; screenshots in light, dark and narrow widths; test alert → incident → low-confidence test plan → held for approval → rejected through the dashboard route. Responder tests 43/43, safety suite 29/29. **Not yet checked:** the Docker image and a live scenario run.
+
+## Step 12: ML anomaly detector + all 9 scenarios live, 9 Oct
+
+- **cAdvisor blocker fixed:** Docker Desktop's containerd image store turned off; HighCPU/HighMemory now fire.
+- **All 9 scenarios on real containers (B2):** 9/9 detected, MTTD median 30 s, root cause 9/9, 8/9 auto-resolved (`experiments/RESULTS.md` §11). Scenario 2's first run was spoiled by a Docker VM stall during host builds.
+- **`ml/`:** per-service robust z-scores + Isolation Forest (`model.py`), `train.py` (holdout FP rate), `detector.py` (compose service `ml-detector`, POSTs `/anomalies` after 2 polls), `replay.py` (offline recall/delay/FPs against ground truth). 10 tests.
+- **Gateway:** a repeat anomaly from the same service refreshes the incident instead of triggering a new analysis; `/incidents` reports `ml_active` (refreshed < 20 s ago). 20 tests.
+- **Responder:** pre-check and verifier treat `ml_active` like a firing alert (an ML-only incident was otherwise skipped as "already cleared"). 45 tests, safety suite 29/29.
+- **Results (§12):** holdout 0 FPs; replay 8/9, 0 FP episodes in 1.07 h; live scenario 8 detected by ML alone at 51 s (rule: 232 s) and verified, MTTR 290 s → 100 s.
+
+Next:
+- [ ] The §10 evaluation proper: all 9 scenarios × ≥ 20 runs for B0, B1, B2 and S (`--gap 300`; stop `ml-detector` for B0–B2). ~~About 2 h per 9-scenario pass~~ About 1–1.2 h per pass (9 × ~6.5 min; checked against the 9 Oct runs). Runner built 12 Oct, see Step 13.
+- [ ] Record normal traffic at other load levels (`LOAD_USERS`) and retrain, or the detector may flag a load change.
+- [ ] Rerun the scenario 9 verification that a redeploy cut off (§11); it will be covered by the evaluation.
+
+
+---
+
+## Step 13: Evaluation runner, token logging (12 Oct)
+
+- **`experiments/run_eval.py`:** runs the §10 evaluation for B1, B2 and S in stages (1/2/3 = 3/10/20 runs of each scenario per system = 81/270/540 runs). A round is the 9 scenarios in a shuffled order fixed by (system, round); rounds are interleaved across systems. Before each block it switches the stack (B1: `ANALYZER_MODE=runbook`; B1/B2: `ml-detector` stopped) and restores the default (S) at the end. Before each run: all containers up, gateway/responder/Ollama/Prometheus targets healthy, no firing alert, no open incident, ≥ 300 s since the previous run of any system. Resumable: finished runs are in `experiments/eval/runs.csv`; Ctrl+C or `kill` undoes the active fault and that run is redone next time. `void <run_id>` marks a spoiled run for redoing. One ground-truth file per system (`experiments/eval/gt_<system>.csv`). `caffeinate -i` while running; warns if lid-close sleep isn't disabled.
+- **Scorer:** `--max-gap` counts false positives only inside a system's own blocks (otherwise the other systems' incidents in between would count); reports LLM calls and prompt/completion tokens per incident.
+- **Analyzer:** each plan carries Ollama's `prompt_tokens` / `completion_tokens` (also on a runbook fallback after an unusable answer). Live check: 2239 + 180 tokens, 29 s for sample scenario 4. Image rebuilt.
+- **§6.1 table** in the plan updated to the real rules.
+- **Not done:** retraining ML at other load levels. The evaluation runs at the training load (5 users), so it wouldn't change these results and would swap in an unvalidated model; still needed before any demo at a different load.
+- Tests: analyzer 81, experiments 25 (total 181).
+
+Next:
+- [x] Stage 1: 81 runs, 11 Oct 20:27 – 12 Oct 04:57 UTC, all remediated (RESULTS.md §13). A runner bug (switching systems before the last run's incident finished) spoiled 4 runs; fixed, voided and redone. Summary: recall 100% everywhere; root cause 100%; action B1 100%, B2/S 96.3% (scenario 5: restart instead of reset); 0 unsafe; MTTD B1 52 s, B2 53 s, S 27 s; MTTR B1 75 s, B2 102 s, S 68 s; scenario 8 S 45 s vs ~225 s detection.
+- [ ] Stages 2 and 3 after reviewing stage 1: `python3 experiments/run_eval.py run --stage 2` (189 more runs, ~21 h, can be split with `--rounds 1` ≈ 3 h).
+- [ ] Decide before stage 2: stop re-analyzing `updated` incidents while a plan for the same attempt is being executed? S makes 1.8 LLM calls per incident (20 of 48 plans unused). Changing it now means stage 1 has to be reported separately or rerun.
+- [ ] Report: the 9 scenarios are all faults the runbooks cover; consider a few unseen-fault scenarios where B2/S can differ from B1.
+- [ ] B0 (manual) runs: the team agrees on how many.
+- [ ] Record normal traffic at other load levels and retrain (before demos at other loads).
