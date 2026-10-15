@@ -1,7 +1,9 @@
 from flask import Flask, Response, request
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from functools import wraps
+import math
 import os
+import random
 import threading
 import time
 
@@ -88,14 +90,21 @@ fault_state = {
 # Incremented on every start/stop so an old timer cannot clear a newer fault
 fault_generation = {name: 0 for name in fault_state}
 
+# Strength of the timed faults. The defaults are the original behaviour
+# (5 s delay, every request fails); /inject can ask for a subtler fault
+DEFAULT_FAULT_PARAMS = {"latency": {"delay_s": 5.0}, "error": {"rate": 1.0}}
+fault_params = {name: dict(p) for name, p in DEFAULT_FAULT_PARAMS.items()}
+
 state_lock = threading.Lock()
 
 memory_data = None
 
 
-def activate_fault(name):
+def activate_fault(name, params=None):
     with state_lock:
         fault_generation[name] += 1
+        if name in fault_params:
+            fault_params[name] = dict(params or DEFAULT_FAULT_PARAMS[name])
         fault_state[name] = True
         FAULT_GAUGES[name].set(1)
         return fault_generation[name]
@@ -130,8 +139,8 @@ def timed_fault_worker(name, generation, duration):
     deactivate_fault(name, generation)
 
 
-def start_timed_fault(name, duration):
-    generation = activate_fault(name)
+def start_timed_fault(name, duration, params=None):
+    generation = activate_fault(name, params)
 
     thread = threading.Thread(
         target=timed_fault_worker,
@@ -274,9 +283,9 @@ def instrumented(endpoint):
 def data():
 
     if fault_state["latency"]:
-        time.sleep(5)
+        time.sleep(fault_params["latency"]["delay_s"])
 
-    if fault_state["error"]:
+    if fault_state["error"] and random.random() < fault_params["error"]["rate"]:
         return {"error": "Injected test failure"}, 500
 
     start = time.time()
@@ -371,13 +380,31 @@ def inject():
             "duration": duration
         }
 
-    # latency / error: auto-clear after `duration`
-    start_timed_fault(fault, duration)
+    # latency / error: auto-clear after `duration`. Optional strength
+    # (delay_s 0.05-10 s, rate 0.01-1) for subtle faults that stay under the
+    # alert thresholds; without it they behave as before (5 s, every request)
+    key, lo, hi = ("delay_s", 0.05, 10.0) if fault == "latency" else ("rate", 0.01, 1.0)
+    raw = data.get(key, DEFAULT_FAULT_PARAMS[fault][key])
+
+    try:
+        if isinstance(raw, bool):
+            raise TypeError
+        value = float(raw)
+    except (TypeError, ValueError):
+        return {"error": f"{key} must be a number"}, 400
+
+    if not math.isfinite(value):
+        return {"error": f"{key} must be finite"}, 400
+
+    value = max(lo, min(value, hi))
+
+    start_timed_fault(fault, duration, {key: value})
 
     return {
         "status": "started",
         "fault": fault,
-        "duration": duration
+        "duration": duration,
+        key: value
     }
 
 
