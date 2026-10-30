@@ -132,7 +132,7 @@ for (const b of blocks) {
 }
 
 const doc = new Document({
-  creator: "Muhammad Shayaan Ali, Shruti Tyagi, Riddhima Sharma, Ashish Kumar",
+  creator: "Muhammad Shayaan Ali, Shruti Tyagi, Riddhima Sharma, Aliza Rana",
   title: "Invention Disclosure Form: Intelligent DevOps Monitoring & Incident Response System",
   styles: { default: { document: { run: { font: FONT, size: 24 } } } },
   numbering: { config: [{ reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT,

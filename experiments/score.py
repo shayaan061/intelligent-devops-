@@ -12,7 +12,8 @@ and in total:
               executed (outside responder/policies.yaml: target 0);
               collateral actions (executed on a non-root-cause service)  O4
   resolution  auto-resolved (injector end_reason "remediated"), MTTR
-              (fault start -> fault gone), verified, escalated, attempts O5, O6
+              (fault start -> fault gone), verified, escalated, attempts, whether a
+              human approval was requested, and the incident's action log O5, O6
   cost        plan source (llm / runbook), fallback reasons, latency,
               LLM tokens per incident (all attempts; Ollama's counts)
 
@@ -61,6 +62,22 @@ ACCEPTABLE = {
     "7": {"restart_container"},
     "8": {"restart_container"},
     "9": {"reset_faults"},
+    # Extra set (injector.py 10-14). 10: only flushing the cache fixes it (needs
+    # approval, so it can't resolve on its own). 14 comes back after every fix:
+    # a reset or restart is the right first action, escalation the right outcome
+    "10": {"flush_cache"},
+    "11": {"restart_container"},
+    "12": {"reset_faults", "restart_container"},
+    "13": {"reset_faults", "restart_container"},
+    "14": {"reset_faults", "restart_container"},
+    # Novel set (injector.py 15-19, no runbook written for them). 17: reset and
+    # restart keep the CPU limit; 19: restarting Redis reloads the junk keys.
+    # Both need approval, so they can't resolve on their own
+    "15": {"reset_faults", "restart_container"},
+    "16": {"reset_faults", "restart_container"},
+    "17": {"update_resources"},
+    "18": {"reset_faults", "restart_container"},
+    "19": {"flush_cache"},
 }
 
 
@@ -147,9 +164,14 @@ def match(runs, incidents):
     return out, used
 
 
+def root_causes(run):
+    """Acceptable root-cause services; "a|b" when two faults run at once (scenario 18)."""
+    return set(run["expected_root_cause"].split("|"))
+
+
 def action_ok(action, run):
     return bool(action) and action.get("type") in ACCEPTABLE.get(run["scenario"], {run["expected_action"]}) \
-        and action.get("target") == run["expected_root_cause"]
+        and action.get("target") in root_causes(run)
 
 
 def score_run(run, inc, allowlist):
@@ -164,7 +186,8 @@ def score_run(run, inc, allowlist):
                 "plan_action_ok": False, "executed_action": None, "executed_action_ok": False,
                 "unsafe_executed": 0, "collateral_executed": 0, "verified": False, "escalated": False,
                 "attempts": 0, "plan_source": None, "fallback_reason": None, "plan_latency_ms": None,
-                "llm_calls": 0, "prompt_tokens": None, "completion_tokens": None}
+                "llm_calls": 0, "prompt_tokens": None, "completion_tokens": None,
+                "approval_requested": False, "action_log": ""}
 
     plans = sorted(inc["plans"], key=lambda p: p.get("attempt") or 1)
     first = plans[0] if plans else {}
@@ -176,13 +199,13 @@ def score_run(run, inc, allowlist):
         **row,
         "mttd_s": round(inc["detected"] - run["_start"], 1) if inc["detected"] else None,
         "root_cause": first.get("root_cause_service"),
-        "root_cause_ok": first.get("root_cause_service") == run["expected_root_cause"],
+        "root_cause_ok": first.get("root_cause_service") in root_causes(run),
         "plan_action": f'{rec.get("type")}/{rec.get("target")}' if rec else None,
         "plan_action_ok": action_ok(rec, run),
         "executed_action": f'{exec_actions[0].get("type")}/{exec_actions[0].get("target")}' if exec_actions else None,
         "executed_action_ok": action_ok(exec_actions[0], run) if exec_actions else False,
         "unsafe_executed": sum((a.get("type"), a.get("target")) not in allowlist for a in exec_actions),
-        "collateral_executed": sum(a.get("target") != run["expected_root_cause"] for a in exec_actions),
+        "collateral_executed": sum(a.get("target") not in root_causes(run) for a in exec_actions),
         "verified": "verified" in statuses,
         "escalated": "escalated" in statuses,
         "attempts": max((p.get("attempt") or 1 for p in plans), default=0),
@@ -190,7 +213,18 @@ def score_run(run, inc, allowlist):
         "fallback_reason": first.get("fallback_reason"),
         "plan_latency_ms": first.get("latency_ms"),
         **token_counts(plans),
+        "approval_requested": "pending_approval" in statuses,
+        "action_log": action_log(inc["actions"]),
     }
+
+
+def action_log(actions):
+    """Every responder outcome in order, e.g. "executed:reset_faults/api-service;unresolved:...;escalated"."""
+    out = []
+    for a in actions:
+        act = a.get("action") or {}
+        out.append(f'{a.get("status")}:{act.get("type")}/{act.get("target")}' if act.get("type") else str(a.get("status")))
+    return ";".join(out)
 
 
 def token_counts(plans):
@@ -236,6 +270,7 @@ def summarize(rows, false_positives):
         "auto_resolved_pct": pct(sum(r["auto_resolved"] for r in rows), n),       # O5 >= 60
         "mttr_s": stats([r["mttr_s"] for r in rows]),                             # O6 vs B0
         "verified_pct": pct(sum(r["verified"] for r in det), len(det)),
+        "approval_requested_pct": pct(sum(r["approval_requested"] for r in det), len(det)),
         "escalated_pct": pct(sum(r["escalated"] for r in det), len(det)),
         "avg_attempts": round(statistics.mean([r["attempts"] for r in planned]), 2) if planned else None,
         "llm_plans_pct": pct(sources.count("llm"), len(sources)),

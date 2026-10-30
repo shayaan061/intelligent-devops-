@@ -1,0 +1,182 @@
+CONFERENCES WITH ACCEPTANCE BEFORE 20 NOVEMBER 2026
+Searched 20 Oct 2026. Check every date on the official site before submitting;
+several sites load their dates with JavaScript and aggregator pages conflict.
+
+Shortlist (updated 21 Oct 2026)
+-------------------------------
+                 Submit by   Decision   Publisher       Student fee   Length
+  ICIDA 2026     30 Oct      10 Nov     Springer LNNS   INR 9,000     >= 10 pages
+  EmergIN 2027   30 Oct      20 Nov     IEEE            INR 6,900     6 pages
+  DAL 2026       7 Nov       20 Nov     Springer LNNS   INR 7,080     <= 10 pages, double-blind
+
+ICAIN-2026 (deadline 20 Oct) was dropped. Details of each are below
+(sections 1-4). One paper goes to one venue at a time: the same paper at two of
+these is dual submission, and ICIDA does not allow a submitted paper to be
+withdrawn. Two clearly different papers (own contribution, own results, no
+shared text) can go to two venues.
+
+Bottom line (20 Oct)
+--------------------
+No reputable conference (IEEE / Springer / Elsevier) can both ACCEPT and
+PUBLISH a paper submitted now before 20 Nov. Proceedings go online 2-6 months
+after the conference. What is possible: an ACCEPTANCE LETTER before 20 Nov.
+
+Patent: the project is also a patent disclosure. File the patent application
+BEFORE any paper or preprint is made public, or the publication can count as
+prior art against it.
+
+
+1. ICAIN-2026 (BEST FIT ON DATES, BUT THE DEADLINE IS TODAY)
+------------------------------------------------------------
+Name:          3rd International Conference on Artificial Intelligence and
+               Networking
+Website:       https://www.icain-conf.com/
+Venue:         BITS Pilani, Dubai Campus (with IIIT Allahabad, GTBIT Delhi)
+Conference:    26-28 Nov 2026
+Publisher:     Springer, Lecture Notes in Networks and Systems (LNNS)
+Indexing:      Scopus, EI Compendex, DBLP (as stated by the site; the 2025
+               edition was also LNNS)
+Dates:         Manuscript submission    20 Oct 2026
+               First review notice      25 Oct 2026
+               Revised manuscript       30 Oct 2026
+               Final acceptance          5 Nov 2026   <-- before 20 Nov
+Publication:   after the conference (not before 20 Nov)
+Fit:           AI conference; an LLM/ML incident-response system fits.
+Verified:      20 Oct 2026, 14:45 IST, from the official site's code (the dates
+               above are confirmed; final manuscript due 10 Nov).
+Submission:    Microsoft CMT, https://cmt3.research.microsoft.com/ICAIN2026
+               (portal reachable on 20 Oct). Double-blind review.
+Length:        max 12 pages, Springer LNNS template (splnproc .docx on the
+               site's Downloads page).
+Fees (USD):    student, online: 180 early / 210 late; student, in person:
+               300 / 350 (early = before 20 Oct). Indian authors pay via
+               Razorpay.
+Contact:       info@icain-conf.com
+Note:          The revised manuscript (30 Oct) can carry the final numbers.
+
+
+2. ICIDA 2026 (BEST REALISTIC OPTION: 10 DAYS LEFT)
+---------------------------------------------------
+Name:          5th International Conference on Innovations in Data Analytics
+Website:       https://icida.ikrf.in/
+Organiser:     International Knowledge Research Foundation (IKRF) with Eminent
+               College of Management and Technology, West Bengal
+Venue:         Kolkata (Fairfield by Marriott); 15 Dec in person, 16 Dec hybrid
+Conference:    15-16 Dec 2026
+Publisher:     Springer LNNS (ISSN 2367-3370)
+Indexing:      Scopus, EI Compendex, INSPEC, zbMATH, SCImago (site says
+               indexing is not guaranteed)
+Dates:         Paper submission         30 Oct 2026  (a 10 Oct date also
+                                                      appears; 30 Oct looks
+                                                      like the extension)
+               Acceptance notification  10 Nov 2026   <-- before 20 Nov
+               Registration             20 Nov 2026
+               Camera-ready             25 Nov 2026
+Publication:   site says 5-6 months or more after the conference
+Submission:    Microsoft CMT, https://cmt3.research.microsoft.com/ICIDAA2026
+Rules:         at least 10 pages in the Springer template; similarity <= 20%
+Fees:          (image on the site, checked 20 Oct) Indian student/academic
+               author INR 9,000; Indian industry INR 10,500; foreign USD 250 /
+               300; attendee INR 2,500 / 3,000. One author must register by
+               20 Nov. No refunds; "once submitted, papers cannot be withdrawn".
+Mode:          15 Dec in person (Fairfield by Marriott, Kolkata), 16 Dec hybrid.
+Template:      Springer LNNS proceedings (Word or LaTeX ZIP linked on the site).
+Contact:       icida.conference@gmail.com, +91-9903149600
+CHOSEN:        20 Oct 2026, the user is keeping ICIDA and EmergIN 2027
+               (NIET, IEEE, due 30 Oct, docs/paper/) as the two targets.
+Tracks:        Computational Intelligence, Advance Computing, Network Security
+               & Telecommunication, Data Science and Data Analytics, Pattern
+               Recognition, Information Retrieval
+Fit:           "Computational Intelligence" / "Advance Computing" tracks.
+
+
+3. EmergIN 2027 (KEPT; THE CURRENT IEEE DRAFT IS FOR THIS ONE)
+----------------------------------------------------------------
+Name:          3rd IEEE International Conference on Emerging Technologies &
+               Innovation for Sustainability (Conference Record #72640)
+Website:       https://www.niet.co.in/ieee-conference-2027/
+Venue:         NIET, 19 Knowledge Park-II, Greater Noida; 5-6 Feb 2027
+Dates:         Full paper 30 Oct 2026, acceptance 20 Nov 2026, early bird
+               30 Nov, registration closes 15 Dec, camera-ready 20 Dec
+Rules:         6 pages, IEEE template, at most 6 authors, Microsoft CMT
+Fees (checked on the official page 20 Oct 2026; national / international):
+               Non-IEEE student     INR 6,900 / USD 72
+               IEEE student member  INR 5,400 / USD 56
+               Non-IEEE professional INR 8,500 / USD 88
+               IEEE professional    INR 7,200 / USD 75
+               Early bird*          INR 7,500 / USD 78 (only industry and
+                                    non-IEEE professionals, by 30 Nov)
+               Industry             INR 10,000 / USD 104
+               Attendee             INR 3,000 / USD 31
+               No online/hybrid mode is mentioned on the page.
+
+
+4. DAL 2026 / ICDAL (FROM docs/paper/IEEE CONFERENCES_2026.xlsx, checked 21 Oct)
+-------------------------------------------------------------------------------
+Name:          4th International Conference on Data Analytics and Learning
+Website:       https://www.iiits.ac.in/icdal2026/ (dates: html/dates.html)
+Venue:         IIIT Sri City, Andhra Pradesh; 15-19 Dec 2026
+Publisher:     Springer LNNS (not IEEE, although the sheet lists it)
+Dates:         Phase II full paper extended to 7 Nov 2026 (AoE); notification
+               for the extended phase 20 Nov 2026; camera-ready and
+               registration 25 Nov 2026
+Rules:         Springer LNNS, LaTeX preferred (Word allowed); long paper max
+               10 pages, short max 6 (+4 pages at USD 10 each); DOUBLE-BLIND
+               (no names, no identifying links); Microsoft CMT
+Fees (incl. GST): student author INR 7,080; faculty/industry INR 11,800;
+               second author of the same paper INR 7,080; foreign USD 280/440
+Note:          decision on 20 Nov, the same day as EmergIN.
+
+The rest of the sheet (718 IEEE events in India, 2026): every AI/computing
+conference from late Nov to Dec that was checked had closed (COSMIC, ICCISCS,
+ICSCSD, ICTBIG, IIHT, ARIIA, ETECIS, MPCIT, ICQDSIS, SoCTA, CVIP...). IC3AI
+(Jalandhar, held 9-10 Apr 2027) takes papers until 30 Oct but decides 30 Nov.
+DISHA (Jaipur, 17-19 Dec), AISSA (Pune, 26-27 Nov) and INCOFT (Belagavi) gave
+no dates online.
+
+
+OTHER OPTIONS (DO NOT MEET THE 20 NOV ACCEPTANCE DATE)
+------------------------------------------------------
+ICMLDE 2026, Dehradun, 27-28 Nov, Elsevier Procedia Computer Science
+  (Scopus, WoS). Submission closed 30 Aug; acceptance rounds ran to 5 Nov.
+  Only an option if the organisers agree to a late round: info@icmlde.org
+  https://www.icmlde.org/
+
+ComSIA 2027, University of Delhi + Silicon University, 5-6 Mar 2027,
+  Springer LNNS. Submission 30 Oct 2026, acceptance 30 Nov 2026 (too late).
+  https://comsia.in/
+
+IEEE ICCA'26, Cairo (hybrid, online allowed), 21-24 Dec, IEEE Xplore.
+  Submission open until 30 Nov, acceptance 11 Dec (too late). $400-450.
+  https://icca-conf.info/
+
+ICCI 2026, SVNIT Surat, 28-29 Dec, Springer LNNS. Closed 18 Oct,
+  acceptance 27 Nov.  https://scrs.in/conference/icci2026
+
+SCRS 2027 conferences with later deadlines (WCSC 2027 deadline 28 Oct,
+  ICCCT 2027 deadline 21 Nov); acceptance dates not listed.
+  https://scrs.in/conferences
+
+
+CHECKED AND CLOSED
+------------------
+ICIICTE 2026 (IEEE, Mandya, 19-20 Nov): closed 31 Jul
+IC-AIMLC 2026 (IEEE MP, Bhopal, 20-21 Nov): closed 10 Aug
+ICETCE 2026 (IEEE, SKIT Jaipur, 20-21 Nov): closed 15 Jul
+ISDCC 2026 (Lucknow, 20-21 Nov): final version was due 30 Sep
+ITI 2026 (NIT Agartala, 13-14 Nov): closed 4 Sep
+SoCTA 2026 (SVNIT Surat, 4-5 Dec): closed 15 Oct (firm)
+CSCT 2026 (NIT Sikkim, 12-13 Dec): closed 3 Oct
+ICDLAI 2026 (Springer, 21-22 Dec): closed 30 Sep, acceptance 30 Nov
+IEEE INDICON 2026 (Chennai, 18-20 Dec): closed 31 Aug
+IEEE UPCON 2026 (IIT Kanpur, 19-21 Dec): closed 25 Sep (final)
+IEEE ICEE 2026 (Bengaluru, 19-22 Dec): closed 1 Oct
+IEEE PuneCon 2026 (17-19 Dec): closed 15 Aug
+IEEE ICAITPR 2026 (Hyderabad, 21-23 Dec): closed 31 Aug
+Cloud Intelligence / AIOps Workshop 2026: closed 8 Feb (workshop was March)
+
+AVOID
+-----
+ICAIRSC-2026 (virtual, 27 Nov): no organiser, publisher, indexing or dates
+  listed. Same for any site promising "guaranteed acceptance and publication
+  in 2 weeks": likely predatory, and it can hurt the project in review.

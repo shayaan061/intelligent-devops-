@@ -1,7 +1,8 @@
 "use client";
 
 // Live state from the gateway's two WebSockets, shared by every page.
-// /ws/events     incident open/updated/reanalyze/resolved (and raw alerts)
+// /ws/events     incident open/updated/reanalyze/resolved, and raw alerts
+//                (a resolved one marks the alert cleared in its open incident)
 // /ws/responses  response plans and responder action records
 // The gateway replays its recent buffer to each new client, so after a
 // reconnect the same messages arrive again; they are de-duplicated by key.
@@ -25,6 +26,43 @@ function gatewayWsBase(): string {
   return `${proto}://${window.location.hostname}:8000`;
 }
 
+// A raw alert message from /ws/events (or GET /events)
+export interface AlertEventMsg {
+  type: "alert";
+  alertname?: string | null;
+  service?: string | null;
+  status?: string;
+  startsAt?: string | null;
+}
+
+// Incident messages only arrive on open/updated/reanalyze/resolved, so an alert
+// that clears while the incident stays open (it does for up to 60 s, waiting
+// for ML anomalies to age out) would still show as firing. The raw "resolved"
+// alert message is applied to the incident's copy of that alert.
+function alertKey(name?: string | null, service?: string | null, startsAt?: string | null): string {
+  return `${name ?? ""}|${service ?? ""}|${startsAt ?? ""}`;
+}
+
+export function resolvedAlertKeys(events: AlertEventMsg[]): Set<string> {
+  const keys = new Set<string>();
+  for (const e of events) {
+    if (e.type !== "alert") continue;
+    const k = alertKey(e.alertname, e.service, e.startsAt);
+    if (e.status === "resolved") keys.add(k);
+    else keys.delete(k); // fired again with the same startsAt: not cleared
+  }
+  return keys;
+}
+
+export function withResolvedAlerts(inc: IncidentMsg, resolved: Set<string>): IncidentMsg {
+  if (!inc.alerts?.some((a) => a.status !== "resolved" && resolved.has(alertKey(a.name, a.service, a.startsAt)))) return inc;
+  return {
+    ...inc,
+    alerts: inc.alerts.map((a) =>
+      a.status !== "resolved" && resolved.has(alertKey(a.name, a.service, a.startsAt)) ? { ...a, status: "resolved" } : a),
+  };
+}
+
 function stepKey(m: StepMsg): string {
   const when = m.type === "action" ? m.at : m.created_at;
   return [m.type, m.incident_id, m.type === "action" ? m.status : "", m.attempt ?? 1, m.received_at ?? "", when ?? ""].join("|");
@@ -34,6 +72,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   const incidents = useRef(new Map<string, IncidentMsg>());
   const steps = useRef(new Map<string, StepMsg[]>());
   const seen = useRef(new Set<string>());
+  const alertEvents = useRef<AlertEventMsg[]>([]);
   const [connected, setConnected] = useState({ events: false, responses: false });
   const [version, setVersion] = useState(0);
   const [lastMessageAt, setLast] = useState<number | null>(null);
@@ -64,8 +103,17 @@ export function LiveProvider({ children }: { children: ReactNode }) {
     };
 
     connect("/ws/events", "events", (m) => {
+      if (m.type === "alert") {
+        alertEvents.current.push(m as unknown as AlertEventMsg);
+        if (alertEvents.current.length > 500) alertEvents.current.splice(0, alertEvents.current.length - 500);
+        const resolved = resolvedAlertKeys(alertEvents.current);
+        for (const [id, inc] of incidents.current) {
+          if (inc.status !== "resolved") incidents.current.set(id, withResolvedAlerts(inc, resolved));
+        }
+        return;
+      }
       if (m.type !== "incident" || typeof m.incident_id !== "string") return;
-      const inc = m as unknown as IncidentMsg;
+      const inc = withResolvedAlerts(m as unknown as IncidentMsg, resolvedAlertKeys(alertEvents.current));
       const prev = incidents.current.get(inc.incident_id);
       // Keep the newest state; a replayed older update must not overwrite it
       if (!prev || (inc.timestamp ?? "") >= (prev.timestamp ?? "")) incidents.current.set(inc.incident_id, inc);

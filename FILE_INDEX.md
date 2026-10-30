@@ -26,6 +26,7 @@ Last updated: 7 Oct 2026.
 | `SESSION_NOTES.txt` | Chronological work log of every session (timestamps, decisions, findings, fixes) |
 | `CLAUDE.md` | Instructions for working on the repo: current state, commands, the gateway → analyzer → responder contract, invariants (no `fault_*` data in inputs, safety rules), the results-log rule |
 | `FILE_INDEX.md` | This file |
+| `commands.txt` | Quick reference: commands to start and stop the whole system (Ollama + compose stack), the URLs to open, pre-demo checks |
 | `EVALUATION_GUIDE.md` | Guide for the Phase 2 evaluation and demo: what each part is, how to run it, what to show, likely questions. **Snapshot of 4 Oct**: written before the gateway, analyzer and responder existed |
 | `sys arch.md` | Plain-language explanation of how the system works, component by component. **Snapshot of Phase 2**: lists the gateway, LLM and response system as future work |
 | `PATENT_ALIGNED_PLAN.md` | Plan B: the base plan aligned with the patent draft (input to `SUGGESTED_PLAN.md`) |
@@ -58,7 +59,24 @@ Last updated: 7 Oct 2026.
 | `results/eval_stage1_ground_truth_{B1,B2,S}.csv` | Injector ground truth per system for stage 1 (same columns as `ground_truth.csv`; includes the voided runs) |
 | `results/eval_stage1_run_eval.log`, `results/eval_stage1_console.log` | Runner log and runner + injector console output for stage 1 |
 | `results/incident_store_eval_stage1.jsonl` | Every gateway message from 11 Oct 20:25 UTC (stage 1 + redo), one JSON per line; no `fault_*` data |
+| `results/eval_stage2_{B1,B2,S}_runs.csv`, `results/eval_stage2_summary.json`, `results/eval_stage2_by_scenario.csv` | §10 evaluation stage 2 scores so far (rounds 1-4, 36 runs per system; same columns as stage 1; per-scenario counts and MTTD/MTTR means) (RESULTS.md §17) |
+| `results/eval_stage2_round4_manifest.csv`, `results/eval_stage2_round4_ground_truth_{B1,B2,S}.csv` | Copies of `eval/runs.csv` and the per-system ground truth after stage 2 round 4 |
+| `results/eval_stage2_round4_console.log`, `results/eval_stage2_round4_run_eval.log` | Runner + injector console output and runner log up to the end of round 4 |
+| `results/eval_stage3_{B1,B2,S}_runs.csv`, `results/eval_stage3_summary.json`, `results/eval_stage3_by_scenario.csv` | §10 evaluation, core final: scores for rounds 1-20 (180 runs per system; same columns as stage 1; per-scenario counts and MTTD/MTTR means) (RESULTS.md §18a) |
+| `results/eval_stage3_manifest.csv`, `results/eval_stage3_ground_truth_{B1,B2,S}.csv`, `results/eval_stage3_run_eval.log` | Copies of `eval/runs.csv`, the per-system ground truth and the runner log after the core block (21 Oct) |
+| `results/eval_extra_stage3_{B1,B2,S,SF}_runs.csv`, `results/eval_extra_stage3_summary.json`, `results/eval_extra_stage3_by_scenario.csv` | Extra suite final scores (scenarios 10-14 on B1/B2/S, 3/4/6/8 on SF; 10 runs per scenario; same columns as the core scores) (RESULTS.md §18b) |
+| `results/eval_extra_stage3_manifest.csv`, `results/eval_extra_stage3_ground_truth_{B1,B2,S,SF}.csv` | Copies of `eval/extra/runs.csv` and the per-system ground truth after the extra block (22 Oct) |
+| `results/eval_novel_stage2_{B1,B2,S,SF}_runs.csv`, `results/eval_novel_stage2_summary.json`, `results/eval_novel_stage2_by_scenario.csv` | Novel unknown-fault suite stage 2 scores (scenarios 15/16/18/19, rounds 1-5, 5 runs per scenario and system; same columns as the core scores) (RESULTS.md §21) |
+| `results/eval_novel_stage2_manifest.csv`, `results/eval_novel_stage2_ground_truth_{B1,B2,S,SF}.csv` | Copies of `eval/novel/runs.csv` and `eval/novel/gt_*.csv` at 97 runs done (27 Oct 00:21 UTC) |
+| `results/eval_novel_stage3_{B1,B2,S,SF}_runs.csv`, `results/eval_novel_stage3_summary.json`, `results/eval_novel_stage3_by_scenario.csv`, `results/eval_novel_stage3_manifest.csv`, `results/eval_novel_stage3_ground_truth_{B1,B2,S,SF}.csv` | Novel suite final scores (10 runs per scenario and system) and copies of `eval/novel/` after the block (RESULTS.md §22) |
+| `results/guard_decisions_long_run.csv`, `results/mttr_mwu_B1_B2.csv` | Derived 26 Oct for Paper A: live responder decisions per system (decision, B1, B2, S, SF) and the MTTR Mann-Whitney test B1 vs B2 per scenario (scenario, n_B1, n_B2, median_B1, median_B2, hl_shift_s, U, z, p) (RESULTS.md §20) |
+| `results/eval_stage3_S_open_sources.csv`, `results/eval_stage3_mttd_percentiles.csv` | Derived 26 Oct from the stage-3 scores and the long-run store: which detector opened each S incident per scenario (suite, scenario, runs, rule, ml, rule+ml, not_in_store, undetected) and MTTD per system (system, n, min, p50, p90, max) (RESULTS.md §18c) |
+| `results/incident_store_long_run_19-22oct.jsonl` | Every gateway message of the long block (19 Oct 15:42 to 22 Oct 18:17 UTC, core + extra), one JSON per line (id, at, channel, type, incident_id, status, body); no `fault_*` data |
+| `results/soak_1_*`, `results/soak_2_*` | Soak tests (no faults, harmless events every 30 min, system S): soak 1 = 12-13 Oct, 10 h, 19 events (RESULTS.md §16); soak 2 = 22-23 Oct, 12 h, 23 events (§19); both 0 false alarms. `*_summary.json` = soak-score output, `*_windows.csv` / `*_events.csv` = copies of `eval/soak/`, `*_console.log` |
+| `results/incident_store_eval_stage2_round4.jsonl` | Gateway messages from the two round-4 windows (12 Oct 11:30-12:45, 13 Oct 16:25-19:00 UTC), one JSON per line; no `fault_*` data |
 | `results/baseline_export_test_40min.csv` | 192 rows of normal-traffic features (test of `record_baseline.py`). Columns: `timestamp, service, clients, cpu, err, mem, mem_bytes, ops, p95, rps, up, upstream_p95` |
+| `results/long_run_19oct.sh`, `long_run_19oct.out`, `long_run_19oct.pid` | Wrapper for the long block of 19 Oct (core rounds 5-20, then extra rounds 2-10, retries after an abort), its stdout and its PID (RESULTS.md §18) |
+| `results/eval_core_r5-20_console.log`, `eval_extra_r2-10_console.log` | Runner output of that block |
 | `ground_truth.csv` *(not in git)* | Live injector log; every new run is appended here. Copy runs worth keeping into `results/` |
 | `incidents.db` *(not in git)* | The gateway's SQLite incident store (table `messages`). Export with a query, as for `results/incident_store_snapshot.jsonl` |
 
@@ -67,12 +85,12 @@ Last updated: 7 Oct 2026.
 | File | Purpose |
 |---|---|
 | `score.py` | Scores runs: joins a ground-truth CSV with `incidents.db` and prints §10 metrics (recall, MTTD, root cause, action, unsafe actions, auto-resolved, MTTR, latency, LLM calls and tokens per incident). `--system`, `--since`, `--max-gap` (count false positives only within a system's blocks), `--out`, `--json` |
-| `run_eval.py` | §10 evaluation runner: B1/B2/S in resumable blocks (stage 1/2/3 = 3/10/20 rounds of the 9 scenarios per system, shuffled, systems interleaved); switches the analyzer mode and ml-detector, checks health/quiet, keeps the 300 s gap, caffeinate. `run`, `status`, `void`, `score` |
-| `eval/` *(not in git until results are kept)* | Runner state: `runs.csv` (columns `system, round, slot, scenario, run_id, status, started, ended, end_reason, note`; status `done` or `void`), `gt_B1.csv` / `gt_B2.csv` / `gt_S.csv` (injector ground truth per system, same columns as `ground_truth.csv`), `run_eval.log` |
+| `run_eval.py` | §10 evaluation runner in resumable blocks, shuffled, systems interleaved. Suite `novel` (scenarios 15-19 on B1/B2/S/SF, `eval/novel/`, added 26 Oct). Suite `core`: scenarios 1-9 on B1/B2/S (stages 1/2/3 = 3/10/20 rounds); suite `extra`: 10-14 on B1/B2/S and 3, 4, 6, 8 on SF (LLM unreachable), stages 3/5/10 rounds. Switches the analyzer mode/LLM URL and ml-detector, checks health/quiet, keeps the 300 s gap, voids runs the Mac slept through, caffeinate. `run`, `status`, `void`, `score` (also a per-scenario table), `soak` (no faults, optional restarts/load changes), `soak-score` |
+| `eval/` *(not in git until results are kept)* | Runner state: `runs.csv` (columns `system, round, slot, scenario, run_id, status, started, ended, end_reason, note`; status `done` or `void`), `gt_B1.csv` / `gt_B2.csv` / `gt_S.csv` (injector ground truth per system, same columns as `ground_truth.csv`), `run_eval.log`; `extra/` the same for the extra suite (incl. `gt_SF.csv`); `soak/windows.csv` (columns `system, start, end, awake_hours, events, note`) and `soak/events.csv` (`window_start, at, event, detail, until`) |
 | `safety_suite.py` | The 29 adversarial plans through the real responder; prints the table, `--csv` |
 | `compare_analyzers.py` | Runbooks vs LLM on `analyzer/samples/scenario*.json`; `--repeat`, `--model`, `--out` |
 | `record_baseline.py` | Exports ML training data from Prometheus (no fault or alert periods); `--last 2h`; `--keep-all` keeps everything, for `ml/replay.py` |
-| `tests/test_score.py`, `tests/test_safety_suite.py`, `tests/test_run_eval.py` | Tests for the scorer (13), the safety suite (1) and the evaluation runner (11) |
+| `tests/test_score.py`, `tests/test_safety_suite.py`, `tests/test_run_eval.py` | Tests for the scorer (15), the safety suite (1) and the evaluation runner (19) |
 
 ## 3. Figures and drafts (`docs/`)
 
@@ -84,6 +102,28 @@ Last updated: 7 Oct 2026.
 | `docs/figures/idf_fig1_architecture.png`, `idf_fig2_workflow.png` | The new IDF figures: architecture (detectors, gateway/context builder, LLM + runbooks, validator, executor, verifier loop, store, dashboard, approval) and workflow (validity and policy decisions, approval, bounded re-analysis, escalation) |
 | `docs/Intelligent DevOps Monitoring and Incident Response System Invention Disclosure.pages` | The team's Pages draft (tracked changes accepted) that `IDF_final` revises |
 | `docs/PATENT_CHANGES_FINAL.txt` | Final, paste-ready patent changes (8 Oct 2026), by IDF section: abstract, field, prior art, summary, figures, working steps, claims 1–15, implementation status, evidence, and the decisions left to the inventors |
+| `docs/ml_training_notes.txt` | Plain-text notes on the ML detector (13 Oct 2026): how it was trained, the training data (`baseline_20261009_1334.csv`, columns and medians), and whether 78 min is enough (soak evidence, limitations, retrain advice) |
+| `experiments/guard_decisions.py`, `experiments/mttr_significance.py` | Paper A analyses: counts live policy decisions from the incident store; Mann-Whitney U on MTTR between two systems (no SciPy) |
+| `docs/paper/build/make_chunks.py` | Splits the paper's .txt into ≤1,200-word parts, one paragraph per line; optional 3rd argument = file prefix (`paperA2_chunks/`) |
+| `docs/paper/paperA2_chunks/paperA2_part<i>_of_5.txt`, `paperA2_combinedfinal.txt` | `EmergIN2027_paperA2.txt` (final, reworded text) split into 5 parts of ≤1,200 words (1136/1088/1064/1083/1034), and all parts joined; regenerated 28 Oct after the rewording |
+| `docs/paper/build/build_paper.py` | Builder library for the paper: fills the IEEE conference template's own styles (layout, tables, figures as TIFF, references, `--txt`/`--latex`/`--literal-numbers` outputs, number loading from `run_eval.py score` files). Its own Paper A text and outputs are no longer used (Paper A files deleted 28 Oct 2026); `build_paper_a2.py` imports it |
+| `docs/paper/build/build_paper_a2.py` | Builder for Paper A2 (28 Oct 2026): imports `build_paper.py` (template, layout, figures, references) and replaces the title and text; adds the unknown-fault suite numbers from `experiments/results/eval_novel_stage3_*` (RESULTS.md §22). Same options plus `--novel DIR` |
+| `docs/paper/build/a2_text.py` | Paper A2 title, abstract, contributions, Fig. 1 caption and the 32 body paragraphs in order: the authors' reworded chunks corrected against the original wording; used by `build_paper_a2.py` (`--original-text` builds the earlier wording) |
+| `docs/paper/EmergIN2027_paperA2.docx`, `EmergIN2027_paperA2.txt`, `EmergIN2027_paperA2.pdf` | **Paper A2**: Paper A extended with the known vs unknown fault comparison (890 runs, 18 scenarios, Table IV unknown faults); Word version, plain text, and the Pages PDF of the Word version (6 pages) |
+| `docs/paper/latex_ieee_a2/` | Paper A2 in IEEEtran (`main.tex`, figures, `paperA2_overleaf.zip`, `main.pdf` 6 pages). Generated by `build_paper_a2.py --latex` |
+| `docs/paper/EmergIN2027.pdf` | **Submission copy of Paper A2** (renamed from EmergIN2027_PaperA2_FINAL.pdf by the authors) (28 Oct 2026): copy of `latex_ieee_a2/main.pdf`, 6 pages, A4. Rebuilt 29 Oct 2026 with the wording of `EmergIN2027_AI_highlights.docx` (27 paragraphs edited directly in `latex_ieee_a2/main.tex`; `build/a2_text.py` still has the 28 Oct wording, so a rebuild with `build_paper_a2.py --latex` would undo them). Same day: floats moved from `[H]` to the top/bottom of columns and `flushend` added, which removed the empty column bottoms (also by hand in `main.tex`) |
+| `docs/paper/build/figures.py` | Draws Fig. 1 (architecture, one column), Fig. 2 (MTTD/MTTR per core scenario) and the MTTR-only Fig. 2 of Paper A (`fig2_mttr` from `eval_stage*_by_scenario.csv`) as SVG and renders PNG with headless Chrome |
+| `docs/paper/figures/fig1_architecture.png`, `fig2_results.png`, `fig2_mttr.png` (+ `.html` sources) | Paper figures (Fig. 1 black and white since 28 Oct)s: architecture; MTTD + MTTR per scenario (earlier paper); MTTR per scenario (Paper A's Fig. 2) |
+| `docs/paper/PAPER_PLANS.md` | Plans for two separate papers (26 Oct 2026): A = policy-guarded LLM remediation → EmergIN 2027 (30 Oct), B = label-free ML detection → DAL 2026 (7 Nov). Claims, RQs, section/word budgets, numbers with RESULTS.md sections, figures, overlap rules, references to verify, schedule, risks |
+| `docs/paper/template/conference-template2027.docx` | The EmergIN 2027 IEEE Word template (A4), downloaded 20 Oct 2026 from niet.co.in/ieee-conference-2027 |
+| `docs/paper/template/springer_lnns/word/` | Springer LNNS proceedings Word template (downloaded 23 Oct 2026 from the link on icida.ikrf.in): `splnproc2510.docm` (Windows) and `splnproc2510_mac.docm` (Mac), with macros for the style ribbon; `Quick Start.pdf`, `SPLNPROC Technical Instructions.pdf`. For ICIDA and DAL |
+| `docs/paper/template/springer_lnns/latex/` | Springer LNCS/LNNS LaTeX2e package (Sept 2026): `llncs.cls`, `samplepaper.tex`, `splncs04.bst`, `llncsdoc.pdf`. DAL prefers LaTeX |
+| `docs/conferences_nov2026.txt` | Conference search for acceptance before 20 Nov 2026 (20-21 Oct 2026). Shortlist at the top: ICIDA 2026, EmergIN 2027, DAL 2026, with dates, fees, rules and links; ICAIN-2026 (dropped), near misses, closed venues and ones to avoid |
+| `docs/results/Evaluation_Results.docx` | Word report of the final evaluation (23 Oct 2026): setup, core and extra summary tables, 9 figures each with its reading, soak result, limits, sources |
+| `docs/results/figures/fig1-9_*.png` | The report's figures: core MTTD and MTTR per scenario, MTTR spread, correct actions, MTTD per round, extra detection, extra outcomes, SF fallback, LLM cost |
+| `docs/results/make_figures.py`, `docs/results/build_doc.py` | Draw the figures (matplotlib) and build the .docx (python-docx) from `experiments/results/`; rerun both after any re-scoring |
+| `docs/paper/IEEE CONFERENCES_2026.xlsx` | List of 718 IEEE conferences in India in 2026 (columns: Name, Start Date as an Excel serial date, Location, External URL; Sheet1 only). Checked 21 Oct 2026; results in `docs/conferences_nov2026.txt` §4 |
+| `docs/devops_incident_handling_irl.txt` | Plain-text notes (19 Oct 2026) on how incidents are handled in industry (detection, on-call, diagnosis, common fixes, existing automation, postmortems) and how this project maps onto it, for the report |
 | `docs/figures/dashboard_scenario7.png` | Screenshot of the dashboard: service map, one incident (scenario 7) with plan → executed → verified, an approval card |
 | `docs/figures/web_incident_detail.png` | Next.js dashboard, incident page for the real scenario 6 incident (redis down → restart → verified): detection, context, plans, actions |
 | `docs/figures/web_overview_synthetic_metrics.png` | Next.js dashboard overview (light mode). **Metrics are synthetic** (a fake Prometheus, Docker was off); the stats come from the real incident snapshot, and the open incident and approval are test data |
@@ -93,7 +133,7 @@ Last updated: 7 Oct 2026.
 ### Demo application (the system being monitored)
 | File | Contents |
 |---|---|
-| `app/app.py` | **frontend** service (Flask): `/` calls api-service; fault injection (`/inject`, `/reset`), `/health`, `/metrics`, upstream-latency metric |
+| `app/app.py` | **frontend** service (Flask): `/` calls api-service; fault injection (`/inject` incl. optional `delay_s`/`rate` for subtle faults, `/reset`), `/health`, `/metrics`, upstream-latency metric |
 | `api-service/app.py` | **api-service** (Flask): `/data` → Redis `INCR`; the same fault-injection, health and metrics code as `app/app.py` (keep the two in sync) |
 | `app/`, `api-service/` `Dockerfile`, `requirements.txt` | Container builds |
 | `load/locustfile.py` | Locust background traffic (~5 req/s) that the HTTP alerts need |
@@ -165,7 +205,7 @@ Last updated: 7 Oct 2026.
 | `web/app/api/*` | Server-side routes: `metrics` (fixed PromQL from `gateway/context.py`, asserts no `fault_*`), `stats` (from `/history`), `system` (health probes), `gateway/*` and `responder/*` allowlisted proxies (approve/reject needs the `x-dashboard` header) |
 | `web/lib/live.tsx`, `web/lib/types.ts` | Live state from both WebSockets (de-duplicated replays); message types |
 | `web/components/` | Charts (one metric per chart, fixed colour per service), service map, plan/action views, approval queue |
-| `injector/injector.py` | Fault injector: the 9 §10 scenarios, suites, ground-truth CSV logging |
+| `injector/injector.py` | Fault injector: the 9 §10 scenarios (core), 15-19 (novel, added 26 Oct: subtle frontend latency/errors, CPU limit cut, two faults at once, Redis memory filled; no runbook covers them) and 10-14 (extra: corrupted cache, slow Redis, subtle latency, subtle errors, recurring fault; Redis faults via `docker exec`), suites, ground-truth CSV logging |
 | `injector/web.py`, `injector/static/index.html` | Injector control panel at `localhost:8088` |
 | `docker-compose.yml` | The whole stack: services, ports, environment variables, mounts |
 

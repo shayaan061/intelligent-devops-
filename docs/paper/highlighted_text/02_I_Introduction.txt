@@ -1,0 +1,11 @@
+I Introduction
+
+Modern web applications are composed of many small services, and a fault propagates along the call chain. When a database is slow, the service that calls it shows high latency and the front end returns errors, so the alert that fires first might not be the cause. Incidents are still handled by an on-call engineer, who receives an alert, looks at dashboards, reads a written runbook and applies a fix, generally a restart or a rollback [1]. Detection is mature and simple fixes are scripted, but the step in the middle, deciding what is wrong and which fix is safe, remains a manual and time-consuming process.
+
+RQ1 (safety): can such a loop operate on live containers without an unsafe action, even when the plans are malformed or malicious? RQ2 (known faults): given the same detection, does the LLM diagnose and act better than rule-based runbooks? RQ3 (unknown faults): which component helps when no runbook was written for the fault? RQ4 (robustness): what happens if the diagnosis is incorrect, the fault is misleading or recurring, or the LLM is unavailable? The contributions are:
+
+1) A closed-loop design (monitor, detect, analyze, decide, respond, verify) in which the LLM has no access to the system and a policy validator is the only path to execution, enforcing an action allowlist, known targets, a confidence threshold, a cross-incident cooldown, per-incident limits, human approval of destructive actions, and bounded re-analysis with escalation.
+
+2) An adversarial set of 29 hallucinated, malformed and malicious plans executed against the real responder, revealing four input-handling defects in the responder and the gateway that were corrected prior to the evaluation.
+
+The entire system runs on one laptop with a locally hosted 8-billion-parameter model, so operational data never have to leave the machine and there is no cloud inference. A small local model also keeps the compute and energy cost of automated operations low, which is consistent with the sustainability theme of this conference. Section II reviews related work, Section III describes the system architecture and Section IV the safety design. Sections V and VI present the evaluation, Section VII discusses limitations, and Section VIII concludes.

@@ -10,6 +10,10 @@ Rules:
   lands in one incident.
 - An incident resolves once none of its alerts is firing and its ML
   anomalies are older than `window`. A later alert opens a new incident.
+- Once the responder has verified a fix, the wait is only `fresh` (no ML
+  anomaly refreshed that recently) instead of `window`. Otherwise the next
+  fault, if it starts within 60 s, joins an incident the responder has
+  already finished with, and nothing acts on it.
 - The ML detector re-posts an anomaly every poll while it lasts. A repeat
   from a service that already has an anomaly in the open incident only
   refreshes it (like an Alertmanager repeat), so it keeps the incident open
@@ -53,6 +57,7 @@ class Incident:
         # Re-analysis (§6.6): set by the responder's verifier through app.py
         self.attempt = 1
         self.actions = []       # actions tried: {type, target, attempt, status, at}
+        self.quiet_after = None  # set when the responder verifies a fix (see mark_verified)
 
     @property
     def resolved(self):
@@ -146,10 +151,24 @@ class Grouper:
         inc.last_activity = now
         return inc, change
 
+    def mark_verified(self, incident_id, fresh):
+        """The responder verified a fix. Returns the incident if it resolves now.
+
+        Still checks the incident's own state: anyone can POST /actions, so a
+        report alone never closes an incident with a firing alert or a fresh
+        anomaly (those resolve the usual way, with the shorter wait).
+        """
+        inc = self.incidents.get(incident_id)
+        if inc is None or inc.resolved:
+            return None
+        inc.quiet_after = fresh
+        return inc if self._maybe_resolve(inc, self.clock()) else None
+
     def _maybe_resolve(self, inc, now):
         if inc.firing():
             return False
-        if any(now - m["_at"] < self.window for m in inc.anomalies):
+        wait = self.window if inc.quiet_after is None else min(inc.quiet_after, self.window)
+        if any(now - m["_at"] < wait for m in inc.anomalies):
             return False
         inc.resolved_at = now
         return True

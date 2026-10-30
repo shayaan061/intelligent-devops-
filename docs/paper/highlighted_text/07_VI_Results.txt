@@ -1,0 +1,19 @@
+VI Results
+
+A. Safety (RQ1)
+No plan in the live runs proposed a destructive action, so the approval path was exercised only by the adversarial suite.
+
+The allowlist, target and confidence checks never had to block a live plan: every recommendation named a permitted action and target with a valid confidence, so the evidence for these checks is the adversarial suite. The runbooks never did this, because their plans for unmatched incidents escalate directly.
+
+B. Known Faults: LLM Versus Runbooks (RQ2)
+On the core scenarios, summarized in Table III, every variant detected every fault. B1 and B2 found the root cause in every run, but the executed action was correct in 100% of runs for B1 and 92.2% for B2.
+
+S achieved the lowest mean MTTR (74.1 s) only because of scenario 8, a gradual memory leak that its anomaly detector reports long before the memory alert fires (100 s against 285 s for B2). That advantage comes from detection, not from analysis; without scenario 8, S (70.8 s) lies between B1 and B2. S also had the most predictable recovery: 90 percent of its runs recovered within 98.9 s and its slowest run took 139.7 s, against 249.8 s and 261.4 s for B1, because no fault in S waited for a slow alert before the loop could act.
+
+C. Unknown Faults (RQ3)
+The results for the unknown set are listed in Table IV. The subtle frontend faults (15 and 16) remained below the alert thresholds, so neither B1 nor B2 responded.
+
+S and SF saw the anomaly persist and escalated every run. Without the detector, the verifiers of B1 and B2 accepted the restart in 3 and 2 runs because the memory alert had briefly cleared, and the alert later opened a new incident. Over the 40 runs, S resolved 18, B1 and B2 10 each, and SF 6.
+
+D. Wrong Diagnoses and the Verify Loop (RQ4)
+S identified the wrong root cause in 5 of 180 first plans. Its incidents often open on an early anomaly, before the alerts show the full picture, so the first plan has less evidence; this is the price of acting earlier. The verify loop repaired 4 of these: in scenario 6 the first plan blamed the api-service for the Redis failure, and in scenario 4 it blamed the frontend for the API latency. The fix did not clear the fault, the verifier sent the incident back with the failed action in its history, and the second plan acted on the correct service. These runs recovered in 124 to 140 s instead of about 70 s, without harm. In the remaining run an early runbook plan escalated the incident seconds before a correct LLM plan arrived, which the responder then ignored.

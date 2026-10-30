@@ -181,3 +181,43 @@ def test_active_spans():
     assert score.active_spans(runs) == [(0, 2060)]
     assert score.active_spans(runs, max_gap=600) == [(0, 510), (2000, 2060)]
     assert score.active_spans([]) == []
+
+
+def test_approval_and_action_log(world):
+    rows, s = world([gt_row("r1", 10, "redis", "flush_cache", 0, 180, "cleanup")],
+                    [incident("i1", 45, 40),
+                     plan("i1", "redis", "flush_cache", "redis", 1, "llm"),
+                     action("i1", "pending_approval", "flush_cache", "redis")])
+    r = rows[0]
+    assert r["approval_requested"] and r["plan_action_ok"] and r["executed_action"] is None
+    assert r["action_log"] == "pending_approval:flush_cache/redis"
+    assert s["approval_requested_pct"] == 100
+
+
+def test_recurring_fault_escalation_log(world):
+    msgs = [incident("i1", 45, 40), plan("i1", "api-service", "reset_faults", "api-service"),
+            action("i1", "executed", "reset_faults", "api-service"),
+            action("i1", "unresolved", "reset_faults", "api-service"),
+            action("i1", "executed", "restart_container", "api-service"),
+            action("i1", "unresolved", "restart_container", "api-service"),
+            ("action", "i1", {"type": "action", "incident_id": "i1", "status": "escalated", "action": None})]
+    rows, _ = world([gt_row("r1", 14, "api-service", "escalate", 0, 480, "expired")], msgs)
+    r = rows[0]
+    assert r["escalated"] and r["executed_action_ok"] and not r["auto_resolved"]
+    assert r["action_log"] == ("executed:reset_faults/api-service;unresolved:reset_faults/api-service;"
+                               "executed:restart_container/api-service;unresolved:restart_container/api-service;escalated")
+
+
+def test_two_root_causes_accept_either_service():
+    run = {"scenario": "18", "expected_root_cause": "frontend|api-service", "expected_action": "reset_faults"}
+    assert score.action_ok({"type": "reset_faults", "target": "frontend"}, run)
+    assert score.action_ok({"type": "restart_container", "target": "api-service"}, run)
+    assert not score.action_ok({"type": "reset_faults", "target": "redis"}, run)
+
+
+def test_novel_scenarios_need_their_specific_action():
+    run = {"scenario": "17", "expected_root_cause": "api-service", "expected_action": "update_resources"}
+    assert score.action_ok({"type": "update_resources", "target": "api-service"}, run)
+    assert not score.action_ok({"type": "restart_container", "target": "api-service"}, run)
+    run19 = {"scenario": "19", "expected_root_cause": "redis", "expected_action": "flush_cache"}
+    assert not score.action_ok({"type": "restart_container", "target": "redis"}, run19)

@@ -1,0 +1,191 @@
+2026-10-12T15:34:35Z extra stage 1: 19 runs to do for B1, B2, S, SF (~2.1 h)
+2026-10-12T15:34:35Z WARNING: closing the lid will sleep the Mac and spoil the running scenario (keep it open, or `sudo pmset -a disablesleep 1`)
+2026-10-12T15:34:35Z analyzer -> ANALYZER_MODE=runbook OLLAMA_URL=http://host.docker.internal:11434
+2026-10-12T15:34:37Z stopping ml-detector
+2026-10-12T15:34:38Z waiting 60s for the switch to settle
+2026-10-12T15:35:38Z extra B1 round 1 slot 1/5: scenario 11
+time="2026-10-12T21:05:38+05:30" level=warning msg="No services to build"
+time="2026-10-12T21:05:38+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-62e22249c1c3 Creating 
+ Container intellegentdevops-injector-run-62e22249c1c3 Created 
+[15:35:39] scenario 11 slow-redis: injecting into redis for 300s
+[15:40:40] scenario 11 ended: expired after 301s
+2026-10-12T15:40:40Z extra B1 round 1 scenario 11: run 3dfffd29 expired
+2026-10-12T15:40:40Z waiting 299s (gap since the previous run)
+2026-10-12T15:45:40Z extra B1 round 1 slot 2/5: scenario 13
+time="2026-10-12T21:15:40+05:30" level=warning msg="No services to build"
+time="2026-10-12T21:15:40+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e44a05ba20d0 Creating 
+ Container intellegentdevops-injector-run-e44a05ba20d0 Created 
+[15:45:40] scenario 13 subtle-error-api: injecting into api-service for 300s
+[15:50:41] scenario 13 ended: expired after 301s
+2026-10-12T15:50:41Z extra B1 round 1 scenario 13: run d82b0c4b expired
+2026-10-12T15:50:41Z waiting 300s (gap since the previous run)
+2026-10-12T15:55:41Z extra B1 round 1 slot 3/5: scenario 10
+time="2026-10-12T21:25:41+05:30" level=warning msg="No services to build"
+time="2026-10-12T21:25:41+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-27c49ac03e14 Creating 
+ Container intellegentdevops-injector-run-27c49ac03e14 Created 
+[15:55:41] scenario 10 corrupted-cache: injecting into redis for 300s
+[16:00:45] scenario 10 ended: cleanup after 304s
+2026-10-12T16:00:45Z extra B1 round 1 scenario 10: run 7f03d07a cleanup
+2026-10-12T16:00:45Z waiting 300s (gap since the previous run)
+2026-10-12T16:05:45Z extra B1 round 1 slot 4/5: scenario 12
+time="2026-10-12T21:35:45+05:30" level=warning msg="No services to build"
+time="2026-10-12T21:35:45+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-377ca471e273 Creating 
+ Container intellegentdevops-injector-run-377ca471e273 Created 
+[16:05:45] scenario 12 subtle-latency-api: injecting into api-service for 300s
+[16:10:45] scenario 12 ended: expired after 301s
+2026-10-12T16:10:46Z extra B1 round 1 scenario 12: run fb2ac392 expired
+2026-10-12T16:10:46Z waiting 300s (gap since the previous run)
+2026-10-12T16:15:46Z extra B1 round 1 slot 5/5: scenario 14
+time="2026-10-12T21:45:46+05:30" level=warning msg="No services to build"
+time="2026-10-12T21:45:46+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-0847270cd586 Creating 
+ Container intellegentdevops-injector-run-0847270cd586 Created 
+[16:15:46] scenario 14 recurring-latency-api: injecting into api-service for 480s
+[16:16:33] scenario 14: cleared (1), re-injecting for 433s
+[16:17:29] scenario 14: cleared (2), re-injecting for 378s
+[16:23:48] scenario 14 ended: expired after 482s
+2026-10-12T16:23:48Z extra B1 round 1 scenario 14: run d675723a expired
+2026-10-12T16:23:48Z waiting 300s (gap since the previous run)
+2026-10-12T16:28:48Z analyzer -> ANALYZER_MODE=llm OLLAMA_URL=http://host.docker.internal:11434
+2026-10-12T16:28:49Z waiting 60s for the switch to settle
+2026-10-12T16:29:49Z extra B2 round 1 slot 1/5: scenario 13
+time="2026-10-12T21:59:49+05:30" level=warning msg="No services to build"
+time="2026-10-12T21:59:49+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e7738b4047d8 Creating 
+ Container intellegentdevops-injector-run-e7738b4047d8 Created 
+[16:29:49] scenario 13 subtle-error-api: injecting into api-service for 300s
+[16:34:50] scenario 13 ended: expired after 300s
+2026-10-12T16:34:50Z extra B2 round 1 scenario 13: run 9ab124ee expired
+2026-10-12T16:34:50Z waiting 299s (gap since the previous run)
+2026-10-12T16:39:50Z extra B2 round 1 slot 2/5: scenario 12
+time="2026-10-12T22:09:50+05:30" level=warning msg="No services to build"
+time="2026-10-12T22:09:50+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-6e2a18e0f3cc Creating 
+ Container intellegentdevops-injector-run-6e2a18e0f3cc Created 
+[16:39:50] scenario 12 subtle-latency-api: injecting into api-service for 300s
+[16:44:50] scenario 12 ended: expired after 300s
+2026-10-12T16:44:51Z extra B2 round 1 scenario 12: run dcdc33d6 expired
+2026-10-12T16:44:51Z waiting 300s (gap since the previous run)
+2026-10-12T16:49:51Z extra B2 round 1 slot 3/5: scenario 10
+time="2026-10-12T22:19:51+05:30" level=warning msg="No services to build"
+time="2026-10-12T22:19:51+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-b368da0b2357 Creating 
+ Container intellegentdevops-injector-run-b368da0b2357 Created 
+[16:49:51] scenario 10 corrupted-cache: injecting into redis for 300s
+[16:54:54] scenario 10 ended: cleanup after 303s
+2026-10-12T16:54:54Z extra B2 round 1 scenario 10: run 4e2a6c2c cleanup
+2026-10-12T16:54:54Z waiting 299s (gap since the previous run)
+2026-10-12T16:59:54Z extra B2 round 1 slot 4/5: scenario 14
+time="2026-10-12T22:29:54+05:30" level=warning msg="No services to build"
+time="2026-10-12T22:29:54+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-857c52dd3024 Creating 
+ Container intellegentdevops-injector-run-857c52dd3024 Created 
+[16:59:54] scenario 14 recurring-latency-api: injecting into api-service for 480s
+[17:01:14] scenario 14: cleared (1), re-injecting for 401s
+[17:02:25] scenario 14: cleared (2), re-injecting for 329s
+[17:07:55] scenario 14 ended: expired after 481s
+2026-10-12T17:07:55Z extra B2 round 1 scenario 14: run 8d5b634b expired
+2026-10-12T17:07:55Z waiting 300s (gap since the previous run)
+2026-10-12T17:12:55Z extra B2 round 1 slot 5/5: scenario 11
+time="2026-10-12T22:42:55+05:30" level=warning msg="No services to build"
+time="2026-10-12T22:42:55+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-c95ff31bc187 Creating 
+ Container intellegentdevops-injector-run-c95ff31bc187 Created 
+[17:12:55] scenario 11 slow-redis: injecting into redis for 300s
+[17:17:56] scenario 11 ended: expired after 301s
+2026-10-12T17:17:57Z extra B2 round 1 scenario 11: run bd6148ab expired
+2026-10-12T17:17:57Z waiting 300s (gap since the previous run)
+2026-10-12T17:22:57Z starting ml-detector
+2026-10-12T17:22:57Z waiting 60s for the switch to settle
+2026-10-12T17:23:57Z extra S round 1 slot 1/5: scenario 12
+time="2026-10-12T22:53:57+05:30" level=warning msg="No services to build"
+time="2026-10-12T22:53:57+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-98daee0fc451 Creating 
+ Container intellegentdevops-injector-run-98daee0fc451 Created 
+[17:23:57] scenario 12 subtle-latency-api: injecting into api-service for 300s
+[17:25:07] scenario 12 ended: remediated after 70s
+2026-10-12T17:25:07Z extra S round 1 scenario 12: run c2f82e65 remediated
+2026-10-12T17:25:07Z waiting 300s (gap since the previous run)
+2026-10-12T17:30:07Z extra S round 1 slot 2/5: scenario 11
+time="2026-10-12T23:00:07+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:00:07+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-f97aeae4cb5e Creating 
+ Container intellegentdevops-injector-run-f97aeae4cb5e Created 
+[17:30:07] scenario 11 slow-redis: injecting into redis for 300s
+[17:35:09] scenario 11 ended: expired after 302s
+2026-10-12T17:35:09Z extra S round 1 scenario 11: run 3ab0241b expired
+2026-10-12T17:35:09Z waiting 300s (gap since the previous run)
+2026-10-12T17:40:09Z extra S round 1 slot 3/5: scenario 13
+time="2026-10-12T23:10:09+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:10:09+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-4449da105e2a Creating 
+ Container intellegentdevops-injector-run-4449da105e2a Created 
+[17:40:09] scenario 13 subtle-error-api: injecting into api-service for 300s
+[17:45:09] scenario 13 ended: expired after 300s
+2026-10-12T17:45:09Z extra S round 1 scenario 13: run 5154e14c expired
+2026-10-12T17:45:09Z waiting 299s (gap since the previous run)
+2026-10-12T17:50:09Z extra S round 1 slot 4/5: scenario 14
+time="2026-10-12T23:20:09+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:20:09+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-8f04af54a048 Creating 
+ Container intellegentdevops-injector-run-8f04af54a048 Created 
+[17:50:09] scenario 14 recurring-latency-api: injecting into api-service for 480s
+[17:51:25] scenario 14: cleared (1), re-injecting for 405s
+[17:52:36] scenario 14: cleared (2), re-injecting for 333s
+[17:58:10] scenario 14 ended: expired after 481s
+2026-10-12T17:58:10Z extra S round 1 scenario 14: run 1b68b094 expired
+2026-10-12T17:58:10Z waiting 299s (gap since the previous run)
+2026-10-12T18:03:10Z extra S round 1 slot 5/5: scenario 10
+time="2026-10-12T23:33:10+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:33:10+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-9408d0c5bad8 Creating 
+ Container intellegentdevops-injector-run-9408d0c5bad8 Created 
+[18:03:10] scenario 10 corrupted-cache: injecting into redis for 300s
+[18:08:13] scenario 10 ended: cleanup after 303s
+2026-10-12T18:08:13Z extra S round 1 scenario 10: run 1b4ce34a cleanup
+2026-10-12T18:08:13Z waiting 299s (gap since the previous run)
+2026-10-12T18:13:13Z analyzer -> ANALYZER_MODE=llm OLLAMA_URL=http://host.docker.internal:9
+2026-10-12T18:13:14Z waiting 60s for the switch to settle
+2026-10-12T18:14:14Z extra SF round 1 slot 1/4: scenario 6
+time="2026-10-12T23:44:14+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:44:14+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-afdb4126ce80 Creating 
+ Container intellegentdevops-injector-run-afdb4126ce80 Created 
+[18:14:14] scenario 6 redis-stopped: injecting into redis for 180s
+[18:14:48] scenario 6 ended: remediated after 34s
+2026-10-12T18:14:48Z extra SF round 1 scenario 6: run 42a0823a remediated
+2026-10-12T18:14:48Z waiting 299s (gap since the previous run)
+2026-10-12T18:19:48Z extra SF round 1 slot 2/4: scenario 8
+time="2026-10-12T23:49:48+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:49:48+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-1c8486e09442 Creating 
+ Container intellegentdevops-injector-run-1c8486e09442 Created 
+[18:19:48] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[18:21:06] scenario 8 ended: remediated after 79s
+2026-10-12T18:21:07Z extra SF round 1 scenario 8: run c08cc775 remediated
+2026-10-12T18:21:07Z waiting 300s (gap since the previous run)
+2026-10-12T18:26:07Z extra SF round 1 slot 3/4: scenario 4
+time="2026-10-12T23:56:07+05:30" level=warning msg="No services to build"
+time="2026-10-12T23:56:07+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-9aa49677102e Creating 
+ Container intellegentdevops-injector-run-9aa49677102e Created 
+[18:26:07] scenario 4 latency-api: injecting into api-service for 180s
+[18:29:08] scenario 4 ended: expired after 181s
+2026-10-12T18:29:08Z extra SF round 1 scenario 4: run f30a80b8 expired
+2026-10-12T18:29:08Z waiting 300s (gap since the previous run)
+2026-10-12T18:34:08Z extra SF round 1 slot 4/4: scenario 3
+time="2026-10-13T00:04:08+05:30" level=warning msg="No services to build"
+time="2026-10-13T00:04:08+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-071a6a0c12e5 Creating 
+ Container intellegentdevops-injector-run-071a6a0c12e5 Created 
+[18:34:08] scenario 3 memory-api: injecting into api-service for 180s
+[18:34:52] scenario 3 ended: remediated after 44s
+2026-10-12T18:34:52Z extra SF round 1 scenario 3: run f3053c93 remediated
+2026-10-12T18:34:52Z extra stage 1: done for B1, B2, S, SF
+2026-10-12T18:34:52Z waiting 299s (gap since the previous run)
+2026-10-12T18:39:52Z analyzer -> ANALYZER_MODE=llm OLLAMA_URL=http://host.docker.internal:11434
+2026-10-12T18:39:53Z block over. If you disabled sleep: sudo pmset -a disablesleep 0

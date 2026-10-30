@@ -1,0 +1,146 @@
+{
+  "B1": {
+    "runs": 180,
+    "detected": 180,
+    "recall_pct": 100.0,
+    "false_positive_incidents": 0,
+    "precision_pct": 100.0,
+    "mttd_s": {
+      "mean": 53.1,
+      "median": 29.2,
+      "n": 180
+    },
+    "root_cause_accuracy_pct": 100.0,
+    "plan_action_accuracy_pct": 100.0,
+    "executed_action_accuracy_pct": 100.0,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 0,
+    "auto_resolved_pct": 100.0,
+    "mttr_s": {
+      "mean": 75.3,
+      "median": 50.4,
+      "n": 180
+    },
+    "verified_pct": 100.0,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 0.0,
+    "avg_attempts": 1,
+    "llm_plans_pct": 0.0,
+    "plan_latency_ms": {
+      "mean": 0.4,
+      "median": 0.3,
+      "n": 180
+    },
+    "llm_calls_per_incident": {
+      "mean": 0,
+      "median": 0.0,
+      "n": 180
+    },
+    "prompt_tokens_per_incident": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    },
+    "completion_tokens_per_incident": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    }
+  },
+  "B2": {
+    "runs": 180,
+    "detected": 180,
+    "recall_pct": 100.0,
+    "false_positive_incidents": 0,
+    "precision_pct": 100.0,
+    "mttd_s": {
+      "mean": 52.8,
+      "median": 28.4,
+      "n": 180
+    },
+    "root_cause_accuracy_pct": 100.0,
+    "plan_action_accuracy_pct": 92.2,
+    "executed_action_accuracy_pct": 92.2,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 0,
+    "auto_resolved_pct": 100.0,
+    "mttr_s": {
+      "mean": 104.9,
+      "median": 83.0,
+      "n": 180
+    },
+    "verified_pct": 100.0,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 0.0,
+    "avg_attempts": 1,
+    "llm_plans_pct": 100.0,
+    "plan_latency_ms": {
+      "mean": 28402.7,
+      "median": 28571.2,
+      "n": 180
+    },
+    "llm_calls_per_incident": {
+      "mean": 1.2,
+      "median": 1.0,
+      "n": 180
+    },
+    "prompt_tokens_per_incident": {
+      "mean": 2917.2,
+      "median": 2504.0,
+      "n": 180
+    },
+    "completion_tokens_per_incident": {
+      "mean": 180.2,
+      "median": 147.0,
+      "n": 180
+    }
+  },
+  "S": {
+    "runs": 180,
+    "detected": 180,
+    "recall_pct": 100.0,
+    "false_positive_incidents": 0,
+    "precision_pct": 100.0,
+    "mttd_s": {
+      "mean": 29.0,
+      "median": 26.4,
+      "n": 180
+    },
+    "root_cause_accuracy_pct": 97.2,
+    "plan_action_accuracy_pct": 93.3,
+    "executed_action_accuracy_pct": 93.9,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 4,
+    "auto_resolved_pct": 99.4,
+    "mttr_s": {
+      "mean": 74.1,
+      "median": 71.6,
+      "n": 179
+    },
+    "verified_pct": 97.8,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 0.6,
+    "avg_attempts": 1.04,
+    "llm_plans_pct": 99.4,
+    "plan_latency_ms": {
+      "mean": 26973.9,
+      "median": 27505.7,
+      "n": 180
+    },
+    "llm_calls_per_incident": {
+      "mean": 1.7,
+      "median": 2.0,
+      "n": 180
+    },
+    "prompt_tokens_per_incident": {
+      "mean": 4284.3,
+      "median": 5015.0,
+      "n": 180
+    },
+    "completion_tokens_per_incident": {
+      "mean": 261.1,
+      "median": 284.0,
+      "n": 180
+    }
+  }
+}

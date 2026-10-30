@@ -14,7 +14,7 @@ module.exports = [
     ["1", "Muhammad Shayaan Ali", "Department of Computer Science and Engineering", "Student", "9136182311", "2023433557.muhammad@ug.sharda.ac.in", "Student, Greater Noida, Sharda University"],
     ["2", "Shruti Tyagi", "Department of Computer Science and Engineering", "Student", "8826043366", "2023566902.shruti@ug.sharda.ac.in", "Student, Greater Noida, Sharda University"],
     ["3", "Riddhima Sharma", "Department of Computer Science and Engineering", "Student", "8860850003", "2023567320.riddhima@ug.sharda.ac.in", "Student, Greater Noida, Sharda University"],
-    ["4", "Ashish Kumar", "Department of Computer Science and Engineering", "Assistant Professor", "8410707739", "ashish.kumar4747@gmail.com", "Assistant Professor, Greater Noida, Sharda University"],
+    ["4", "Aliza Rana", "Department of Computer Science and Engineering", "Assistant Professor", "[phone]", "[email]", "Assistant Professor, Greater Noida, Sharda University"],
   ] },
 
   { t: "title", text: "Intelligent DevOps Monitoring & Incident Response System" },
@@ -149,8 +149,8 @@ module.exports = [
   ] },
 
   { t: "h1", text: "Implementation Status:" },
-  { t: "p", text: "A working prototype has been built and tested end-to-end on Docker Compose with a three-service application (a frontend service, an API service and a Redis cache). It implements rule-based detection with Prometheus and Alertmanager, an event gateway with dependency-aware context building and WebSocket channels, an LLM analysis engine (a locally hosted 8-billion-parameter model) with deterministic runbook fallback, the policy validator, the action executor, the verifier with bounded re-analysis and escalation, an incident store, and a web dashboard built with Next.js, TypeScript, Tailwind CSS and Recharts. A fault injector reproduces failure scenarios and records their ground truth. The machine-learning anomaly detector is under development." },
-  { t: "p", text: "In preliminary tests on injected faults, every logged fault was detected, in 18–35 seconds; in a pilot of eight runs with the complete loop, every fault was remediated and verified automatically; and an adversarial test of 29 malformed, hallucinated or malicious response plans resulted in no unsafe action being executed. These results are preliminary; the full evaluation across all failure scenarios is planned, and its results will be reported when complete." },
+  { t: "p", text: "A working prototype has been built and tested end-to-end on Docker Compose with a three-service application (a frontend service, an API service and a Redis cache). It implements rule-based detection with Prometheus and Alertmanager, an event gateway with dependency-aware context building and WebSocket channels, an LLM analysis engine (a locally hosted 8-billion-parameter model) with deterministic runbook fallback, the policy validator, the action executor, the verifier with bounded re-analysis and escalation, an incident store, a machine-learning anomaly detector (per-service robust z-scores and an Isolation Forest, trained on metrics from normal operation), and a web dashboard built with Next.js, TypeScript, Tailwind CSS and Recharts. A fault injector reproduces failure scenarios and records their ground truth." },
+  { t: "p", text: "In a first evaluation, nine failure scenarios (CPU, memory, latency and error faults, stopped containers, a failed dependency, a gradual memory leak and a combined fault) were each injected three times under load into three configurations: rules with runbooks, rules with the LLM, and the complete system with the machine-learning detector (81 runs). Every fault was detected and remediated automatically, the root-cause service was identified correctly in every run, the executed action matched the expected action in 79 of 81 runs, and no unsafe action was executed. Adding the machine-learning detector halved the mean detection time (from 53 to 27 seconds) and detected the gradual memory leak in about 45 seconds, compared with about 225 seconds for the threshold rule. In an adversarial test, 29 malformed, hallucinated or malicious response plans resulted in no unsafe action being executed. The evaluation is being extended to 20 runs per scenario." },
 
   { t: "h1", text: "Claims:" },
   { t: "claims", items: [
@@ -188,5 +188,5 @@ module.exports = [
 
   { t: "h1", text: "Disclaimer:" },
   { t: "p", text: "The undersigned inventor(s) hereby declare that all statements, descriptions, and representations made in this Invention Disclosure Form are true, complete, and made to the best of their knowledge and belief. The inventor(s) shall bear sole responsibility and liability for the accuracy, validity, and authenticity of the information and data provided herein. The Research and Development Cell (RDC), the Institution, and any associated patent attorney, agent, or representative shall not be held liable or accountable for any inaccuracies, omissions, misrepresentations, or consequences arising from the information furnished by the inventor(s)." },
-  { t: "signatures", names: ["Muhammad Shayaan Ali", "Shruti Tyagi", "Riddhima Sharma", "Ashish Kumar"] },
+  { t: "signatures", names: ["Muhammad Shayaan Ali", "Shruti Tyagi", "Riddhima Sharma", "Aliza Rana"] },
 ];

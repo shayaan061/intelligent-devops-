@@ -1,0 +1,753 @@
+2026-10-11T20:25:57Z stage 1: 81 runs to do for B1, B2, S (~8.8 h)
+2026-10-11T20:25:57Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-11T20:25:57Z analyzer -> ANALYZER_MODE=runbook
+2026-10-11T20:25:59Z stopping ml-detector
+2026-10-11T20:26:00Z waiting 60s for the switch to settle
+2026-10-11T20:27:00Z B1 round 1 slot 1/9: scenario 5
+time="2026-10-12T01:57:00+05:30" level=warning msg="No services to build"
+time="2026-10-12T01:57:00+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-0266ceef12b9 Creating 
+ Container intellegentdevops-injector-run-0266ceef12b9 Created 
+[20:27:00] scenario 5 error-api: injecting into api-service for 180s
+[20:27:48] scenario 5 ended: remediated after 47s
+2026-10-11T20:27:48Z B1 round 1 scenario 5: run 46c5978a remediated
+2026-10-11T20:27:48Z waiting 299s (gap since the previous run)
+2026-10-11T20:32:48Z B1 round 1 slot 2/9: scenario 2
+time="2026-10-12T02:02:48+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:02:48+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-72063e6e75a4 Creating 
+ Container intellegentdevops-injector-run-72063e6e75a4 Created 
+[20:32:48] scenario 2 cpu-api: injecting into api-service for 180s
+[20:33:54] scenario 2 ended: remediated after 66s
+2026-10-11T20:33:54Z B1 round 1 scenario 2: run 64d19472 remediated
+2026-10-11T20:33:54Z waiting 299s (gap since the previous run)
+2026-10-11T20:38:54Z B1 round 1 slot 3/9: scenario 7
+time="2026-10-12T02:08:54+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:08:54+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-715067e4eb8e Creating 
+ Container intellegentdevops-injector-run-715067e4eb8e Created 
+[20:38:54] scenario 7 frontend-stopped: injecting into frontend for 180s
+[20:39:36] scenario 7 ended: remediated after 43s
+2026-10-11T20:39:37Z B1 round 1 scenario 7: run 9935a750 remediated
+2026-10-11T20:39:37Z waiting 300s (gap since the previous run)
+2026-10-11T20:44:37Z B1 round 1 slot 4/9: scenario 8
+time="2026-10-12T02:14:37+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:14:37+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-1578de20d0ca Creating 
+ Container intellegentdevops-injector-run-1578de20d0ca Created 
+[20:44:37] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[20:48:50] scenario 8 ended: remediated after 253s
+2026-10-11T20:48:50Z B1 round 1 scenario 8: run 4051baf5 remediated
+2026-10-11T20:48:50Z waiting 300s (gap since the previous run)
+2026-10-11T20:53:50Z B1 round 1 slot 5/9: scenario 1
+time="2026-10-12T02:23:50+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:23:50+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-553c35b52cca Creating 
+ Container intellegentdevops-injector-run-553c35b52cca Created 
+[20:53:50] scenario 1 cpu-frontend: injecting into frontend for 180s
+[20:54:54] scenario 1 ended: remediated after 64s
+2026-10-11T20:54:54Z B1 round 1 scenario 1: run 0c7e58e0 remediated
+2026-10-11T20:54:54Z waiting 299s (gap since the previous run)
+2026-10-11T20:59:54Z B1 round 1 slot 6/9: scenario 6
+time="2026-10-12T02:29:54+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:29:54+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-7123edcf0105 Creating 
+ Container intellegentdevops-injector-run-7123edcf0105 Created 
+[20:59:54] scenario 6 redis-stopped: injecting into redis for 180s
+[21:00:31] scenario 6 ended: remediated after 38s
+2026-10-11T21:00:32Z B1 round 1 scenario 6: run 4c5449b5 remediated
+2026-10-11T21:00:32Z waiting 300s (gap since the previous run)
+2026-10-11T21:05:32Z B1 round 1 slot 7/9: scenario 9
+time="2026-10-12T02:35:32+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:35:32+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-6ed074d5f5e2 Creating 
+ Container intellegentdevops-injector-run-6ed074d5f5e2 Created 
+[21:05:32] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[21:06:23] scenario 9 ended: remediated after 51s
+2026-10-11T21:06:23Z B1 round 1 scenario 9: run 625441f0 remediated
+2026-10-11T21:06:23Z waiting 300s (gap since the previous run)
+2026-10-11T21:11:23Z B1 round 1 slot 8/9: scenario 4
+time="2026-10-12T02:41:23+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:41:23+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-4565cc0bcc98 Creating 
+ Container intellegentdevops-injector-run-4565cc0bcc98 Created 
+[21:11:23] scenario 4 latency-api: injecting into api-service for 180s
+[21:12:12] scenario 4 ended: remediated after 49s
+2026-10-11T21:12:12Z B1 round 1 scenario 4: run 5ed951c3 remediated
+2026-10-11T21:12:12Z waiting 299s (gap since the previous run)
+2026-10-11T21:17:12Z B1 round 1 slot 9/9: scenario 3
+time="2026-10-12T02:47:12+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:47:12+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-025da2f3b3b1 Creating 
+ Container intellegentdevops-injector-run-025da2f3b3b1 Created 
+[21:17:12] scenario 3 memory-api: injecting into api-service for 180s
+[21:18:10] scenario 3 ended: remediated after 58s
+2026-10-11T21:18:11Z B1 round 1 scenario 3: run d49eee6b remediated
+2026-10-11T21:18:11Z analyzer -> ANALYZER_MODE=llm
+2026-10-11T21:18:12Z waiting 60s for the switch to settle
+2026-10-11T21:19:12Z waiting 239s (gap since the previous run)
+2026-10-11T21:23:11Z B2 round 1 slot 1/9: scenario 3
+time="2026-10-12T02:53:11+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:53:11+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-6a2e2c18e106 Creating 
+ Container intellegentdevops-injector-run-6a2e2c18e106 Created 
+[21:23:11] scenario 3 memory-api: injecting into api-service for 180s
+[21:24:39] scenario 3 ended: remediated after 88s
+2026-10-11T21:24:39Z B2 round 1 scenario 3: run 960e28de remediated
+2026-10-11T21:24:39Z waiting 300s (gap since the previous run)
+2026-10-11T21:29:39Z B2 round 1 slot 2/9: scenario 8
+time="2026-10-12T02:59:39+05:30" level=warning msg="No services to build"
+time="2026-10-12T02:59:39+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-3bf8fd07356b Creating 
+ Container intellegentdevops-injector-run-3bf8fd07356b Created 
+[21:29:39] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[21:34:29] scenario 8 ended: remediated after 290s
+2026-10-11T21:34:29Z B2 round 1 scenario 8: run 47428453 remediated
+2026-10-11T21:34:29Z waiting 300s (gap since the previous run)
+2026-10-11T21:39:29Z B2 round 1 slot 3/9: scenario 4
+time="2026-10-12T03:09:29+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:09:29+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-c627542f52d2 Creating 
+ Container intellegentdevops-injector-run-c627542f52d2 Created 
+[21:39:29] scenario 4 latency-api: injecting into api-service for 180s
+[21:40:50] scenario 4 ended: remediated after 81s
+2026-10-11T21:40:50Z B2 round 1 scenario 4: run d2e5d25a remediated
+2026-10-11T21:40:50Z waiting 300s (gap since the previous run)
+2026-10-11T21:45:50Z B2 round 1 slot 4/9: scenario 6
+time="2026-10-12T03:15:50+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:15:50+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-1815ae3bf8e1 Creating 
+ Container intellegentdevops-injector-run-1815ae3bf8e1 Created 
+[21:45:50] scenario 6 redis-stopped: injecting into redis for 180s
+[21:46:57] scenario 6 ended: remediated after 67s
+2026-10-11T21:46:57Z B2 round 1 scenario 6: run 109071ff remediated
+2026-10-11T21:46:57Z waiting 299s (gap since the previous run)
+2026-10-11T21:51:57Z B2 round 1 slot 5/9: scenario 1
+time="2026-10-12T03:21:57+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:21:57+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-b3567b552f7c Creating 
+ Container intellegentdevops-injector-run-b3567b552f7c Created 
+[21:51:57] scenario 1 cpu-frontend: injecting into frontend for 180s
+[21:53:30] scenario 1 ended: remediated after 93s
+2026-10-11T21:53:30Z B2 round 1 scenario 1: run 2a8de8c7 remediated
+2026-10-11T21:53:30Z waiting 299s (gap since the previous run)
+2026-10-11T21:58:30Z B2 round 1 slot 6/9: scenario 7
+time="2026-10-12T03:28:30+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:28:30+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-04da60190f98 Creating 
+ Container intellegentdevops-injector-run-04da60190f98 Created 
+[21:58:30] scenario 7 frontend-stopped: injecting into frontend for 180s
+[21:59:35] scenario 7 ended: remediated after 65s
+2026-10-11T21:59:35Z B2 round 1 scenario 7: run 18209587 remediated
+2026-10-11T21:59:35Z waiting 300s (gap since the previous run)
+2026-10-11T22:04:35Z B2 round 1 slot 7/9: scenario 5
+time="2026-10-12T03:34:35+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:34:35+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-4ea4539ad90a Creating 
+ Container intellegentdevops-injector-run-4ea4539ad90a Created 
+[22:04:35] scenario 5 error-api: injecting into api-service for 180s
+[22:05:59] scenario 5 ended: remediated after 84s
+2026-10-11T22:05:59Z B2 round 1 scenario 5: run 9f954034 remediated
+2026-10-11T22:05:59Z waiting 300s (gap since the previous run)
+2026-10-11T22:10:59Z B2 round 1 slot 8/9: scenario 9
+time="2026-10-12T03:40:59+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:40:59+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-c84ab122e440 Creating 
+ Container intellegentdevops-injector-run-c84ab122e440 Created 
+[22:10:59] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[22:12:15] scenario 9 ended: remediated after 76s
+2026-10-11T22:12:15Z B2 round 1 scenario 9: run 8714ac7d remediated
+2026-10-11T22:12:15Z waiting 300s (gap since the previous run)
+2026-10-11T22:17:15Z B2 round 1 slot 9/9: scenario 2
+time="2026-10-12T03:47:15+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:47:15+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-08511a6d3d6f Creating 
+ Container intellegentdevops-injector-run-08511a6d3d6f Created 
+[22:17:15] scenario 2 cpu-api: injecting into api-service for 180s
+[22:18:45] scenario 2 ended: remediated after 90s
+2026-10-11T22:18:45Z B2 round 1 scenario 2: run 38ffe64c remediated
+2026-10-11T22:18:45Z starting ml-detector
+2026-10-11T22:18:45Z waiting 60s for the switch to settle
+2026-10-11T22:19:45Z waiting 239s (gap since the previous run)
+2026-10-11T22:23:45Z S round 1 slot 1/9: scenario 8
+time="2026-10-12T03:53:45+05:30" level=warning msg="No services to build"
+time="2026-10-12T03:53:45+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-599e2f2744d6 Creating 
+ Container intellegentdevops-injector-run-599e2f2744d6 Created 
+[22:23:45] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[22:25:18] scenario 8 ended: remediated after 93s
+2026-10-11T22:25:18Z S round 1 scenario 8: run 6d27df08 remediated
+2026-10-11T22:25:18Z waiting 300s (gap since the previous run)
+2026-10-11T22:30:18Z S round 1 slot 2/9: scenario 3
+time="2026-10-12T04:00:18+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:00:18+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-f961c71ed741 Creating 
+ Container intellegentdevops-injector-run-f961c71ed741 Created 
+[22:30:18] scenario 3 memory-api: injecting into api-service for 180s
+[22:31:34] scenario 3 ended: remediated after 76s
+2026-10-11T22:31:34Z S round 1 scenario 3: run ea74af6b remediated
+2026-10-11T22:31:34Z waiting 300s (gap since the previous run)
+2026-10-11T22:36:34Z S round 1 slot 3/9: scenario 6
+time="2026-10-12T04:06:34+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:06:34+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-90fa4bc2b04c Creating 
+ Container intellegentdevops-injector-run-90fa4bc2b04c Created 
+[22:36:34] scenario 6 redis-stopped: injecting into redis for 180s
+[22:37:38] scenario 6 ended: remediated after 64s
+2026-10-11T22:37:38Z S round 1 scenario 6: run e178b379 remediated
+2026-10-11T22:37:38Z waiting 300s (gap since the previous run)
+2026-10-11T22:42:38Z S round 1 slot 4/9: scenario 9
+time="2026-10-12T04:12:38+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:12:38+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-8be2f7fe5f9a Creating 
+ Container intellegentdevops-injector-run-8be2f7fe5f9a Created 
+[22:42:38] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[22:43:39] scenario 9 ended: remediated after 61s
+2026-10-11T22:43:39Z S round 1 scenario 9: run 1a42f1b2 remediated
+2026-10-11T22:43:39Z waiting 299s (gap since the previous run)
+2026-10-11T22:48:39Z S round 1 slot 5/9: scenario 2
+time="2026-10-12T04:18:39+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:18:39+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-6aad64ef7ead Creating 
+ Container intellegentdevops-injector-run-6aad64ef7ead Created 
+[22:48:39] scenario 2 cpu-api: injecting into api-service for 180s
+[22:49:37] scenario 2 ended: remediated after 58s
+2026-10-11T22:49:37Z S round 1 scenario 2: run 74358e25 remediated
+2026-10-11T22:49:37Z waiting 299s (gap since the previous run)
+2026-10-11T22:54:37Z S round 1 slot 6/9: scenario 5
+time="2026-10-12T04:24:37+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:24:37+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-b35a69d352d2 Creating 
+ Container intellegentdevops-injector-run-b35a69d352d2 Created 
+[22:54:37] scenario 5 error-api: injecting into api-service for 180s
+[22:55:39] scenario 5 ended: remediated after 62s
+2026-10-11T22:55:40Z S round 1 scenario 5: run 208a0224 remediated
+2026-10-11T22:55:40Z waiting 300s (gap since the previous run)
+2026-10-11T23:00:40Z S round 1 slot 7/9: scenario 7
+time="2026-10-12T04:30:40+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:30:40+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-1f30e7fc21c0 Creating 
+ Container intellegentdevops-injector-run-1f30e7fc21c0 Created 
+[23:00:40] scenario 7 frontend-stopped: injecting into frontend for 180s
+[23:01:46] scenario 7 ended: remediated after 66s
+2026-10-11T23:01:46Z S round 1 scenario 7: run de1b4e4d remediated
+2026-10-11T23:01:46Z waiting 300s (gap since the previous run)
+2026-10-11T23:06:46Z S round 1 slot 8/9: scenario 1
+time="2026-10-12T04:36:46+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:36:46+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-8d7a84e90734 Creating 
+ Container intellegentdevops-injector-run-8d7a84e90734 Created 
+[23:06:46] scenario 1 cpu-frontend: injecting into frontend for 180s
+[23:07:55] scenario 1 ended: remediated after 69s
+2026-10-11T23:07:55Z S round 1 scenario 1: run 98e298f4 remediated
+2026-10-11T23:07:55Z waiting 299s (gap since the previous run)
+2026-10-11T23:12:55Z S round 1 slot 9/9: scenario 4
+time="2026-10-12T04:42:55+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:42:55+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-dec8f9144802 Creating 
+ Container intellegentdevops-injector-run-dec8f9144802 Created 
+[23:12:55] scenario 4 latency-api: injecting into api-service for 180s
+[23:13:57] scenario 4 ended: remediated after 63s
+2026-10-11T23:13:58Z S round 1 scenario 4: run 5821659a remediated
+2026-10-11T23:13:58Z analyzer -> ANALYZER_MODE=runbook
+2026-10-11T23:13:59Z stopping ml-detector
+2026-10-11T23:14:00Z waiting 60s for the switch to settle
+2026-10-11T23:15:00Z waiting 237s (gap since the previous run)
+2026-10-11T23:18:58Z B1 round 2 slot 1/9: scenario 3
+time="2026-10-12T04:48:58+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:48:58+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-968ca2c29b82 Creating 
+ Container intellegentdevops-injector-run-968ca2c29b82 Created 
+[23:18:58] scenario 3 memory-api: injecting into api-service for 180s
+[23:19:55] scenario 3 ended: remediated after 57s
+2026-10-11T23:19:56Z B1 round 2 scenario 3: run 6c002446 remediated
+2026-10-11T23:19:56Z waiting 300s (gap since the previous run)
+2026-10-11T23:24:56Z B1 round 2 slot 2/9: scenario 8
+time="2026-10-12T04:54:56+05:30" level=warning msg="No services to build"
+time="2026-10-12T04:54:56+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-aff80723410a Creating 
+ Container intellegentdevops-injector-run-aff80723410a Created 
+[23:24:56] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[23:29:15] scenario 8 ended: remediated after 259s
+2026-10-11T23:29:15Z B1 round 2 scenario 8: run 99c96cf6 remediated
+2026-10-11T23:29:15Z waiting 299s (gap since the previous run)
+2026-10-11T23:34:15Z B1 round 2 slot 3/9: scenario 7
+time="2026-10-12T05:04:15+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:04:15+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-72e762d9d0e0 Creating 
+ Container intellegentdevops-injector-run-72e762d9d0e0 Created 
+[23:34:15] scenario 7 frontend-stopped: injecting into frontend for 180s
+[23:34:56] scenario 7 ended: remediated after 42s
+2026-10-11T23:34:57Z B1 round 2 scenario 7: run d7905d9f remediated
+2026-10-11T23:34:57Z waiting 300s (gap since the previous run)
+2026-10-11T23:39:57Z B1 round 2 slot 4/9: scenario 9
+time="2026-10-12T05:09:57+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:09:57+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-8ad7edd3d861 Creating 
+ Container intellegentdevops-injector-run-8ad7edd3d861 Created 
+[23:39:57] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[23:40:47] scenario 9 ended: remediated after 50s
+2026-10-11T23:40:47Z B1 round 2 scenario 9: run a8412ac0 remediated
+2026-10-11T23:40:47Z waiting 299s (gap since the previous run)
+2026-10-11T23:45:47Z B1 round 2 slot 5/9: scenario 4
+time="2026-10-12T05:15:47+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:15:47+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-21214c3bb204 Creating 
+ Container intellegentdevops-injector-run-21214c3bb204 Created 
+[23:45:47] scenario 4 latency-api: injecting into api-service for 180s
+[23:46:37] scenario 4 ended: remediated after 50s
+2026-10-11T23:46:37Z B1 round 2 scenario 4: run 069da54d remediated
+2026-10-11T23:46:37Z waiting 299s (gap since the previous run)
+2026-10-11T23:51:37Z B1 round 2 slot 6/9: scenario 2
+time="2026-10-12T05:21:37+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:21:37+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-c1d6300235ee Creating 
+ Container intellegentdevops-injector-run-c1d6300235ee Created 
+[23:51:37] scenario 2 cpu-api: injecting into api-service for 180s
+[23:52:44] scenario 2 ended: remediated after 68s
+2026-10-11T23:52:44Z B1 round 2 scenario 2: run 98d0c8e6 remediated
+2026-10-11T23:52:44Z waiting 299s (gap since the previous run)
+2026-10-11T23:57:44Z B1 round 2 slot 7/9: scenario 1
+time="2026-10-12T05:27:44+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:27:44+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-fa0c917f4155 Creating 
+ Container intellegentdevops-injector-run-fa0c917f4155 Created 
+[23:57:44] scenario 1 cpu-frontend: injecting into frontend for 180s
+[23:58:49] scenario 1 ended: remediated after 65s
+2026-10-11T23:58:49Z B1 round 2 scenario 1: run 6b22cdf6 remediated
+2026-10-11T23:58:49Z waiting 299s (gap since the previous run)
+2026-10-12T00:03:49Z B1 round 2 slot 8/9: scenario 5
+time="2026-10-12T05:33:49+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:33:49+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-3afabc4bfa53 Creating 
+ Container intellegentdevops-injector-run-3afabc4bfa53 Created 
+[00:03:49] scenario 5 error-api: injecting into api-service for 180s
+[00:04:37] scenario 5 ended: remediated after 48s
+2026-10-12T00:04:37Z B1 round 2 scenario 5: run d68df72d remediated
+2026-10-12T00:04:37Z waiting 299s (gap since the previous run)
+2026-10-12T00:09:37Z B1 round 2 slot 9/9: scenario 6
+time="2026-10-12T05:39:37+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:39:37+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-71ec14e9d111 Creating 
+ Container intellegentdevops-injector-run-71ec14e9d111 Created 
+[00:09:37] scenario 6 redis-stopped: injecting into redis for 180s
+[00:10:16] scenario 6 ended: remediated after 40s
+2026-10-12T00:10:17Z B1 round 2 scenario 6: run 959d5c5b remediated
+2026-10-12T00:10:17Z analyzer -> ANALYZER_MODE=llm
+2026-10-12T00:10:18Z waiting 60s for the switch to settle
+2026-10-12T00:11:18Z waiting 239s (gap since the previous run)
+2026-10-12T00:15:17Z B2 round 2 slot 1/9: scenario 7
+time="2026-10-12T05:45:17+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:45:17+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e5197ec799ac Creating 
+ Container intellegentdevops-injector-run-e5197ec799ac Created 
+[00:15:17] scenario 7 frontend-stopped: injecting into frontend for 180s
+[00:16:29] scenario 7 ended: remediated after 72s
+2026-10-12T00:16:29Z B2 round 2 scenario 7: run 481f287a remediated
+2026-10-12T00:16:29Z waiting 299s (gap since the previous run)
+2026-10-12T00:21:29Z B2 round 2 slot 2/9: scenario 2
+time="2026-10-12T05:51:29+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:51:29+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-79eb1291240c Creating 
+ Container intellegentdevops-injector-run-79eb1291240c Created 
+[00:21:29] scenario 2 cpu-api: injecting into api-service for 180s
+[00:22:59] scenario 2 ended: remediated after 90s
+2026-10-12T00:22:59Z B2 round 2 scenario 2: run 0ba8a54c remediated
+2026-10-12T00:22:59Z waiting 299s (gap since the previous run)
+2026-10-12T00:27:59Z B2 round 2 slot 3/9: scenario 8
+time="2026-10-12T05:57:59+05:30" level=warning msg="No services to build"
+time="2026-10-12T05:57:59+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-b514f0dffaa3 Creating 
+ Container intellegentdevops-injector-run-b514f0dffaa3 Created 
+[00:27:59] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[00:32:41] scenario 8 ended: remediated after 282s
+2026-10-12T00:32:41Z B2 round 2 scenario 8: run 4ba44b80 remediated
+2026-10-12T00:32:41Z waiting 299s (gap since the previous run)
+2026-10-12T00:37:41Z B2 round 2 slot 4/9: scenario 5
+time="2026-10-12T06:07:41+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:07:41+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-543817bf7000 Creating 
+ Container intellegentdevops-injector-run-543817bf7000 Created 
+[00:37:41] scenario 5 error-api: injecting into api-service for 180s
+[00:38:52] scenario 5 ended: remediated after 72s
+2026-10-12T00:38:53Z B2 round 2 scenario 5: run 8da1d203 remediated
+2026-10-12T00:38:53Z waiting 300s (gap since the previous run)
+2026-10-12T00:43:53Z B2 round 2 slot 5/9: scenario 4
+time="2026-10-12T06:13:53+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:13:53+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-aaedcb0fdb4e Creating 
+ Container intellegentdevops-injector-run-aaedcb0fdb4e Created 
+[00:43:53] scenario 4 latency-api: injecting into api-service for 180s
+[00:45:09] scenario 4 ended: remediated after 76s
+2026-10-12T00:45:09Z B2 round 2 scenario 4: run 58f933c3 remediated
+2026-10-12T00:45:09Z waiting 300s (gap since the previous run)
+2026-10-12T00:50:09Z B2 round 2 slot 6/9: scenario 1
+time="2026-10-12T06:20:09+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:20:09+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-aa5c2a717c65 Creating 
+ Container intellegentdevops-injector-run-aa5c2a717c65 Created 
+[00:50:09] scenario 1 cpu-frontend: injecting into frontend for 180s
+[00:51:40] scenario 1 ended: remediated after 91s
+2026-10-12T00:51:40Z B2 round 2 scenario 1: run 5c96710b remediated
+2026-10-12T00:51:40Z waiting 299s (gap since the previous run)
+2026-10-12T00:56:40Z B2 round 2 slot 7/9: scenario 3
+time="2026-10-12T06:26:40+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:26:40+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-2b9fe06a8aaf Creating 
+ Container intellegentdevops-injector-run-2b9fe06a8aaf Created 
+[00:56:40] scenario 3 memory-api: injecting into api-service for 180s
+[00:58:07] scenario 3 ended: remediated after 87s
+2026-10-12T00:58:07Z B2 round 2 scenario 3: run 5b0092e4 remediated
+2026-10-12T00:58:07Z waiting 300s (gap since the previous run)
+2026-10-12T01:03:07Z B2 round 2 slot 8/9: scenario 9
+time="2026-10-12T06:33:07+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:33:07+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e131c83a50f7 Creating 
+ Container intellegentdevops-injector-run-e131c83a50f7 Created 
+[01:03:07] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[01:04:25] scenario 9 ended: remediated after 78s
+2026-10-12T01:04:25Z B2 round 2 scenario 9: run e2384f44 remediated
+2026-10-12T01:04:25Z waiting 300s (gap since the previous run)
+2026-10-12T01:09:25Z B2 round 2 slot 9/9: scenario 6
+time="2026-10-12T06:39:25+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:39:25+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e3fe1747d2d9 Creating 
+ Container intellegentdevops-injector-run-e3fe1747d2d9 Created 
+[01:09:25] scenario 6 redis-stopped: injecting into redis for 180s
+[01:10:31] scenario 6 ended: remediated after 66s
+2026-10-12T01:10:31Z B2 round 2 scenario 6: run 04c0e910 remediated
+2026-10-12T01:10:31Z starting ml-detector
+2026-10-12T01:10:31Z waiting 60s for the switch to settle
+2026-10-12T01:11:31Z waiting 239s (gap since the previous run)
+2026-10-12T01:15:31Z S round 2 slot 1/9: scenario 6
+time="2026-10-12T06:45:31+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:45:31+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-c0e7fd23af60 Creating 
+ Container intellegentdevops-injector-run-c0e7fd23af60 Created 
+[01:15:31] scenario 6 redis-stopped: injecting into redis for 180s
+[01:16:26] scenario 6 ended: remediated after 55s
+2026-10-12T01:16:26Z S round 2 scenario 6: run 099d2120 remediated
+2026-10-12T01:16:26Z waiting 299s (gap since the previous run)
+2026-10-12T01:21:26Z S round 2 slot 2/9: scenario 3
+time="2026-10-12T06:51:26+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:51:26+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-7e2c1f1e4ea4 Creating 
+ Container intellegentdevops-injector-run-7e2c1f1e4ea4 Created 
+[01:21:26] scenario 3 memory-api: injecting into api-service for 180s
+[01:22:34] scenario 3 ended: remediated after 68s
+2026-10-12T01:22:35Z S round 2 scenario 3: run ac4e84c2 remediated
+2026-10-12T01:22:35Z waiting 300s (gap since the previous run)
+2026-10-12T01:27:35Z S round 2 slot 3/9: scenario 9
+time="2026-10-12T06:57:35+05:30" level=warning msg="No services to build"
+time="2026-10-12T06:57:35+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-14b748e07fc3 Creating 
+ Container intellegentdevops-injector-run-14b748e07fc3 Created 
+[01:27:35] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[01:28:40] scenario 9 ended: remediated after 65s
+2026-10-12T01:28:40Z S round 2 scenario 9: run 90c0a351 remediated
+2026-10-12T01:28:40Z waiting 300s (gap since the previous run)
+2026-10-12T01:33:40Z S round 2 slot 4/9: scenario 1
+time="2026-10-12T07:03:40+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:03:40+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-39294418d772 Creating 
+ Container intellegentdevops-injector-run-39294418d772 Created 
+[01:33:40] scenario 1 cpu-frontend: injecting into frontend for 180s
+[01:34:38] scenario 1 ended: remediated after 58s
+2026-10-12T01:34:39Z S round 2 scenario 1: run 4678e2f8 remediated
+2026-10-12T01:34:39Z waiting 300s (gap since the previous run)
+2026-10-12T01:39:39Z S round 2 slot 5/9: scenario 4
+time="2026-10-12T07:09:39+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:09:39+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-8d1a979a57eb Creating 
+ Container intellegentdevops-injector-run-8d1a979a57eb Created 
+[01:39:39] scenario 4 latency-api: injecting into api-service for 180s
+[01:40:41] scenario 4 ended: remediated after 62s
+2026-10-12T01:40:42Z S round 2 scenario 4: run bd206222 remediated
+2026-10-12T01:40:42Z waiting 300s (gap since the previous run)
+2026-10-12T01:45:42Z S round 2 slot 6/9: scenario 5
+time="2026-10-12T07:15:42+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:15:42+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e3d43c069704 Creating 
+ Container intellegentdevops-injector-run-e3d43c069704 Created 
+[01:45:42] scenario 5 error-api: injecting into api-service for 180s
+[01:46:50] scenario 5 ended: remediated after 69s
+2026-10-12T01:46:51Z S round 2 scenario 5: run 3175f996 remediated
+2026-10-12T01:46:51Z waiting 300s (gap since the previous run)
+2026-10-12T01:51:51Z S round 2 slot 7/9: scenario 2
+time="2026-10-12T07:21:51+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:21:51+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-cee87520baa2 Creating 
+ Container intellegentdevops-injector-run-cee87520baa2 Created 
+[01:51:51] scenario 2 cpu-api: injecting into api-service for 180s
+[01:52:55] scenario 2 ended: remediated after 64s
+2026-10-12T01:52:56Z S round 2 scenario 2: run 222f8174 remediated
+2026-10-12T01:52:56Z waiting 300s (gap since the previous run)
+2026-10-12T01:57:56Z S round 2 slot 8/9: scenario 7
+time="2026-10-12T07:27:56+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:27:56+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-bb6a7e3e0af5 Creating 
+ Container intellegentdevops-injector-run-bb6a7e3e0af5 Created 
+[01:57:56] scenario 7 frontend-stopped: injecting into frontend for 180s
+[01:59:05] scenario 7 ended: remediated after 69s
+2026-10-12T01:59:05Z S round 2 scenario 7: run 664575ab remediated
+2026-10-12T01:59:05Z waiting 299s (gap since the previous run)
+2026-10-12T02:04:05Z S round 2 slot 9/9: scenario 8
+time="2026-10-12T07:34:05+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:34:05+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-402c52720c92 Creating 
+ Container intellegentdevops-injector-run-402c52720c92 Created 
+[02:04:05] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[02:05:52] scenario 8 ended: remediated after 107s
+2026-10-12T02:05:52Z S round 2 scenario 8: run b154b2fe remediated
+2026-10-12T02:05:52Z analyzer -> ANALYZER_MODE=runbook
+2026-10-12T02:05:53Z stopping ml-detector
+2026-10-12T02:05:55Z waiting 60s for the switch to settle
+2026-10-12T02:06:55Z waiting 237s (gap since the previous run)
+2026-10-12T02:10:52Z B1 round 3 slot 1/9: scenario 3
+time="2026-10-12T07:40:52+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:40:52+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-ba74bf7e320e Creating 
+ Container intellegentdevops-injector-run-ba74bf7e320e Created 
+[02:10:52] scenario 3 memory-api: injecting into api-service for 180s
+[02:11:50] scenario 3 ended: remediated after 58s
+2026-10-12T02:11:51Z B1 round 3 scenario 3: run a23079b5 remediated
+2026-10-12T02:11:51Z waiting 300s (gap since the previous run)
+2026-10-12T02:16:51Z B1 round 3 slot 2/9: scenario 4
+time="2026-10-12T07:46:51+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:46:51+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-62c31b950715 Creating 
+ Container intellegentdevops-injector-run-62c31b950715 Created 
+[02:16:51] scenario 4 latency-api: injecting into api-service for 180s
+[02:17:42] scenario 4 ended: remediated after 51s
+2026-10-12T02:17:42Z B1 round 3 scenario 4: run 91b1c36c remediated
+2026-10-12T02:17:42Z waiting 299s (gap since the previous run)
+2026-10-12T02:22:42Z B1 round 3 slot 3/9: scenario 8
+time="2026-10-12T07:52:42+05:30" level=warning msg="No services to build"
+time="2026-10-12T07:52:42+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-1c28f4cd7a5c Creating 
+ Container intellegentdevops-injector-run-1c28f4cd7a5c Created 
+[02:22:42] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[02:26:55] scenario 8 ended: remediated after 253s
+2026-10-12T02:26:55Z B1 round 3 scenario 8: run c73af89a remediated
+2026-10-12T02:26:55Z waiting 299s (gap since the previous run)
+2026-10-12T02:31:55Z B1 round 3 slot 4/9: scenario 9
+time="2026-10-12T08:01:55+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:01:55+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-edc0d02fcac5 Creating 
+ Container intellegentdevops-injector-run-edc0d02fcac5 Created 
+[02:31:55] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[02:32:42] scenario 9 ended: remediated after 47s
+2026-10-12T02:32:42Z B1 round 3 scenario 9: run 990df09e remediated
+2026-10-12T02:32:42Z waiting 299s (gap since the previous run)
+2026-10-12T02:37:42Z B1 round 3 slot 5/9: scenario 5
+time="2026-10-12T08:07:42+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:07:42+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-4815e7d9f25d Creating 
+ Container intellegentdevops-injector-run-4815e7d9f25d Created 
+[02:37:42] scenario 5 error-api: injecting into api-service for 180s
+[02:38:27] scenario 5 ended: remediated after 45s
+2026-10-12T02:38:27Z B1 round 3 scenario 5: run b202d6e2 remediated
+2026-10-12T02:38:27Z waiting 299s (gap since the previous run)
+2026-10-12T02:43:27Z B1 round 3 slot 6/9: scenario 7
+time="2026-10-12T08:13:27+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:13:27+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-b401a9cd36d7 Creating 
+ Container intellegentdevops-injector-run-b401a9cd36d7 Created 
+[02:43:27] scenario 7 frontend-stopped: injecting into frontend for 180s
+[02:44:12] scenario 7 ended: remediated after 45s
+2026-10-12T02:44:12Z B1 round 3 scenario 7: run d1809dde remediated
+2026-10-12T02:44:12Z waiting 300s (gap since the previous run)
+2026-10-12T02:49:12Z B1 round 3 slot 7/9: scenario 2
+time="2026-10-12T08:19:12+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:19:12+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-292cba87c586 Creating 
+ Container intellegentdevops-injector-run-292cba87c586 Created 
+[02:49:12] scenario 2 cpu-api: injecting into api-service for 180s
+[02:50:19] scenario 2 ended: remediated after 67s
+2026-10-12T02:50:19Z B1 round 3 scenario 2: run afc64e65 remediated
+2026-10-12T02:50:19Z waiting 299s (gap since the previous run)
+2026-10-12T02:55:19Z B1 round 3 slot 8/9: scenario 1
+time="2026-10-12T08:25:19+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:25:19+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-dcd21312a7c0 Creating 
+ Container intellegentdevops-injector-run-dcd21312a7c0 Created 
+[02:55:19] scenario 1 cpu-frontend: injecting into frontend for 180s
+[02:56:24] scenario 1 ended: remediated after 65s
+2026-10-12T02:56:24Z B1 round 3 scenario 1: run 02b81849 remediated
+2026-10-12T02:56:24Z waiting 299s (gap since the previous run)
+2026-10-12T03:01:24Z B1 round 3 slot 9/9: scenario 6
+time="2026-10-12T08:31:24+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:31:24+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-a870ae26c0d3 Creating 
+ Container intellegentdevops-injector-run-a870ae26c0d3 Created 
+[03:01:24] scenario 6 redis-stopped: injecting into redis for 180s
+[03:02:01] scenario 6 ended: remediated after 38s
+2026-10-12T03:02:02Z B1 round 3 scenario 6: run 7aa875af remediated
+2026-10-12T03:02:02Z analyzer -> ANALYZER_MODE=llm
+2026-10-12T03:02:03Z waiting 60s for the switch to settle
+2026-10-12T03:03:03Z waiting 239s (gap since the previous run)
+2026-10-12T03:07:02Z B2 round 3 slot 1/9: scenario 8
+time="2026-10-12T08:37:02+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:37:02+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-5952c26e6d70 Creating 
+ Container intellegentdevops-injector-run-5952c26e6d70 Created 
+[03:07:02] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[03:11:44] scenario 8 ended: remediated after 282s
+2026-10-12T03:11:44Z B2 round 3 scenario 8: run a34ecf51 remediated
+2026-10-12T03:11:44Z waiting 299s (gap since the previous run)
+2026-10-12T03:16:44Z B2 round 3 slot 2/9: scenario 5
+time="2026-10-12T08:46:44+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:46:44+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-a97a255dc1dc Creating 
+ Container intellegentdevops-injector-run-a97a255dc1dc Created 
+[03:16:44] scenario 5 error-api: injecting into api-service for 180s
+[03:17:59] scenario 5 ended: remediated after 75s
+2026-10-12T03:17:59Z B2 round 3 scenario 5: run 00ca0bc9 remediated
+2026-10-12T03:17:59Z waiting 300s (gap since the previous run)
+2026-10-12T03:22:59Z B2 round 3 slot 3/9: scenario 1
+time="2026-10-12T08:52:59+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:52:59+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-aeefc80ab03c Creating 
+ Container intellegentdevops-injector-run-aeefc80ab03c Created 
+[03:22:59] scenario 1 cpu-frontend: injecting into frontend for 180s
+[03:24:30] scenario 1 ended: remediated after 91s
+2026-10-12T03:24:30Z B2 round 3 scenario 1: run 58ca7da4 remediated
+2026-10-12T03:24:30Z waiting 300s (gap since the previous run)
+2026-10-12T03:29:30Z B2 round 3 slot 4/9: scenario 3
+time="2026-10-12T08:59:30+05:30" level=warning msg="No services to build"
+time="2026-10-12T08:59:30+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-f4d0e867dcb4 Creating 
+ Container intellegentdevops-injector-run-f4d0e867dcb4 Created 
+[03:29:30] scenario 3 memory-api: injecting into api-service for 180s
+[03:30:51] scenario 3 ended: remediated after 81s
+2026-10-12T03:30:51Z B2 round 3 scenario 3: run a0c01962 remediated
+2026-10-12T03:30:51Z waiting 300s (gap since the previous run)
+2026-10-12T03:35:51Z B2 round 3 slot 5/9: scenario 6
+time="2026-10-12T09:05:51+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:05:51+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-fc820886e8d6 Creating 
+ Container intellegentdevops-injector-run-fc820886e8d6 Created 
+[03:35:51] scenario 6 redis-stopped: injecting into redis for 180s
+[03:36:57] scenario 6 ended: remediated after 66s
+2026-10-12T03:36:57Z B2 round 3 scenario 6: run f28dffe4 remediated
+2026-10-12T03:36:57Z waiting 299s (gap since the previous run)
+2026-10-12T03:41:57Z B2 round 3 slot 6/9: scenario 7
+time="2026-10-12T09:11:57+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:11:57+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-218093beea23 Creating 
+ Container intellegentdevops-injector-run-218093beea23 Created 
+[03:41:57] scenario 7 frontend-stopped: injecting into frontend for 180s
+[03:43:05] scenario 7 ended: remediated after 68s
+2026-10-12T03:43:05Z B2 round 3 scenario 7: run 607f47a7 remediated
+2026-10-12T03:43:05Z waiting 300s (gap since the previous run)
+2026-10-12T03:48:05Z B2 round 3 slot 7/9: scenario 2
+time="2026-10-12T09:18:05+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:18:05+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-2635dc49dfb2 Creating 
+ Container intellegentdevops-injector-run-2635dc49dfb2 Created 
+[03:48:05] scenario 2 cpu-api: injecting into api-service for 180s
+[03:49:40] scenario 2 ended: remediated after 95s
+2026-10-12T03:49:40Z B2 round 3 scenario 2: run 94faeb1b remediated
+2026-10-12T03:49:40Z waiting 299s (gap since the previous run)
+2026-10-12T03:54:40Z B2 round 3 slot 8/9: scenario 9
+time="2026-10-12T09:24:40+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:24:40+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-56104db216fe Creating 
+ Container intellegentdevops-injector-run-56104db216fe Created 
+[03:54:40] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[03:55:54] scenario 9 ended: remediated after 74s
+2026-10-12T03:55:54Z B2 round 3 scenario 9: run 341d9c06 remediated
+2026-10-12T03:55:54Z waiting 300s (gap since the previous run)
+2026-10-12T04:00:54Z B2 round 3 slot 9/9: scenario 4
+time="2026-10-12T09:30:54+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:30:54+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-48dbc303f4e7 Creating 
+ Container intellegentdevops-injector-run-48dbc303f4e7 Created 
+[04:00:54] scenario 4 latency-api: injecting into api-service for 180s
+[04:02:09] scenario 4 ended: remediated after 75s
+2026-10-12T04:02:09Z B2 round 3 scenario 4: run 5e1bb6e9 remediated
+2026-10-12T04:02:09Z starting ml-detector
+2026-10-12T04:02:09Z waiting 60s for the switch to settle
+2026-10-12T04:03:09Z waiting 240s (gap since the previous run)
+2026-10-12T04:07:09Z S round 3 slot 1/9: scenario 6
+time="2026-10-12T09:37:09+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:37:09+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-f5e3c6c61814 Creating 
+ Container intellegentdevops-injector-run-f5e3c6c61814 Created 
+[04:07:09] scenario 6 redis-stopped: injecting into redis for 180s
+[04:08:01] scenario 6 ended: remediated after 52s
+2026-10-12T04:08:01Z S round 3 scenario 6: run 9f35bdf2 remediated
+2026-10-12T04:08:01Z waiting 300s (gap since the previous run)
+2026-10-12T04:13:01Z S round 3 slot 2/9: scenario 2
+time="2026-10-12T09:43:01+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:43:01+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-dc5b64760a19 Creating 
+ Container intellegentdevops-injector-run-dc5b64760a19 Created 
+[04:13:01] scenario 2 cpu-api: injecting into api-service for 180s
+[04:14:17] scenario 2 ended: remediated after 76s
+2026-10-12T04:14:17Z S round 3 scenario 2: run cf36463e remediated
+2026-10-12T04:14:17Z waiting 300s (gap since the previous run)
+2026-10-12T04:19:17Z S round 3 slot 3/9: scenario 4
+time="2026-10-12T09:49:17+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:49:17+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e3d899c89ccb Creating 
+ Container intellegentdevops-injector-run-e3d899c89ccb Created 
+[04:19:17] scenario 4 latency-api: injecting into api-service for 180s
+[04:20:33] scenario 4 ended: remediated after 77s
+2026-10-12T04:20:34Z S round 3 scenario 4: run c3f4df82 remediated
+2026-10-12T04:20:34Z waiting 300s (gap since the previous run)
+2026-10-12T04:25:34Z S round 3 slot 4/9: scenario 9
+time="2026-10-12T09:55:34+05:30" level=warning msg="No services to build"
+time="2026-10-12T09:55:34+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-d394a7cff7ba Creating 
+ Container intellegentdevops-injector-run-d394a7cff7ba Created 
+[04:25:34] scenario 9 cpu-latency-api: injecting into api-service for 180s
+[04:26:31] scenario 9 ended: remediated after 57s
+2026-10-12T04:26:31Z S round 3 scenario 9: run caad4d22 remediated
+2026-10-12T04:26:31Z waiting 299s (gap since the previous run)
+2026-10-12T04:31:31Z S round 3 slot 5/9: scenario 8
+time="2026-10-12T10:01:31+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:01:31+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-9142e91da97b Creating 
+ Container intellegentdevops-injector-run-9142e91da97b Created 
+[04:31:31] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[04:32:47] scenario 8 ended: remediated after 76s
+2026-10-12T04:32:47Z S round 3 scenario 8: run fd915fdc remediated
+2026-10-12T04:32:47Z waiting 300s (gap since the previous run)
+2026-10-12T04:37:47Z S round 3 slot 6/9: scenario 5
+time="2026-10-12T10:07:47+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:07:47+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-edfb5346eb03 Creating 
+ Container intellegentdevops-injector-run-edfb5346eb03 Created 
+[04:37:47] scenario 5 error-api: injecting into api-service for 180s
+[04:38:49] scenario 5 ended: remediated after 62s
+2026-10-12T04:38:50Z S round 3 scenario 5: run 52802448 remediated
+2026-10-12T04:38:50Z waiting 300s (gap since the previous run)
+2026-10-12T04:43:50Z S round 3 slot 7/9: scenario 3
+time="2026-10-12T10:13:50+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:13:50+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-5d4f949822e3 Creating 
+ Container intellegentdevops-injector-run-5d4f949822e3 Created 
+[04:43:50] scenario 3 memory-api: injecting into api-service for 180s
+[04:44:57] scenario 3 ended: remediated after 67s
+2026-10-12T04:44:57Z S round 3 scenario 3: run f045d2f1 remediated
+2026-10-12T04:44:57Z waiting 300s (gap since the previous run)
+2026-10-12T04:49:57Z S round 3 slot 8/9: scenario 1
+time="2026-10-12T10:19:57+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:19:57+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-77818df837a9 Creating 
+ Container intellegentdevops-injector-run-77818df837a9 Created 
+[04:49:57] scenario 1 cpu-frontend: injecting into frontend for 180s
+[04:51:02] scenario 1 ended: remediated after 65s
+2026-10-12T04:51:02Z S round 3 scenario 1: run 55495ba0 remediated
+2026-10-12T04:51:02Z waiting 299s (gap since the previous run)
+2026-10-12T04:56:02Z S round 3 slot 9/9: scenario 7
+time="2026-10-12T10:26:02+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:26:02+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-8c7a78aabe97 Creating 
+ Container intellegentdevops-injector-run-8c7a78aabe97 Created 
+[04:56:02] scenario 7 frontend-stopped: injecting into frontend for 180s
+[04:57:10] scenario 7 ended: remediated after 68s
+2026-10-12T04:57:10Z S round 3 scenario 7: run 967cbf41 remediated
+2026-10-12T04:57:10Z stage 1: done for B1, B2, S
+2026-10-12T04:57:10Z block over. If you disabled sleep: sudo pmset -a disablesleep 0

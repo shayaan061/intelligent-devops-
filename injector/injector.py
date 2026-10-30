@@ -7,6 +7,16 @@ run, when the fault really started and ended and *why* it ended:
   remediated  it ended early: something reset/restarted the target
   cleanup     the injector had to undo it itself (e.g. restart a stopped container)
 
+Scenarios 1-9 are the core set (SUGGESTED_PLAN.md §10). 10-14 are the extra set:
+faults whose obvious fix is wrong (corrupted cache, slow Redis), faults below
+the alert thresholds (subtle latency/errors, for the ML detector) and a fault
+that comes back after every fix (to reach escalation). The Redis faults are
+made inside the redis container (docker exec), not through an HTTP /inject.
+15-19 are the novel set (added 26 Oct 2026, after the v1 evaluation): faults
+no runbook was written for, to compare the LLM with the runbooks outside known
+patterns (subtle faults on the frontend, a CPU limit that resets and restarts
+can't undo, two faults at once, Redis memory filled with junk keys).
+
 The CSV is ground truth for scoring only; never feed it to the detector or LLM.
 
 Usage:
@@ -19,6 +29,7 @@ Usage:
 
 import argparse
 import csv
+import math
 import os
 import random
 import sys
@@ -58,8 +69,16 @@ class Scenario:
     name: str
     target: str
     expected_action: str
-    # (fault, extra /inject params); fault "stop" = docker stop the target
+    # (fault, extra /inject params); fault "stop" = docker stop the target,
+    # "redis_corrupt" / "redis_slow" = made inside the redis container
     faults: list = field(default_factory=list)
+    # Re-inject whenever the fault is cleared, until the planned end
+    recurring: bool = False
+    # More than one acceptable root cause (two faults at once); default (target,)
+    root_causes: tuple = ()
+
+    def expected_root_cause(self):
+        return "|".join(self.root_causes) if self.root_causes else self.target
 
 
 SCENARIOS = {s.id: s for s in [
@@ -74,10 +93,53 @@ SCENARIOS = {s.id: s for s in [
     Scenario(8, "gradual-memory-api", "api-service", "restart_container",
              [("memory", {"size_mb": 440, "ramp_seconds": 240})]),
     Scenario(9, "cpu-latency-api", "api-service", "reset_faults", [("cpu", {}), ("latency", {})]),
+    # --- extra set ---
+    # A non-integer `hits` makes api-service's INCR fail (503) while Redis is up.
+    # Resetting/restarting api-service doesn't help, and Redis saves to disk, so
+    # restarting it reloads the bad value: only flush_cache (approval) fixes it
+    Scenario(10, "corrupted-cache", "redis", "flush_cache", [("redis_corrupt", {})]),
+    # Redis pauses writes for 1.5 s every 2 s: both services get slow (p95 > 1 s)
+    # but the cause is Redis, which has no latency metric of its own. Restarting
+    # Redis ends it
+    Scenario(11, "slow-redis", "redis", "restart_container", [("redis_slow", {"pause_ms": 1500})]),
+    # Below the alert thresholds (HighLatency > 1 s, HighErrorRate > 10%)
+    Scenario(12, "subtle-latency-api", "api-service", "reset_faults", [("latency", {"delay_s": 0.6})]),
+    Scenario(13, "subtle-error-api", "api-service", "reset_faults", [("error", {"rate": 0.05})]),
+    # Comes back after every reset/restart: should end in escalation
+    Scenario(14, "recurring-latency-api", "api-service", "escalate", [("latency", {})], recurring=True),
+    # --- novel set: no runbook was written for these ---
+    # Below the thresholds, on the frontend (12/13 are on api-service)
+    Scenario(15, "subtle-latency-frontend", "frontend", "reset_faults", [("latency", {"delay_s": 0.6})]),
+    Scenario(16, "subtle-error-frontend", "frontend", "reset_faults", [("error", {"rate": 0.05})]),
+    # The container's CPU limit is cut (docker update). Reset and restart keep
+    # the limit; only restoring it helps: update_resources, which needs approval
+    Scenario(17, "cpu-throttled-api", "api-service", "update_resources", [("cpu_limit", {"cpus": 0.05})]),
+    # Two independent faults; both must be fixed, in either order
+    Scenario(18, "two-faults", "api-service", "reset_faults",
+             [("cpu", {"_target": "frontend"}), ("error", {})], root_causes=("frontend", "api-service")),
+    # Junk keys fill Redis toward its 256 MB limit. Restarting reloads them from
+    # disk; only flush_cache (approval) removes them
+    Scenario(19, "redis-memory-pressure", "redis", "flush_cache", [("redis_fill", {"mb": 150})]),
 ]}
 
-# Scenario 8 needs time to ramp; everything else uses --duration
-MIN_DURATION = {8: 300}
+CORE_IDS = list(range(1, 10))
+EXTRA_IDS = list(range(10, 15))
+# 17 is left out of the suite (26 Oct pilot): the incident context shows CPU
+# relative to the limit, so a cut limit looks normal and no analyzer can see it
+NOVEL_IDS = [15, 16, 18, 19]
+
+# Scenario 8 needs time to ramp; the extra and novel sets need time for several
+# attempts (or to show that no rule fires); everything else uses --duration
+MIN_DURATION = {8: 300, 10: 300, 11: 300, 12: 300, 13: 300, 14: 480,
+                15: 300, 16: 300, 17: 300, 18: 300, 19: 300}
+
+# Compose limits (docker-compose.yml `cpus: "1.0"`), restored after scenario 17
+DEFAULT_NANO_CPUS = 1_000_000_000
+FILL_PREFIX = "fill:"
+FILL_SENTINEL = FILL_PREFIX + "0"
+
+REDIS = "redis"
+SLOW_PATTERN = "CLIENT PAUSE"   # matches the slow-redis loop's command line
 
 
 # -----------------------------
@@ -136,8 +198,13 @@ def http_faults(service):
         return None
 
 
+def fault_target(scenario, extra):
+    """A fault's own target (two-fault scenarios), else the scenario's."""
+    return extra.get("_target", scenario.target)
+
+
 def inject_http(service, fault, params, duration):
-    body = {"fault": fault, "duration": duration, **params}
+    body = {"fault": fault, "duration": duration, **{k: v for k, v in params.items() if not k.startswith("_")}}
     r = requests.post(f"{SERVICE_URLS[service]}/inject", json=body, timeout=5)
 
     if r.status_code != 200:
@@ -151,14 +218,133 @@ def reset_http(service):
         pass
 
 
+def redis_exec(*cmd):
+    """(exit code, output) of a command in the redis container."""
+    res = docker_client().containers.get(REDIS).exec_run(list(cmd))
+    return res.exit_code, res.output.decode(errors="replace").strip()
+
+
+def cache_corrupted():
+    """True if `hits` holds a non-integer. Redis down counts as still corrupted
+    (it reloads the saved value when it comes back)."""
+    try:
+        code, out = redis_exec("redis-cli", "GET", "hits")
+    except Exception:
+        return True
+    if code != 0:
+        return True
+    return out != "" and not out.lstrip("-").isdigit()
+
+
+def redis_slow_running():
+    """True while the pause loop runs (or Redis is mid-restart)."""
+    if not container_running(REDIS):
+        return True
+    try:
+        code, _ = redis_exec("pgrep", "-f", SLOW_PATTERN)
+    except Exception:
+        return True
+    return code == 0
+
+
+def start_redis_slow(pause_ms, duration):
+    # Pauses write commands for pause_ms every 2 s; ends by itself after
+    # `duration` (like the HTTP faults) or when the container restarts
+    loop = (f"end=$(( $(date +%s) + {int(duration)} )); while [ $(date +%s) -lt $end ]; do "
+            f"redis-cli {SLOW_PATTERN} {int(pause_ms)} WRITE >/dev/null; sleep 2; done")
+    docker_client().containers.get(REDIS).exec_run(["sh", "-c", loop], detach=True)
+
+
+def stop_redis_slow():
+    redis_exec("pkill", "-f", SLOW_PATTERN)
+    redis_exec("redis-cli", "CLIENT", "UNPAUSE")
+
+
+def nano_cpus(name):
+    """The container's CPU limit in units of 1e-9 CPUs (0 = no limit)."""
+    return docker_client().containers.get(name).attrs["HostConfig"].get("NanoCpus") or 0
+
+
+def set_nano_cpus(name, value):
+    # docker-py's Container.update() has no NanoCpus argument, so call the Engine
+    # API directly (POST /containers/{id}/update), as `docker update --cpus` does
+    api = docker_client().api
+    res = api._post_json(api._url("/containers/{0}/update", name), data={"NanoCpus": int(value)})
+    api._raise_for_status(res)
+
+
+def cpu_limited(name):
+    """True while the limit is below the compose default (scenario 17)."""
+    try:
+        return 0 < nano_cpus(name) < DEFAULT_NANO_CPUS
+    except Exception:
+        return True
+
+
+def fill_redis(mb):
+    """Writes about `mb` MB of 1 KB junk values under fill:* in chunks of 10,000
+    keys (one EVAL per chunk keeps each Redis block short)."""
+    total = int(mb) * 1024
+    script = ("for i = tonumber(ARGV[1]), tonumber(ARGV[2]) do "
+              f"redis.call('SET', '{FILL_PREFIX}' .. i, string.rep('x', 1024)) end return 1")
+    for lo in range(0, total, 10_000):
+        code, out = redis_exec("redis-cli", "EVAL", script, "0", str(lo), str(min(lo + 9_999, total - 1)))
+        if code != 0 or out != "1":
+            raise RuntimeError(f"fill {lo}: {code} {out}")
+
+
+def redis_filled():
+    """True while the junk keys are there. Redis down counts as filled (it
+    reloads them from disk when it comes back)."""
+    try:
+        code, out = redis_exec("redis-cli", "EXISTS", FILL_SENTINEL)
+    except Exception:
+        return True
+    return code != 0 or out != "0"
+
+
+def clear_redis_fill():
+    redis_exec("sh", "-c", f"redis-cli --scan --pattern '{FILL_PREFIX}*' | xargs -r -n 1000 redis-cli DEL >/dev/null")
+
+
+def inject_faults(scenario, duration):
+    for fault, extra in scenario.faults:
+        if fault == "stop":
+            docker_client().containers.get(scenario.target).stop(timeout=5)
+        elif fault == "redis_corrupt":
+            code, out = redis_exec("redis-cli", "SET", "hits", "corrupted")
+            if code != 0 or out != "OK":
+                raise RuntimeError(f"SET hits -> {code} {out}")
+        elif fault == "redis_slow":
+            start_redis_slow(extra.get("pause_ms", 1500), duration)
+        elif fault == "cpu_limit":
+            set_nano_cpus(scenario.target, float(extra.get("cpus", 0.05)) * 1e9)
+        elif fault == "redis_fill":
+            fill_redis(extra.get("mb", 150))
+        else:
+            inject_http(fault_target(scenario, extra), fault, extra, duration)
+
+
 def fault_active(scenario):
     """Is any part of the scenario's fault still in effect?"""
-    for fault, _ in scenario.faults:
+    for fault, extra in scenario.faults:
         if fault == "stop":
             if not container_running(scenario.target):
                 return True
+        elif fault == "redis_corrupt":
+            if cache_corrupted():
+                return True
+        elif fault == "redis_slow":
+            if redis_slow_running():
+                return True
+        elif fault == "cpu_limit":
+            if cpu_limited(scenario.target):
+                return True
+        elif fault == "redis_fill":
+            if redis_filled():
+                return True
         else:
-            flags = http_faults(scenario.target)
+            flags = http_faults(fault_target(scenario, extra))
             # Unreachable mid-restart: treat as still active until it comes back
             if flags is None or flags.get(fault):
                 return True
@@ -194,11 +380,7 @@ def run_scenario(scenario, duration, cancel=None):
     start = now()
 
     try:
-        for fault, extra in scenario.faults:
-            if fault == "stop":
-                docker_client().containers.get(scenario.target).stop(timeout=5)
-            else:
-                inject_http(scenario.target, fault, extra, duration)
+        inject_faults(scenario, duration)
 
     except Exception as exc:
         log(f"scenario {scenario.id} failed to inject: {exc}")
@@ -206,6 +388,7 @@ def run_scenario(scenario, duration, cancel=None):
         return None
 
     planned_end = start.timestamp() + duration
+    cleared = 0
 
     try:
         # Poll until the fault is gone (expired or remediated) or its time is up
@@ -213,7 +396,24 @@ def run_scenario(scenario, duration, cancel=None):
             pause(1, cancel)
 
             if not fault_active(scenario):
-                break
+                # Recurring: something fixed it; bring it back for the rest of the
+                # run (not in the last 5 s, where it may just be expiring)
+                if not scenario.recurring or planned_end - time.time() < 5:
+                    break
+                cleared += 1
+                while (any(http_faults(fault_target(scenario, e)) is None for _, e in scenario.faults)
+                       and time.time() < planned_end):
+                    pause(1, cancel)
+                # Rounded up so the re-injected fault doesn't expire before planned_end
+                remaining = math.ceil(planned_end - time.time())
+                if remaining < 5:
+                    break
+                log(f"scenario {scenario.id}: cleared ({cleared}), re-injecting for {remaining}s")
+                try:
+                    inject_faults(scenario, remaining)
+                except Exception as exc:
+                    log(f"scenario {scenario.id}: re-inject failed ({exc}); ending the run")
+                    break
 
         # HTTP faults clear themselves up to ~0.5s after planned_end
         while time.time() < planned_end + 3 and fault_active(scenario):
@@ -226,6 +426,8 @@ def run_scenario(scenario, duration, cancel=None):
         raise
 
     end = now()
+    if scenario.recurring:
+        params += f";cleared={cleared}"
 
     if end.timestamp() < planned_end - 1:
         end_reason = "remediated"
@@ -242,7 +444,7 @@ def run_scenario(scenario, duration, cancel=None):
         "name": scenario.name,
         "fault": "+".join(f for f, _ in scenario.faults),
         "target_service": scenario.target,
-        "expected_root_cause": scenario.target,
+        "expected_root_cause": scenario.expected_root_cause(),
         "expected_action": scenario.expected_action,
         "start": iso(start),
         "planned_end": iso(datetime.fromtimestamp(planned_end, timezone.utc)),
@@ -259,12 +461,23 @@ def run_scenario(scenario, duration, cancel=None):
 
 def cleanup(scenario):
     """Undo a scenario's fault (HTTP faults expire on their own; containers don't)."""
-    for fault, _ in scenario.faults:
+    for fault, extra in scenario.faults:
         if fault == "stop":
             if not container_running(scenario.target):
                 docker_client().containers.get(scenario.target).start()
+        elif fault == "redis_corrupt":
+            if container_running(REDIS) and cache_corrupted():
+                redis_exec("redis-cli", "SET", "hits", "0")
+        elif fault == "redis_slow":
+            if container_running(REDIS):
+                stop_redis_slow()
+        elif fault == "cpu_limit":
+            set_nano_cpus(scenario.target, DEFAULT_NANO_CPUS)
+        elif fault == "redis_fill":
+            if container_running(REDIS):
+                clear_redis_fill()
         else:
-            reset_http(scenario.target)
+            reset_http(fault_target(scenario, extra))
 
     # Wait for the target to come back so the next scenario starts clean
     for _ in range(30):
@@ -286,6 +499,26 @@ def reset_all():
 
     for service in SERVICE_URLS:
         reset_http(service)
+
+    # Faults made inside the redis container
+    try:
+        if container_running(REDIS):
+            stop_redis_slow()
+            if cache_corrupted():
+                redis_exec("redis-cli", "SET", "hits", "0")
+            if redis_filled():
+                clear_redis_fill()
+    except Exception as exc:
+        log(f"could not reset redis faults: {exc}")
+
+    # CPU limits cut by scenario 17
+    for name in SERVICE_URLS:
+        try:
+            if cpu_limited(name):
+                set_nano_cpus(name, DEFAULT_NANO_CPUS)
+                log(f"restored the CPU limit of {name}")
+        except Exception as exc:
+            log(f"could not restore the CPU limit of {name}: {exc}")
 
     log("all faults reset")
 

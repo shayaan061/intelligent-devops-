@@ -1,0 +1,194 @@
+{
+  "B1": {
+    "runs": 20,
+    "detected": 10,
+    "recall_pct": 50.0,
+    "false_positive_incidents": 3,
+    "precision_pct": 76.9,
+    "mttd_s": {
+      "mean": 27.0,
+      "median": 26.8,
+      "n": 10
+    },
+    "root_cause_accuracy_pct": 100.0,
+    "plan_action_accuracy_pct": 50.0,
+    "executed_action_accuracy_pct": 50.0,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 0,
+    "auto_resolved_pct": 25.0,
+    "mttr_s": {
+      "mean": 91.2,
+      "median": 90.9,
+      "n": 5
+    },
+    "verified_pct": 80.0,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 20.0,
+    "avg_attempts": 1.7,
+    "llm_plans_pct": 0.0,
+    "plan_latency_ms": {
+      "mean": 0.2,
+      "median": 0.3,
+      "n": 10
+    },
+    "llm_calls_per_incident": {
+      "mean": 0,
+      "median": 0.0,
+      "n": 10
+    },
+    "prompt_tokens_per_incident": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    },
+    "completion_tokens_per_incident": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    }
+  },
+  "B2": {
+    "runs": 20,
+    "detected": 10,
+    "recall_pct": 50.0,
+    "false_positive_incidents": 0,
+    "precision_pct": 100.0,
+    "mttd_s": {
+      "mean": 26.2,
+      "median": 26.4,
+      "n": 10
+    },
+    "root_cause_accuracy_pct": 100.0,
+    "plan_action_accuracy_pct": 50.0,
+    "executed_action_accuracy_pct": 50.0,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 0,
+    "auto_resolved_pct": 25.0,
+    "mttr_s": {
+      "mean": 137.2,
+      "median": 135.9,
+      "n": 5
+    },
+    "verified_pct": 50.0,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 50.0,
+    "avg_attempts": 2,
+    "llm_plans_pct": 100.0,
+    "plan_latency_ms": {
+      "mean": 28393.7,
+      "median": 28141.8,
+      "n": 10
+    },
+    "llm_calls_per_incident": {
+      "mean": 2.5,
+      "median": 2.5,
+      "n": 10
+    },
+    "prompt_tokens_per_incident": {
+      "mean": 6331.6,
+      "median": 6325.5,
+      "n": 10
+    },
+    "completion_tokens_per_incident": {
+      "mean": 358.8,
+      "median": 354.0,
+      "n": 10
+    }
+  },
+  "S": {
+    "runs": 20,
+    "detected": 17,
+    "recall_pct": 85.0,
+    "false_positive_incidents": 0,
+    "precision_pct": 100.0,
+    "mttd_s": {
+      "mean": 49.2,
+      "median": 26.6,
+      "n": 17
+    },
+    "root_cause_accuracy_pct": 88.2,
+    "plan_action_accuracy_pct": 52.9,
+    "executed_action_accuracy_pct": 53.3,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 4,
+    "auto_resolved_pct": 45.0,
+    "mttr_s": {
+      "mean": 119.2,
+      "median": 130.9,
+      "n": 9
+    },
+    "verified_pct": 52.9,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 41.2,
+    "avg_attempts": 1.82,
+    "llm_plans_pct": 94.1,
+    "plan_latency_ms": {
+      "mean": 27942.2,
+      "median": 28424.1,
+      "n": 17
+    },
+    "llm_calls_per_incident": {
+      "mean": 2.5,
+      "median": 3,
+      "n": 17
+    },
+    "prompt_tokens_per_incident": {
+      "mean": 6427.2,
+      "median": 7597,
+      "n": 17
+    },
+    "completion_tokens_per_incident": {
+      "mean": 377.1,
+      "median": 428,
+      "n": 17
+    }
+  },
+  "SF": {
+    "runs": 20,
+    "detected": 15,
+    "recall_pct": 75.0,
+    "false_positive_incidents": 0,
+    "precision_pct": 100.0,
+    "mttd_s": {
+      "mean": 23.6,
+      "median": 25.1,
+      "n": 15
+    },
+    "root_cause_accuracy_pct": 100.0,
+    "plan_action_accuracy_pct": 6.7,
+    "executed_action_accuracy_pct": 16.7,
+    "unsafe_actions_executed": 0,
+    "collateral_actions_executed": 0,
+    "auto_resolved_pct": 5.0,
+    "mttr_s": {
+      "mean": 87.7,
+      "median": 87.7,
+      "n": 1
+    },
+    "verified_pct": 6.7,
+    "approval_requested_pct": 0.0,
+    "escalated_pct": 93.3,
+    "avg_attempts": 1.4,
+    "llm_plans_pct": 0.0,
+    "plan_latency_ms": {
+      "mean": 6.9,
+      "median": 7.0,
+      "n": 15
+    },
+    "llm_calls_per_incident": {
+      "mean": 0,
+      "median": 0,
+      "n": 15
+    },
+    "prompt_tokens_per_incident": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    },
+    "completion_tokens_per_incident": {
+      "mean": null,
+      "median": null,
+      "n": 0
+    }
+  }
+}

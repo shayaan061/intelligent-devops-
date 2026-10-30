@@ -1,0 +1,25 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+a014ae6a,15,subtle-latency-frontend,latency,frontend,frontend,reset_faults,2026-10-26T10:17:37.564Z,2026-10-26T10:22:37.564Z,2026-10-26T10:18:47.056Z,remediated,latency:{'delay_s': 0.6}
+4f8b6be9,18,two-faults,cpu+error,api-service,frontend|api-service,reset_faults,2026-10-26T10:23:47.389Z,2026-10-26T10:28:47.389Z,2026-10-26T10:25:46.130Z,remediated,cpu:{'_target': 'frontend'};error
+139ab100,19,redis-memory-pressure,redis_fill,redis,redis,flush_cache,2026-10-26T10:30:46.528Z,2026-10-26T10:35:46.528Z,2026-10-26T10:35:50.435Z,cleanup,redis_fill:{'mb': 150}
+1dc7ff4a,16,subtle-error-frontend,error,frontend,frontend,reset_faults,2026-10-26T10:40:50.406Z,2026-10-26T10:45:50.406Z,2026-10-26T10:45:51.355Z,expired,error:{'rate': 0.05}
+3cd3c1d7,15,subtle-latency-frontend,latency,frontend,frontend,reset_faults,2026-10-26T12:49:01.708Z,2026-10-26T12:54:01.708Z,2026-10-26T12:50:11.169Z,remediated,latency:{'delay_s': 0.6}
+d74678cb,19,redis-memory-pressure,redis_fill,redis,redis,flush_cache,2026-10-26T12:55:11.504Z,2026-10-26T13:00:11.504Z,2026-10-26T13:00:15.570Z,cleanup,redis_fill:{'mb': 150}
+54f6a315,16,subtle-error-frontend,error,frontend,frontend,reset_faults,2026-10-26T13:05:15.470Z,2026-10-26T13:10:15.470Z,2026-10-26T13:10:16.075Z,expired,error:{'rate': 0.05}
+0c057e70,18,two-faults,cpu+error,api-service,frontend|api-service,reset_faults,2026-10-26T13:15:16.276Z,2026-10-26T13:20:16.276Z,2026-10-26T13:17:36.930Z,remediated,cpu:{'_target': 'frontend'};error
+6ff3bf93,16,subtle-error-frontend,error,frontend,frontend,reset_faults,2026-10-26T15:20:45.729Z,2026-10-26T15:25:45.729Z,2026-10-26T15:25:46.288Z,expired,error:{'rate': 0.05}
+86538f00,19,redis-memory-pressure,redis_fill,redis,redis,flush_cache,2026-10-26T15:30:46.451Z,2026-10-26T15:35:46.451Z,2026-10-26T15:35:50.250Z,cleanup,redis_fill:{'mb': 150}
+64b86178,18,two-faults,cpu+error,api-service,frontend|api-service,reset_faults,2026-10-26T15:40:50.480Z,2026-10-26T15:45:50.480Z,2026-10-26T15:43:05.066Z,remediated,cpu:{'_target': 'frontend'};error
+dc352a61,15,subtle-latency-frontend,latency,frontend,frontend,reset_faults,2026-10-26T15:48:05.420Z,2026-10-26T15:53:05.420Z,2026-10-26T15:53:06.382Z,expired,latency:{'delay_s': 0.6}
+b5cfb29b,18,two-faults,cpu+error,api-service,frontend|api-service,reset_faults,2026-10-26T17:56:15.695Z,2026-10-26T18:01:15.695Z,2026-10-26T17:58:26.550Z,remediated,cpu:{'_target': 'frontend'};error
+3494d8a4,15,subtle-latency-frontend,latency,frontend,frontend,reset_faults,2026-10-26T18:03:26.458Z,2026-10-26T18:08:26.458Z,2026-10-26T18:06:54.126Z,remediated,latency:{'delay_s': 0.6}
+f403eacb,16,subtle-error-frontend,error,frontend,frontend,reset_faults,2026-10-26T18:11:54.446Z,2026-10-26T18:16:54.446Z,2026-10-26T18:16:55.295Z,expired,error:{'rate': 0.05}
+2a4f14de,19,redis-memory-pressure,redis_fill,redis,redis,flush_cache,2026-10-26T18:21:55.461Z,2026-10-26T18:26:55.461Z,2026-10-26T18:26:59.351Z,cleanup,redis_fill:{'mb': 150}
+9d6b9908,19,redis-memory-pressure,redis_fill,redis,redis,flush_cache,2026-10-26T20:26:40.615Z,2026-10-26T20:31:40.615Z,2026-10-26T20:31:44.684Z,cleanup,redis_fill:{'mb': 150}
+a927f6d3,18,two-faults,cpu+error,api-service,frontend|api-service,reset_faults,2026-10-26T20:36:44.432Z,2026-10-26T20:41:44.432Z,2026-10-26T20:38:59.001Z,remediated,cpu:{'_target': 'frontend'};error
+add2c3ea,16,subtle-error-frontend,error,frontend,frontend,reset_faults,2026-10-26T20:43:59.477Z,2026-10-26T20:48:59.477Z,2026-10-26T20:48:59.919Z,expired,error:{'rate': 0.05}
+167931dd,15,subtle-latency-frontend,latency,frontend,frontend,reset_faults,2026-10-26T20:54:00.415Z,2026-10-26T20:59:00.415Z,2026-10-26T20:55:06.985Z,remediated,latency:{'delay_s': 0.6}
+0ab23032,16,subtle-error-frontend,error,frontend,frontend,reset_faults,2026-10-26T22:58:26.643Z,2026-10-26T23:03:26.643Z,2026-10-26T23:03:27.238Z,expired,error:{'rate': 0.05}
+b27bf7f8,19,redis-memory-pressure,redis_fill,redis,redis,flush_cache,2026-10-26T23:08:27.341Z,2026-10-26T23:13:27.341Z,2026-10-26T23:13:31.646Z,cleanup,redis_fill:{'mb': 150}
+59819ccf,18,two-faults,cpu+error,api-service,frontend|api-service,reset_faults,2026-10-26T23:18:31.423Z,2026-10-26T23:23:31.423Z,2026-10-26T23:20:37.048Z,remediated,cpu:{'_target': 'frontend'};error
+5de26d7d,15,subtle-latency-frontend,latency,frontend,frontend,reset_faults,2026-10-26T23:25:37.386Z,2026-10-26T23:30:37.386Z,2026-10-26T23:30:37.909Z,expired,latency:{'delay_s': 0.6}

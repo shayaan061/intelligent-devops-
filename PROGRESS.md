@@ -404,6 +404,37 @@ Next:
 - [x] Stage 1: 81 runs, 11 Oct 20:27 – 12 Oct 04:57 UTC, all remediated (RESULTS.md §13). A runner bug (switching systems before the last run's incident finished) spoiled 4 runs; fixed, voided and redone. Summary: recall 100% everywhere; root cause 100%; action B1 100%, B2/S 96.3% (scenario 5: restart instead of reset); 0 unsafe; MTTD B1 52 s, B2 53 s, S 27 s; MTTR B1 75 s, B2 102 s, S 68 s; scenario 8 S 45 s vs ~225 s detection.
 - [ ] Stages 2 and 3 after reviewing stage 1: `python3 experiments/run_eval.py run --stage 2` (189 more runs, ~21 h, can be split with `--rounds 1` ≈ 3 h).
 - [ ] Decide before stage 2: stop re-analyzing `updated` incidents while a plan for the same attempt is being executed? S makes 1.8 LLM calls per incident (20 of 48 plans unused). Changing it now means stage 1 has to be reported separately or rerun.
-- [ ] Report: the 9 scenarios are all faults the runbooks cover; consider a few unseen-fault scenarios where B2/S can differ from B1.
+- [x] Report: the 9 scenarios are all faults the runbooks cover; consider a few unseen-fault scenarios where B2/S can differ from B1. Built 12 Oct as the extra suite (Step 14).
 - [ ] B0 (manual) runs: the team agrees on how many.
 - [ ] Record normal traffic at other load levels and retrain (before demos at other loads).
+
+---
+
+## Step 14: Extra scenarios, LLM-down system, soak test (12 Oct)
+
+- **Stage 2 paused** after 5 runs (B1 round 4): the Mac slept on battery around 12:08 UTC. The run in progress wasn't recorded (redone later). Docker's clock fell ~3 min behind and caught up. The runner now matches runs to ground truth by row count (not time) and voids a run the Mac slept through.
+- **Demo app** (both copies): optional `delay_s` / `rate` on `/inject` for subtle faults; defaults unchanged (smoke-tested). Images rebuilt.
+- **Injector:** scenarios 10-14 (corrupted cache, slow Redis, subtle latency 0.6 s, subtle errors 5%, recurring latency). Redis faults via `docker exec`; `reset` undoes them. Checked live (RESULTS.md §14); one bug fixed (recurring fault counted its own expiry as a fix).
+- **Runner:** `--suite extra` (own manifest in `experiments/eval/extra/`; stages 3/5/10 rounds), system **SF** (S with the LLM unreachable) on scenarios 3, 4, 6, 8, `soak` / `soak-score` for the false-alarm rate. Core order and paths unchanged, so stage 2 resumes where it stopped.
+- **Scorer:** approval requested, action log; expected actions for 10-14.
+- Tests: experiments 35 (total 191).
+
+Next:
+- [x] Finish core stage 2 in ~3 h blocks: `python3 experiments/run_eval.py run --stage 2 --rounds 1` (162 runs left after round 4 on 13 Oct, RESULTS.md §17; 6 rounds of 27). Charger in, lid open.
+- [x] Extra suite stage 1: `python3 experiments/run_eval.py run --suite extra --stage 1 --rounds 1` (57 runs, ~3 h per round; longer runs than core).
+- [x] Soak: `python3 experiments/run_eval.py soak --hours 12 --events`, then `soak-score` (10 h soak, 0 false alarms, RESULTS.md §16).
+- [ ] Optional: retrain ML on 3/5/10 users and repeat the soak to compare false alarms.
+
+## Step 15: Long evaluation block, final scores (19-23 Oct)
+
+- One unattended block (`experiments/results/long_run_19oct.sh`): core stage 3 (rounds 5-20, 432 runs, 47.1 h) then extra stage 3 (rounds 2-10, 171 runs, 27.6 h). One attempt each, no aborts, no voided runs; the runner restored system S at the end.
+- **Core final** (RESULTS.md §18a, n = 180 per system): recall 100% and 0 false positives / 0 unsafe actions in B1, B2, S; MTTD 53.1 / 52.8 / **29.0 s**; MTTR 75.3 / 104.9 / **74.1 s**; executed action correct 100 / 92.2 / 93.9%. S's 4 misdiagnoses were all fixed on attempt 2 by the verify loop.
+- **Extra final** (RESULTS.md §18b, n = 10 per scenario): recall B1 60%, B2 60%, **S 90%**, SF 100%; 0 unsafe actions everywhere. Only S detects the subtle faults (12: 10/10 fixed; 13: 5/10 detected, 0 fixed). No variant finds Redis on 10/11 (all escalated). SF (LLM down) resolves 34/40, but escalates scenario 4 early in 6/10.
+- Raw data copied to `experiments/results/` (`eval_stage3_*`, `eval_extra_stage3_*`, `incident_store_long_run_19-22oct.jsonl`). Old untagged Docker images removed (23 Oct).
+- Soak test 2 (22-23 Oct, 12 h, 23 events): 0 false alarms, 0 actions (RESULTS.md §19); with soak 1: 22 h, 42 events, 0 false alarms. Report: `docs/results/Evaluation_Results.docx` (9 figures).
+
+Next:
+- [ ] Run `sudo pmset -a disablesleep 0` (sleep was disabled for the block).
+- [ ] Papers: final numbers into `docs/paper/` (EmergIN, due 30 Oct); decide the venue(s), see `docs/conferences_nov2026.txt`.
+- [ ] B0 (manual baseline) not run: state it as a limitation (O6 can't be assessed against a human).
+

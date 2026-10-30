@@ -1,0 +1,7 @@
+II Related Work
+
+AIOps and root-cause localization. In microservices, a failure in one service produces symptoms in its callers; MicroRCA [7] ranks candidate causes over a graph of services and hosts.
+
+LLMs for incident management.
+
+Site reliability practice [1] codifies such rules in runbooks, graded escalation and review, and chaos engineering [10] injects failures to test them.

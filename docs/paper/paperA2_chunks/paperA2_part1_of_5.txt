@@ -1,0 +1,69 @@
+Policy-Guarded Recovery of Known and Unknown Microservice Faults using a Local Large Language Model
+
+Muhammad Shayaan Ali
+
+Dept. Of Computer Science & Engineering
+
+Sharda University
+
+Greater Noida, India
+
+2023433557.muhammad@ug.sharda.ac.in
+
+Riddhima Sharma
+
+Dept. Of Computer Science and Engineering
+
+Sharda University
+
+Greater Noida, India
+
+2023567320.riddhima@ug.sharda.ac.in
+
+Shruti Tyagi
+
+Dept. Of Computer Science and Engineering
+
+Sharda University
+
+Greater Noida, India
+
+2023566902.shruti@ug.sharda.ac.in
+
+Aliza Rana
+
+Dept. Of Computer Science and Engineering
+
+Sharda University
+
+Greater Noida, India
+
+aliza.rana@sharda.ac.in
+
+Abstract-Large language models (LLMs) have the potential to read monitoring data and recommend fixes for failing services, but taking those fixes in an uncontrolled fashion might put the service through a faulty state, use a non-existent action, or generate a malformed plan. This paper presents a closed-loop incident response to failure for containerized microservices, where monitoring identifies the fault and generates an alert, a locally hosted LLM (or rule-based runbook) generates a set of candidate actions, and a simple monotonic policy validator only allows approved actions to be taken. Every fix that gets applied is validated, and an incident that persists after three countermeasures is re-characterized. We compare the runbooks, LLM, and full system over 890 fault-injection runs across 18 different failure scenarios on a three-service container application, broken into failures for which a runbook was written and failures for which one was not, testing the validator with 29 malicious plans. No unsafe actions were taken in any case, while runbooks or the LLM activated on known failures 82.2 percent and 86.7 percent of the time respectively, adding 29 seconds on average to recovery; on four unknown failures, the full system resolved 45 percent of failures against 25 percent for the runbooks, with runbooks and the LLM both missing some valid faults; and escalated causes that every system misdiagnosed went through a bounded number of countermeasures. Runbooks for known failures, the LLM for unknowns, and a single guard for both.
+
+Keywords- incident response, large language models, AIOps, automated remediation, safety, microservices
+
+I. INTRODUCTION
+
+Many web apps are collections of lots of small services, each call propagating the fault. A slow database is wrapped by a slow call, returning error by the time it reaches the front end, so the alert that fires first may not be the problem. Incidents continue to be dealt with by on-call engineers who get an alert, look at dashboards, read a written runbook and perform a fix, often a restart or rollback [1]. Detection is mature and simple fixes are scripted, but the step in the middle, deciding what is broken and what is a safe fix, is still a manual and time-consuming process.
+
+AI for IT operations (AIOps) [2] uses machine learning for anomaly detection and correlating alerts. [2], [3], [4] and open-source assistants like k8sgpt and HolmesGPT [5], [6] are providing natural-language descriptions of problems in the cluster. While the majority of the recommendations are human-generated, under limited conditions, actions are taken by a language model that would be safe only if the output is correct. An LLM may generate the name of a bogus service, create a new action, provide a false confidence score, or copy an already-failing fix and to execute the output as a command can turn a minor incident into an outage.
+
+This paper asks: can we hand the remediation to an LLM if we treat the model as an untrusted advisor within a closed control loop? The LLM provides a plan; a separate policy validator that does not trust the plan decides if it is permissible to run, each fix is verified, and the loop terminates after a bounded number of attempts and hands off the incident to a human. We ask four questions. RQ1 (safety): can such a loop run on live containers without causing an unsafe action, even when the plans are broken or malicious? RQ2 (known faults): with the same detection, does the LLM diagnose and behave better than rule-based runbooks? RQ3 (unknown faults): which of the components help when no runbook has been written for the fault? RQ4 (robustness): what can we do if the diagnosis is wrong, the fault is misleading or recurring, or we do not have an LLM? The contributions are:
+
+1) A closed-loop design (monitor, detect, analyze, decide, respond, verify) in which the LLM does not have an access to the system and a policy validator is the only way to run anything. This enforces an allowlist for actions, known targets, confidence threshold, a cross-incident cooldown, per-incident limits, human approval of destructive actions, and bounded reanalysis with escalation.
+
+2) One draw of 29 unhelpful, misshapen, and malicious plans run against the true responder, exposing four flaws in handling of input by the responder and gateway which were fixed before testing.
+
+3) A real container test with 890 fault-injection runs through 18 scenarios in three sets, known faults, misleading, below-threshold and recurring faults, and faults without a runbook and four system variants, including one where the LLM is not available.
+
+4) A comparison of the detector, the LLM and the runbooks all under the same guard and illustrating that each is covering a different part of the problem: the runbooks the known faults, the detector the tricky ones, and the LLM the faults no runbook matches.
+
+The system all runs on a single laptop that hosts locally an 8-billion-parameter model, so no operational data leave that machine and there is no cloud inference. The small local model also results in a low compute and energy cost for automated operations, which is in the spirit of the theme of this conference. Section II overviews related work, Section III details the system architecture, and Section IV the safety design. Section V-VI present the evaluation, section VII the limitations, and VIII the conclusion.
+
+II. RELATED WORK
+
+AIOps and root-cause localization Anomaly detection, alert correlation and fault localization are based on learning from metrics, logs, and traces [2]. In microservices, because of their asynchronous eventdriven design, a failure in one service manifests in its callers, so MicroRCA [7] proposes to rank candidate causes on a graph of services and hosts. Here, we use a simpler metric: every service logs the time that it blocks while waiting for the call to its downstream service, which can be accessed by the runbooks and the LLM.
+
+LLMs for incident management. Ahmed et al. [3] show how fine-tuned LLMs can recommend root-cause and mitigation recommendations for production cloud incidents, and RCACopilot [4] uses diagnostic data gathered from production incidents together with an LLM to predict the root-cause class. AIOps Lab [8] provides an environment where LLM agents identify, diagnose, and mitigate injected faults, and quantify their success rate. All of these works evaluate either the correctness of the diagnosis or the success of the agent, rather than how to mitigate the damage of executing a wrong recommendation.

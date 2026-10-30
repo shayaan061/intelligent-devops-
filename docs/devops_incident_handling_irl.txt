@@ -1,0 +1,99 @@
+HOW DEVOPS INCIDENTS ARE HANDLED IN REAL LIFE
+(and how this project maps onto it)
+Notes, 19 Oct 2026
+
+In industry the loop is the same as in this project:
+detect -> page a human -> diagnose -> fix -> verify -> learn.
+Most fixing is still done by people following runbooks; only the simple,
+safe fixes are automated.
+
+
+1. DETECTION
+------------
+- Metrics + alert rules: Prometheus/Alertmanager, Datadog, CloudWatch.
+  Good teams alert on symptoms users feel (latency, error rate), not on
+  every CPU spike.
+- SLOs and error budgets (Google SRE): e.g. 99.9% availability per month;
+  alert when the budget is burning too fast.
+- Logs and traces: ELK, Loki, Jaeger, OpenTelemetry. Traces show which
+  downstream service is slow (the same job upstream_request_duration_seconds
+  does in this project).
+- Synthetic checks: fake users hitting the site every minute from outside.
+- Anomaly detection (AIOps): ML baselines in Dynatrace, Datadog Watchdog,
+  New Relic. This is what our ML detector does.
+
+
+2. GETTING A HUMAN
+------------------
+- On-call rotation: an engineer carries a pager (PagerDuty, Opsgenie).
+- Severity levels: SEV1 = site down, whole team + an incident commander;
+  SEV3 = can wait until morning.
+- Dedup and grouping: 50 alerts from one root cause become 1 page.
+  Our gateway's incident grouping is this step.
+
+
+3. DIAGNOSIS
+------------
+- Runbooks: written steps per alert ("if HighMemory on X, check Y, then
+  restart"). Our YAML runbooks are machine-readable versions of these.
+- "What changed?" is the first question. The Google SRE book says roughly
+  70% of outages come from changes to a live system (deploys, config).
+- Dashboards and dependency maps to tell the root cause from the symptoms.
+
+
+4. THE FIXES USED IN PRACTICE (roughly most to least common)
+------------------------------------------------------------
+Fix                              | When                        | In our project?
+---------------------------------+-----------------------------+------------------------------
+Rollback (deploy or config)      | a change just went out      | no (closest: reset_faults)
+Restart pod/container            | memory leak, stuck process  | restart_container
+Scale out (replicas, autoscale)  | load spike                  | no
+Feature flag off                 | one new feature is broken   | closest to reset_faults
+Failover (other zone/replica)    | node/zone/database down     | no
+Traffic controls (rate limits,   | overload, failing           | no
+  circuit breakers, shed load)   |   dependency                |
+Flush/rebuild cache              | bad or corrupt cached data  | flush_cache (needs approval)
+Raise resource limits            | OOM kills, CPU throttling   | update_resources (not built)
+Escalate to the owning team      | nothing above works         | escalate
+
+
+5. AUTOMATION THAT EXISTS TODAY
+-------------------------------
+- Kubernetes self-healing: liveness probes restart crashed pods, the HPA
+  scales out, ReplicaSets replace dead pods. Handles "crashed -> restart"
+  but does not reason about root cause (restarting api-service does not fix
+  a Redis problem).
+- Auto-remediation tools: Rundeck, StackStorm, AWS Systems Manager
+  Automation, PagerDuty automation. They run a script when an alert fires:
+  if-this-then-that, like our B1 baseline (runbooks only).
+- Progressive delivery: canary and blue-green deploys with automatic
+  rollback when error rates rise (Argo Rollouts, Spinnaker).
+- AIOps platforms (Moogsoft, BigPanda, Dynatrace Davis): group alerts and
+  suggest a root cause. Mostly they RECOMMEND; a human still approves
+  risky actions.
+
+
+6. AFTER THE INCIDENT
+---------------------
+- Blameless postmortem: timeline, root cause, action items.
+- Prevention: chaos engineering (Netflix's Chaos Monkey breaks things on
+  purpose; our fault injector is a small version of this), better alerts,
+  new runbook entries.
+
+
+WHAT THIS MEANS FOR THE REPORT
+------------------------------
+- Our gaps are known and fine to state: no rollbacks (no real deploys), no
+  scaling (Compose, not Kubernetes), no failover (single instances).
+  Kubernetes is out of scope.
+- reset_faults only exists in the demo (it switches off the injected fault).
+  The real-world equivalent is a rollback or a feature-flag toggle. Say so,
+  so "auto-resolved" isn't overclaimed.
+- The industry gap our project targets: detection is mature and simple fixes
+  (restart, rollback) are automated, but the step in between -- deciding
+  what is wrong and which fix is safe -- is still mostly a human reading
+  dashboards at 3 a.m. Our system combines ML detection, LLM diagnosis and
+  a policy layer that only allows safe actions and sends the rest to a
+  human. That is the "recommend, then guarded automation" direction AIOps
+  vendors are moving in, and a reasonable position for the report and the
+  patent.

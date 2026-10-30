@@ -1,0 +1,51 @@
+2026-10-12T05:00:23Z stage 1: 2 runs to do for B1 (~0.2 h)
+2026-10-12T05:00:23Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-12T05:00:23Z waiting 106s (gap since the previous run)
+2026-10-12T05:02:10Z analyzer -> ANALYZER_MODE=runbook
+2026-10-12T05:02:11Z stopping ml-detector
+2026-10-12T05:02:12Z waiting 60s for the switch to settle
+2026-10-12T05:03:12Z B1 round 2 slot 9/9: scenario 6
+time="2026-10-12T10:33:12+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:33:12+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-e53be1360e2c Creating 
+ Container intellegentdevops-injector-run-e53be1360e2c Created 
+[05:03:13] scenario 6 redis-stopped: injecting into redis for 180s
+[05:03:51] scenario 6 ended: remediated after 39s
+2026-10-12T05:03:52Z B1 round 2 scenario 6: run 4d45d91d remediated
+2026-10-12T05:03:52Z waiting 300s (gap since the previous run)
+2026-10-12T05:08:52Z B1 round 3 slot 9/9: scenario 6
+time="2026-10-12T10:38:52+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:38:52+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-0c291f183867 Creating 
+ Container intellegentdevops-injector-run-0c291f183867 Created 
+[05:08:52] scenario 6 redis-stopped: injecting into redis for 180s
+[05:09:31] scenario 6 ended: remediated after 40s
+2026-10-12T05:09:32Z B1 round 3 scenario 6: run 74a93060 remediated
+2026-10-12T05:09:32Z stage 1: done for B1
+2026-10-12T05:09:32Z block over. If you disabled sleep: sudo pmset -a disablesleep 0
+2026-10-12T05:09:32Z stage 1: 2 runs to do for S (~0.2 h)
+2026-10-12T05:09:32Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-12T05:09:32Z waiting 300s (gap since the previous run)
+2026-10-12T05:14:32Z analyzer -> ANALYZER_MODE=llm
+2026-10-12T05:14:33Z starting ml-detector
+2026-10-12T05:14:33Z waiting 60s for the switch to settle
+2026-10-12T05:15:33Z S round 1 slot 9/9: scenario 4
+time="2026-10-12T10:45:33+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:45:33+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-76ce20ff3c28 Creating 
+ Container intellegentdevops-injector-run-76ce20ff3c28 Created 
+[05:15:33] scenario 4 latency-api: injecting into api-service for 180s
+[05:16:45] scenario 4 ended: remediated after 72s
+2026-10-12T05:16:45Z S round 1 scenario 4: run 7580459d remediated
+2026-10-12T05:16:45Z waiting 299s (gap since the previous run)
+2026-10-12T05:21:45Z S round 2 slot 9/9: scenario 8
+time="2026-10-12T10:51:45+05:30" level=warning msg="No services to build"
+time="2026-10-12T10:51:45+05:30" level=warning msg="No services to build"
+ Container intellegentdevops-injector-run-a57e00ccaeb9 Creating 
+ Container intellegentdevops-injector-run-a57e00ccaeb9 Created 
+[05:21:45] scenario 8 gradual-memory-api: injecting into api-service for 300s
+[05:23:24] scenario 8 ended: remediated after 99s
+2026-10-12T05:23:24Z S round 2 scenario 8: run 3563f9ca remediated
+2026-10-12T05:23:24Z stage 1: done for S
+2026-10-12T05:23:24Z waiting 300s (gap since the previous run)
+2026-10-12T05:28:24Z block over. If you disabled sleep: sudo pmset -a disablesleep 0

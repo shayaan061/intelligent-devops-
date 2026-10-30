@@ -1,0 +1,62 @@
+INTELLIGENT DEVOPS - START / STOP COMMANDS
+Run everything from the project folder: ~/Desktop/intellegent devops
+
+
+=====================================================================
+START EVERYTHING
+=====================================================================
+
+# 1. Start the LLM (once; it keeps running after reboots)
+brew services start ollama
+
+# 2. Start the whole stack (add --build after code changes)
+docker compose up -d
+
+# 3. Check that everything is up
+docker compose ps
+
+All 14 containers start by default: the demo app, Prometheus,
+Alertmanager, cAdvisor, gateway, analyzer, responder, ML detector,
+load generator, injector UI and dashboard.
+
+Pages to open:
+  Main dashboard       http://localhost:3001
+  Fault injector       http://localhost:8088
+  Minimal UI           http://localhost:8000/dashboard/
+  Prometheus targets   http://localhost:9090/targets
+  Alertmanager         http://localhost:9093
+  Demo app             http://localhost:5001
+
+Before a demo, run these checks:
+  curl localhost:5001/                              # should return hits as a number, not an error
+  curl -s localhost:11434/api/tags | head -c 100    # Ollama answering (model llama3.1:8b)
+  docker compose run --rm injector reset            # clear any leftover faults
+
+Run the reset because a corrupted-cache scenario can come back after a
+restart (Redis reloads its saved data from disk).
+
+
+=====================================================================
+STOP EVERYTHING
+=====================================================================
+
+# 1. Clear any active faults first, so none are saved and come back on the next start
+docker compose run --rm injector reset
+
+# 2. Stop and remove all containers (the injector is in the tools profile, so name it too)
+docker compose --profile tools down
+
+# 3. Stop the LLM (frees about 5 GB of RAM)
+brew services stop ollama
+
+To check that everything is stopped:
+  docker compose ps                    # should list nothing
+  brew services list | grep ollama     # should say "none" or "stopped"
+
+Notes:
+- "down" keeps your data: experiments/incidents.db, ground_truth.csv
+  and the results live on your disk, not in the containers.
+- Don't add -v. "docker compose down -v" also deletes the Docker
+  volumes, such as the saved Redis data.
+- To free all the memory Docker uses, quit Docker Desktop from the
+  menu bar as well.

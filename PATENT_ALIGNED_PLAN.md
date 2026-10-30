@@ -2,7 +2,7 @@
 ### Final Year Project — Project Plan (aligned with the Invention Disclosure / patent draft)
 
 **Team:** Muhammad Shayaan Ali · Riddhima Sharma · Shruti Tyagi
-**Guide:** Ashish Kumar (Assistant Professor, CSE), Sharda University
+**Guide:** Ms. Aliza Rana (Assistant Professor, CSE), Sharda University
 **Plan date:** 1 Oct 2026
 
 ---

@@ -10,7 +10,7 @@ import { Legend, ServiceLineChart } from "@/components/charts";
 import { ActionLine, PlanView } from "@/components/incident";
 import { Badge, Card, Empty, ErrorNote, KV } from "@/components/ui";
 import { fmtBytes, fmtDateTime, fmtLatency, fmtNum, fmtPct, fmtPctAuto, fmtTime } from "@/lib/format";
-import { usePoll } from "@/lib/live";
+import { resolvedAlertKeys, usePoll, withResolvedAlerts, type AlertEventMsg } from "@/lib/live";
 import type { ActionMsg, IncidentMsg, PlanMsg, ServiceContext, TimelineMsg } from "@/lib/types";
 
 const TREND_X = (x: number) => (x === 0 ? "event" : `${x} min`);
@@ -26,13 +26,17 @@ function trendSeries(ctx: Record<string, ServiceContext | null> | undefined, met
 export default function IncidentDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data, error } = usePoll<TimelineMsg[]>(`/api/gateway/history/${encodeURIComponent(id)}`, 3000, [id]);
+  // Raw alert messages aren't in the incident's history; an alert that clears
+  // while the incident is still open is only marked resolved there
+  const { data: events } = usePoll<AlertEventMsg[]>("/api/gateway/events", 3000);
 
   if (error && !data) {
     return <div className="space-y-3"><Back /><ErrorNote error={`Could not load ${id}: ${error}`} /></div>;
   }
   if (!data) return <div className="space-y-3"><Back /><Empty>Loading…</Empty></div>;
 
-  const incs = data.filter((m): m is IncidentMsg => m.type === "incident");
+  const resolved = resolvedAlertKeys(events ?? []);
+  const incs = data.filter((m): m is IncidentMsg => m.type === "incident").map((m) => withResolvedAlerts(m, resolved));
   const first = incs.find((m) => m.status === "open") ?? incs[0];
   const last = incs[incs.length - 1];
   // The context the analyzer saw for the first plan

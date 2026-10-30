@@ -1,0 +1,3 @@
+VIII Conclusion
+
+We presented a closed-loop incident response system in which a policy layer, not the LLM itself, decides what runs. On real containers no unsafe action was executed in 890 runs or 29 adversarial plans, the verify loop repaired wrong first diagnoses, and misleading or recurring faults were escalated after a bounded number of attempts. On known faults the runbooks outperformed the LLM in both action choice and speed; on faults without a runbook, the detector and the LLM together resolved 18 of 40 runs against 10 for the runbooks. Bounded, verified automation with graded human approval enables operators to use LLMs where runbooks end, without trusting them.

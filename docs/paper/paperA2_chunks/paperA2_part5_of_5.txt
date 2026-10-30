@@ -1,0 +1,26 @@
+What the guard contributes. The errors made by the LLM were exactly the kinds the guard was designed for: a weaker action on a known fault, the symptom service blamed for a misleading fault, and a failed action recommended again on re-analysis (45 times in S) although the incident history listed it. In each case the outcome was bounded by the policy layer and the verify loop, not by the model. Safety therefore did not depend on the quality of the model, which matters because an operator cannot verify each recommendation of a model in advance.
+
+Each component has a different role. On known faults the LLM added latency and no accuracy, and on the misleading faults it failed in the same way as the runbooks. On the unknown set it was the only analysis step that resolved the subtle latency fault, and only because the detector had found it first: the detector without the LLM could only escalate, and the LLM without the detector never saw the fault. The detector also prevented the verifier from accepting a restart that had not worked. A deployment should therefore assign known patterns to runbooks, call the LLM when no runbook applies, and keep the same guard for both. The LLM is not a universal fix: for the Redis memory fault it suggested the same useless restart as the runbook.
+
+Validity. Faults are injected through an endpoint, so the reset action stands in for real rollbacks or feature-flag switches. The testbed is a single laptop with three services, synthetic load and one 8-billion-parameter model; a larger model may diagnose the misleading faults better. The unknown set has four scenarios, created by the authors after the first evaluation, so it shows where the LLM can help rather than how often it will. A manual baseline in which an engineer handles the same faults is needed to measure the time saved against current practice. Future work includes error logs and deployment events in the incident context, rollback as an action, fine-tuning the model on logged incidents and testing it on held-out faults, and larger Kubernetes deployments.
+
+VIII. CONCLUSION
+
+We presented a closed-loop incident response system in which a policy layer, not the LLM itself, decides what runs. On real containers no unsafe action was executed in 890 runs or 29 adversarial plans, the verify loop repaired wrong first diagnoses, and misleading or recurring faults were escalated after a bounded number of attempts. On known faults the runbooks outperformed the LLM in both action choice and speed; on faults without a runbook, the detector and the LLM together resolved 18 of 40 runs against 10 for the runbooks. Bounded, verified automation with graded human approval enables operators to use LLMs where runbooks end, without trusting them.
+
+REFERENCES
+
+[1] B. Beyer, C. Jones, J. Petoff, and N. R. Murphy, Eds., Site Reliability Engineering: How Google Runs Production Systems. Sebastopol, CA, USA: O’Reilly Media, 2016.
+[2] Y. Dang, Q. Lin, and P. Huang, “AIOps: Real-world challenges and research innovations,” in Proc. IEEE/ACM Int. Conf. Software Engineering: Companion (ICSE-Companion), 2019.
+[3] T. Ahmed, S. Ghosh, C. Bansal, T. Zimmermann, X. Zhang, and S. Rajmohan, “Recommending root-cause and mitigation steps for cloud incidents using large language models,” in Proc. IEEE/ACM Int. Conf. Software Engineering (ICSE), 2023.
+[4] Y. Chen et al., “Automatic root cause analysis via large language models for cloud incidents,” in Proc. European Conf. Computer Systems (EuroSys), 2024.
+[5] k8sgpt-ai, “k8sgpt: Giving Kubernetes superpowers to everyone,” GitHub repository. Accessed: Oct. 26, 2026. [Online]. Available: https://github.com/k8sgpt-ai/k8sgpt
+[6] Robusta, “HolmesGPT,” GitHub repository. Accessed: Oct. 26, 2026. [Online]. Available: https://github.com/robusta-dev/holmesgpt
+[7] L. Wu, J. Tordsson, E. Elmroth, and O. Kao, “MicroRCA: Root cause localization of performance issues in microservices,” in Proc. IEEE/IFIP Network Operations and Management Symp. (NOMS), 2020.
+[8] Y. Chen et al., “AIOpsLab: A holistic framework to evaluate AI agents for enabling autonomous clouds,” 2025, arXiv:2501.06706. [Online]. Available: https://arxiv.org/abs/2501.06706
+[9] T. Rebedea, R. Dinu, M. Sreedhar, C. Parisien, and J. Cohen, “NeMo Guardrails: A toolkit for controllable and safe LLM applications with programmable rails,” in Proc. Conf. Empirical Methods in Natural Language Processing: System Demonstrations (EMNLP), 2023.
+[10] A. Basiri et al., “Chaos engineering,” IEEE Software, vol. 33, no. 3, pp. 35–41, 2016.
+[11] Prometheus Authors, “Prometheus documentation.” Accessed: Oct. 26, 2026. [Online]. Available: https://prometheus.io/docs/
+[12] P. J. Rousseeuw and C. Croux, “Alternatives to the median absolute deviation,” J. American Statistical Association, vol. 88, no. 424, pp. 1273–1283, 1993.
+[13] F. T. Liu, K. M. Ting, and Z.-H. Zhou, “Isolation forest,” in Proc. IEEE Int. Conf. Data Mining (ICDM), 2008, pp. 413–422.
+[14] A. Grattafiori et al., “The Llama 3 herd of models,” 2024, arXiv:2407.21783. [Online]. Available: https://arxiv.org/abs/2407.21783

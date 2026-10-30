@@ -1,0 +1,6 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+9ab124ee,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-12T16:29:49.942Z,2026-10-12T16:34:49.942Z,2026-10-12T16:34:50.398Z,expired,error:{'rate': 0.05}
+dcdc33d6,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-12T16:39:50.412Z,2026-10-12T16:44:50.412Z,2026-10-12T16:44:50.875Z,expired,latency:{'delay_s': 0.6}
+4e2a6c2c,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-12T16:49:51.471Z,2026-10-12T16:54:51.471Z,2026-10-12T16:54:54.650Z,cleanup,redis_corrupt
+8d5b634b,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-12T16:59:54.431Z,2026-10-12T17:07:54.431Z,2026-10-12T17:07:55.274Z,expired,latency;cleared=2
+bd6148ab,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-12T17:12:55.466Z,2026-10-12T17:17:55.466Z,2026-10-12T17:17:56.885Z,expired,redis_slow:{'pause_ms': 1500}

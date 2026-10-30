@@ -1,0 +1,17 @@
+system,scenario,name,runs,detected,root_cause_ok,plan_action_ok,executed_action_ok,approval_requested,escalated,auto_resolved,llm_fallbacks,mttd_mean_s,mttr_mean_s
+B1,15,subtle-latency-frontend,5,0,0,0,0,0,0,0,0,,
+B1,16,subtle-error-frontend,5,0,0,0,0,0,0,0,0,,
+B1,18,two-faults,5,5,5,5,5,0,0,5,0,26.5,91.2
+B1,19,redis-memory-pressure,5,5,5,0,0,0,2,0,0,27.6,
+B2,15,subtle-latency-frontend,5,0,0,0,0,0,0,0,0,,
+B2,16,subtle-error-frontend,5,0,0,0,0,0,0,0,0,,
+B2,18,two-faults,5,5,5,5,5,0,0,5,0,25.4,137.2
+B2,19,redis-memory-pressure,5,5,5,0,0,0,5,0,0,27.1,
+S,15,subtle-latency-frontend,5,5,3,3,3,0,1,4,0,29.5,103.3
+S,16,subtle-error-frontend,5,2,2,1,0,0,1,0,1,223.1,
+S,18,two-faults,5,5,5,5,5,0,0,5,0,24.6,131.9
+S,19,redis-memory-pressure,5,5,5,0,0,0,5,0,0,24.1,
+SF,15,subtle-latency-frontend,5,5,5,0,0,0,5,0,5,23.4,
+SF,16,subtle-error-frontend,5,0,0,0,0,0,0,0,0,,
+SF,18,two-faults,5,5,5,1,1,0,4,1,5,23.9,87.7
+SF,19,redis-memory-pressure,5,5,5,0,0,0,5,0,5,23.3,

@@ -1,0 +1,5 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+42a0823a,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T18:14:14.775Z,2026-10-12T18:17:14.775Z,2026-10-12T18:14:48.416Z,remediated,stop
+c08cc775,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-12T18:19:48.276Z,2026-10-12T18:24:48.276Z,2026-10-12T18:21:06.913Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+f30a80b8,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-12T18:26:07.333Z,2026-10-12T18:29:07.333Z,2026-10-12T18:29:08.157Z,expired,latency
+f3053c93,3,memory-api,memory,api-service,api-service,restart_container,2026-10-12T18:34:08.375Z,2026-10-12T18:37:08.375Z,2026-10-12T18:34:52.743Z,remediated,memory:{'size_mb': 420}

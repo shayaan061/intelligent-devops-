@@ -1,0 +1,41 @@
+2026-10-22T21:49:27Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-22T21:49:27Z soak S: no faults for 12.0 h with events every 30 min
+2026-10-22T21:49:45Z soak interrupted; the window so far is kept
+2026-10-22T21:49:53Z sleep is disabled (lid can be closed); run `sudo pmset -a disablesleep 0` when done
+2026-10-22T21:49:53Z waiting 291s (gap since the previous run)
+2026-10-22T21:54:45Z soak S: no faults for 12.0 h with events every 30 min
+2026-10-22T22:24:47Z soak event 1: restart frontend
+2026-10-22T22:54:50Z soak event 2: load 5 -> 10 users
+2026-10-22T23:04:51Z soak: load back to 5 users
+2026-10-22T23:24:53Z soak event 3: restart api-service
+2026-10-22T23:54:55Z soak event 4: load 5 -> 2 users
+2026-10-23T00:04:55Z soak: load back to 5 users
+2026-10-23T00:24:57Z soak event 5: restart frontend
+2026-10-23T00:54:59Z soak event 6: load 5 -> 10 users
+2026-10-23T01:05:00Z soak: load back to 5 users
+2026-10-23T01:25:02Z soak event 7: restart api-service
+2026-10-23T01:55:03Z soak event 8: load 5 -> 2 users
+2026-10-23T02:05:04Z soak: load back to 5 users
+2026-10-23T02:25:06Z soak event 9: restart frontend
+2026-10-23T02:55:08Z soak event 10: load 5 -> 10 users
+2026-10-23T03:05:09Z soak: load back to 5 users
+2026-10-23T03:25:11Z soak event 11: restart api-service
+2026-10-23T03:55:12Z soak event 12: load 5 -> 2 users
+2026-10-23T04:05:13Z soak: load back to 5 users
+2026-10-23T04:25:15Z soak event 13: restart frontend
+2026-10-23T04:55:17Z soak event 14: load 5 -> 10 users
+2026-10-23T05:05:18Z soak: load back to 5 users
+2026-10-23T05:25:20Z soak event 15: restart api-service
+2026-10-23T05:55:21Z soak event 16: load 5 -> 2 users
+2026-10-23T06:05:22Z soak: load back to 5 users
+2026-10-23T06:25:24Z soak event 17: restart frontend
+2026-10-23T06:55:25Z soak event 18: load 5 -> 10 users
+2026-10-23T07:05:26Z soak: load back to 5 users
+2026-10-23T07:25:28Z soak event 19: restart api-service
+2026-10-23T07:55:30Z soak event 20: load 5 -> 2 users
+2026-10-23T08:05:30Z soak: load back to 5 users
+2026-10-23T08:25:32Z soak event 21: restart frontend
+2026-10-23T08:55:34Z soak event 22: load 5 -> 10 users
+2026-10-23T09:05:35Z soak: load back to 5 users
+2026-10-23T09:25:37Z soak event 23: restart api-service
+2026-10-23T09:54:48Z soak S: done

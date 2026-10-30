@@ -1,0 +1,51 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+3dfffd29,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-12T15:35:39.076Z,2026-10-12T15:40:39.076Z,2026-10-12T15:40:40.476Z,expired,redis_slow:{'pause_ms': 1500}
+d82b0c4b,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-12T15:45:40.393Z,2026-10-12T15:50:40.393Z,2026-10-12T15:50:41.034Z,expired,error:{'rate': 0.05}
+7f03d07a,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-12T15:55:41.423Z,2026-10-12T16:00:41.423Z,2026-10-12T16:00:45.032Z,cleanup,redis_corrupt
+fb2ac392,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-12T16:05:45.386Z,2026-10-12T16:10:45.386Z,2026-10-12T16:10:45.947Z,expired,latency:{'delay_s': 0.6}
+d675723a,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-12T16:15:46.427Z,2026-10-12T16:23:46.427Z,2026-10-12T16:23:48.087Z,expired,latency;cleared=2
+aea3efb5,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-21T14:45:04.132Z,2026-10-21T14:50:04.132Z,2026-10-21T14:50:04.525Z,expired,latency:{'delay_s': 0.6}
+fa066482,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-21T14:55:04.499Z,2026-10-21T15:00:04.499Z,2026-10-21T15:00:05.876Z,expired,redis_slow:{'pause_ms': 1500}
+9537e29f,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-21T15:05:06.438Z,2026-10-21T15:10:06.438Z,2026-10-21T15:10:07.061Z,expired,error:{'rate': 0.05}
+12c8c320,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-21T15:15:07.390Z,2026-10-21T15:23:07.390Z,2026-10-21T15:23:08.897Z,expired,latency;cleared=2
+3293927f,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-21T15:28:09.523Z,2026-10-21T15:33:09.523Z,2026-10-21T15:33:13.182Z,cleanup,redis_corrupt
+5c0eb9e6,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-21T17:47:53.244Z,2026-10-21T17:52:53.244Z,2026-10-21T17:52:53.340Z,expired,latency:{'delay_s': 0.6}
+6dbab03c,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-21T17:57:53.479Z,2026-10-21T18:02:53.479Z,2026-10-21T18:02:53.941Z,expired,error:{'rate': 0.05}
+a1decc3c,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-21T18:07:54.511Z,2026-10-21T18:12:54.511Z,2026-10-21T18:12:57.792Z,cleanup,redis_corrupt
+95460b98,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-21T18:17:57.476Z,2026-10-21T18:22:57.476Z,2026-10-21T18:22:59.073Z,expired,redis_slow:{'pause_ms': 1500}
+56e90edb,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-21T18:27:59.423Z,2026-10-21T18:35:59.423Z,2026-10-21T18:36:00.482Z,expired,latency;cleared=2
+1fda8a4b,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-21T20:50:44.288Z,2026-10-21T20:55:44.288Z,2026-10-21T20:55:47.591Z,cleanup,redis_corrupt
+b100a848,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-21T21:00:47.435Z,2026-10-21T21:08:47.435Z,2026-10-21T21:08:49.272Z,expired,latency;cleared=2
+49a9f7b6,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-21T21:13:49.477Z,2026-10-21T21:18:49.477Z,2026-10-21T21:18:51.127Z,expired,redis_slow:{'pause_ms': 1500}
+d64cc02c,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-21T21:23:51.475Z,2026-10-21T21:28:51.475Z,2026-10-21T21:28:51.978Z,expired,latency:{'delay_s': 0.6}
+917637d6,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-21T21:33:52.381Z,2026-10-21T21:38:52.381Z,2026-10-21T21:38:52.575Z,expired,error:{'rate': 0.05}
+bcb15589,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-21T23:53:31.205Z,2026-10-21T23:58:31.205Z,2026-10-21T23:58:34.455Z,cleanup,redis_corrupt
+0fdac37f,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-22T00:03:34.424Z,2026-10-22T00:08:34.424Z,2026-10-22T00:08:34.989Z,expired,latency:{'delay_s': 0.6}
+67093a06,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-22T00:13:35.431Z,2026-10-22T00:21:35.431Z,2026-10-22T00:21:36.597Z,expired,latency;cleared=2
+d9289909,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-22T00:26:36.462Z,2026-10-22T00:31:36.462Z,2026-10-22T00:31:36.973Z,expired,error:{'rate': 0.05}
+5a019068,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-22T00:36:37.520Z,2026-10-22T00:41:37.520Z,2026-10-22T00:41:39.114Z,expired,redis_slow:{'pause_ms': 1500}
+d1bf8f3e,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-22T02:58:37.140Z,2026-10-22T03:06:37.140Z,2026-10-22T03:06:38.593Z,expired,latency;cleared=2
+2fea9dfe,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-22T03:11:38.471Z,2026-10-22T03:16:38.471Z,2026-10-22T03:16:42.085Z,cleanup,redis_corrupt
+317efa8c,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-22T03:21:42.457Z,2026-10-22T03:26:42.457Z,2026-10-22T03:26:42.944Z,expired,latency:{'delay_s': 0.6}
+09148f64,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-22T03:31:43.417Z,2026-10-22T03:36:43.417Z,2026-10-22T03:36:43.970Z,expired,error:{'rate': 0.05}
+faf607e7,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-22T03:41:44.545Z,2026-10-22T03:46:44.545Z,2026-10-22T03:46:46.098Z,expired,redis_slow:{'pause_ms': 1500}
+6401f37b,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-22T06:01:40.179Z,2026-10-22T06:06:40.179Z,2026-10-22T06:06:40.652Z,expired,error:{'rate': 0.05}
+3f2b51ae,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-22T06:11:40.477Z,2026-10-22T06:16:40.477Z,2026-10-22T06:16:42.322Z,expired,redis_slow:{'pause_ms': 1500}
+c64f0d69,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-22T06:21:42.438Z,2026-10-22T06:26:42.438Z,2026-10-22T06:26:43.020Z,expired,latency:{'delay_s': 0.6}
+89f1b89a,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-22T06:31:43.497Z,2026-10-22T06:36:43.497Z,2026-10-22T06:36:47.101Z,cleanup,redis_corrupt
+d555aa40,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-22T06:41:47.459Z,2026-10-22T06:49:47.459Z,2026-10-22T06:49:48.434Z,expired,latency;cleared=2
+2d6a5b90,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-22T09:06:47.122Z,2026-10-22T09:14:47.122Z,2026-10-22T09:14:48.597Z,expired,latency;cleared=2
+e75cb65d,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-22T09:19:48.507Z,2026-10-22T09:24:48.507Z,2026-10-22T09:24:51.782Z,cleanup,redis_corrupt
+51ebcf93,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-22T09:29:51.474Z,2026-10-22T09:34:51.474Z,2026-10-22T09:34:52.062Z,expired,latency:{'delay_s': 0.6}
+2b6ba55b,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-22T09:39:52.414Z,2026-10-22T09:44:52.414Z,2026-10-22T09:44:52.982Z,expired,error:{'rate': 0.05}
+c2c30e84,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-22T09:49:53.583Z,2026-10-22T09:54:53.583Z,2026-10-22T09:54:55.202Z,expired,redis_slow:{'pause_ms': 1500}
+f458bb1f,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-22T12:12:20.174Z,2026-10-22T12:17:20.174Z,2026-10-22T12:17:20.642Z,expired,latency:{'delay_s': 0.6}
+5a1d294c,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-22T12:22:20.489Z,2026-10-22T12:27:20.489Z,2026-10-22T12:27:20.880Z,expired,error:{'rate': 0.05}
+5f737820,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-22T12:32:21.395Z,2026-10-22T12:40:21.395Z,2026-10-22T12:40:22.589Z,expired,latency;cleared=2
+7502e197,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-22T12:45:22.522Z,2026-10-22T12:50:22.522Z,2026-10-22T12:50:23.595Z,expired,redis_slow:{'pause_ms': 1500}
+8c7126e9,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-22T12:55:23.541Z,2026-10-22T13:00:23.541Z,2026-10-22T13:00:27.194Z,cleanup,redis_corrupt
+85ff7f6f,13,subtle-error-api,error,api-service,api-service,reset_faults,2026-10-22T15:17:38.052Z,2026-10-22T15:22:38.052Z,2026-10-22T15:22:38.723Z,expired,error:{'rate': 0.05}
+3dc76363,14,recurring-latency-api,latency,api-service,api-service,escalate,2026-10-22T15:27:38.387Z,2026-10-22T15:35:38.387Z,2026-10-22T15:35:39.489Z,expired,latency;cleared=2
+f71a9d52,11,slow-redis,redis_slow,redis,redis,restart_container,2026-10-22T15:40:39.470Z,2026-10-22T15:45:39.470Z,2026-10-22T15:45:41.059Z,expired,redis_slow:{'pause_ms': 1500}
+1fb97bc2,12,subtle-latency-api,latency,api-service,api-service,reset_faults,2026-10-22T15:50:41.318Z,2026-10-22T15:55:41.318Z,2026-10-22T15:55:41.646Z,expired,latency:{'delay_s': 0.6}
+84776820,10,corrupted-cache,redis_corrupt,redis,redis,flush_cache,2026-10-22T16:00:41.457Z,2026-10-22T16:05:41.457Z,2026-10-22T16:05:45.066Z,cleanup,redis_corrupt

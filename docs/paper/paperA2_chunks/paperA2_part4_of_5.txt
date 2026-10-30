@@ -1,0 +1,44 @@
+S, with an average (mean) MTTR of 74.1 s, was only beat if you include scenario 8, a slow memory leak which its anomaly detector picks up on long before the memory alert (100 s against 285 s for B2). But, again, that comes from detection, not analysis; without scenario 8, S has an average of 70.8 s, so not much worse than B1's 58.3 s or B2's 55.1 s. The slowest runs, on the other hand, were slower still: for S, 139.7 s and 98.9 s, against 261.4 s and 249.8 s for B1, because no fault in S held out for a slow alert before the loop reacted.
+
+C. Unknown Faults (RQ3)
+
+The unknown set results are given in Table IV. The subtle frontend faults (15 and 16) did not cross the alert thresholds and neither B1 nor B2 responded. The anomaly detector identified the latency fault (15) in all ten of the S and SF runs. Unable to get the LLM off-line SF did not have a runbook rule for an anomaly-only latency fault, and all ten runs were escalated; S got 8 of 10, 6 following correct first reset of the frontend (58 to 70 s) and 2 after the verify loop moved to a correct first plan which blamed the api-service (208 and 212 s); the others were escalated. The detector identified this fault and the LLM fixed it; neither could do so alone. The 5% error fault (16) is intermittent and only found in 4 S runs and one SF run, and was not ever resolved.
+
+TABLE IV. UNKNOWN FAULTS: DETECTED / RESOLVED / ESCALATED RUNS OF 10
+
+Scenario | B1 | B2 | S | SF
+
+15 Frontend latency | 0 / 0 / 0 | 0 / 0 / 0 | 10 / 8 / 2 | 10 / 0 / 10
+16 Frontend Errors | 0 / 0 / 0 | 0 / 0 / 0 | 4 / 0 / 2 | 1 / 0 / 1
+18 Two faults | 10 / 10 / 0 | 10 / 10 / 0 | 10 / 10 / 0 | 10 / 6 / 4
+19 Memory of Redis | 10 / 0 / 7 | 10 / 0 / 8 | 10 / 0 / 10 | 10 / 0 / 10
+
+Resolved (of 40) | 10 | 10 | 18 | 6
+
+FACT That fault remained as verified | 3 | 2 | 0 | 0 |
+
+Both variants of the combined fault (18) generated the expected error alert, and B1, B2 and S always solved it, one service per run (S needed three attempts once). B1 was fastest (91 s compared to 143 s for S). SF solved 6, escalating when its incident opened on the anomaly before the alert. In the Redis memory fault (19), every variant named Redis and restarted it, but Redis reloaded the keys from disk and the fault remained; no plan from the LLM or runbook knew to flush the cache. S and SF saw the anomaly remain and escalated every run. Without the detector, the verifiers of B1 and B2 always accepted the restart when the memory alert briefly disappeared and then cleared the alert again with a new incident. Over the 40 runs, S resolved 18, B1 and B2 10 each and SF 6.
+
+D. Mistakes in Diagnosis and the Verify Loop (RQ4)
+
+S needed a second run in 5 of 180 first plans. Some incidents open on an early anomaly, before the alerts reveal the whole story, so the first plan had less evidence of the root. This is the cost of fixing earlier. The verify loop fixed 4 of them: in scenario 6 the first plan found api-service rather than the more-serious Redis failure, and in scenario 4 the first plan found the API latency rather than the more-serious frontend fault. This patch left the fault, the verifier re-run the incident with the failed action still in its history, and the second plan acted on the correct service. These two runs came to 124–140 s rather than the $final$ near 70 s, with no adverse consequences. (In the other case an early runbook plan triggered the incident one second before a correct LLM plan arrived, which was then ignored.) Over all, 7 S runs needed a second run (the other three after a correct fix which was judged unresolved as the anomaly vanished); B1 and B2 never needed a second run.
+
+E. Misleading and Recurring Faults (RQ4)
+
+Results of the extra set are in Table V. For the two misleading Redis faults 10 and 11, Redis remains online while the api-service reports the latency or errors. All variations, including LLM, concluded the root cause was the api-service (a sole S run blamed the frontend); no plan suggested flushing cache or restarting Redis. The cooldown, fallback and action limit kept the response to finite, and all 60 runs were escalated to human with the attempted actions. The repeating fault (14) escalated in all 30 runs following the reset, and a second restart was not successful as designed. The below threshold faults 12 and 13 did not generate alerts, so B1 and B2 did not step in; by its anomaly detector, S identified scenario 12 in 10/10 runs and scenario 13 in 5/10 runs, and corrected scenario 12 in 10/10 runs. In scenario 13 the intermittent anomaly was older than the responder's freshness window on arrival of the fourth LLM plans, therefore the pre-check ignored them all as already addressed; the fifth detected run was escalated by a runbook plan.
+
+TABLE V. ADDITIONAL SCENARIOS: REPORTED / RESOLVED / ESCALATED 10 RUNS
+
+Scenario | B1 | B2 | S
+
+10 Corrupted cache | 10 / 0 / 10 | 10 / 0 / 10 | 10 / 0 / 10
+11 Slow Redis | 10 / 0 / 10 | 10 / 0 / 10 | 10 / 0 / 10
+12 Latency 0.6 s | 0 / 0 / 0 | 0 / 0 / 0 | 10 / 10 / 0
+13 5% errors | 0 / 0 / 0 | 0 / 0 / 0 | 5 / 0 / 1
+14 Repeat latency | 10 / 0 / 10 | 10 / 0 / 10 | 10 / 0 / 10 |
+
+F. LLM Unavailable and Cost (RQ4)
+
+When the LLM was out of reach, SF relied on the runbooks and fixed 34 out of 40 known-fault runs, including the memory, Redis and leak faults, for all runs and faster than S for no LLM call. In 6 of 10 latency runs (scn 4), the incident opened on an anomaly before the latency alert, no runbook sat by for an anomaly-only latency incident, and the fallback plan held the escalation early; this same hole prompted its escalations in scns 15 and 18 of the unknown set. An incident in S averaged 1.7 LLM calls, about 4284 prompt and 261 completion tokens on the core set; with a local model this costs time, not money, about 27.0 s per plan.
+
+VII. DISCUSSION AND LIMITATIONS

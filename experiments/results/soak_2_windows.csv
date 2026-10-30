@@ -1,0 +1,4 @@
+system,start,end,awake_hours,events,note
+S,2026-10-12T19:01:00Z,2026-10-13T05:01:04Z,10.001,19,
+S,2026-10-22T21:49:27Z,2026-10-22T21:49:45Z,0.005,0,interrupted after 18 s and restarted detached (not a result)
+S,2026-10-22T21:54:45Z,2026-10-23T09:54:48Z,12.001,23,

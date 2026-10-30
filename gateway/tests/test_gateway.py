@@ -85,6 +85,35 @@ def test_ml_anomaly_keeps_incident_open_for_window():
     assert g.sweep() == [inc]
 
 
+def test_verified_fix_closes_without_the_anomaly_window():
+    # 16 Oct: the next scenario started 60 s after a verified fix, joined the
+    # still-open incident and was skipped as "incident already handled"
+    clock = Clock()
+    g = Grouper(window=60, clock=clock)
+    inc, _ = g.add_anomaly({"service": "api-service", "score": 0.9, "top_features": ["cpu"]})
+    g.add_alert(alert("HighCPU", "api-service", "a"))
+    clock.t += 40
+    g.resolve_alert(alert("HighCPU", "api-service", "a", "resolved"))
+    assert not inc.resolved  # anomaly 40 s old, window 60 s
+    assert g.mark_verified(inc.id, fresh=20) is inc and inc.resolved
+    nxt, change = g.add_alert(alert("HighMemory", "api-service", "b"))
+    assert change == "new" and nxt is not inc
+
+
+def test_verified_report_never_closes_a_firing_or_fresh_incident():
+    clock = Clock()
+    g = Grouper(window=60, clock=clock)
+    inc, _ = g.add_alert(alert("HighCPU", "api-service", "a"))
+    assert g.mark_verified(inc.id, fresh=20) is None and not inc.resolved  # alert still firing
+    g.add_anomaly({"service": "api-service", "score": 0.9, "top_features": ["cpu"]})
+    clock.t += 10
+    assert g.resolve_alert(alert("HighCPU", "api-service", "a", "resolved")) is None  # anomaly 10 s old
+    clock.t += 11
+    assert g.sweep() == [inc]  # 21 s > fresh, without waiting for the 60 s window
+    assert g.mark_verified(inc.id, fresh=20) is None  # already resolved
+    assert g.mark_verified("inc-nope", fresh=20) is None
+
+
 def test_repeat_anomaly_refreshes_without_change():
     clock = Clock()
     g = Grouper(window=60, clock=clock)
@@ -286,6 +315,28 @@ def test_bad_webhooks(client):
     assert client.post("/alerts", json={"x": 1}).status_code == 400
     h = client.get("/health").json()
     assert h["status"] == "ok" and "open_incidents" in h
+
+
+def test_verified_action_resolves_incident_and_next_fault_opens_new_one(client):
+    with client.websocket_connect("/ws/events") as ws:
+        client.post("/anomalies", json={"service": "api-service", "score": 0.9, "top_features": ["cpu"]})
+        inc = next_of_type(ws, "incident")
+        iid = inc["incident_id"]
+        # Forged or early: the anomaly is fresh, so the incident stays open
+        rec = {"incident_id": iid, "status": "verified", "attempt": 1,
+               "action": {"type": "reset_faults", "target": "api-service"}}
+        client.post("/actions", json=rec)
+        assert client.get(f"/incidents/{iid}").json()["status"] != "resolved"
+
+        gw.grouper.incidents[iid].anomalies[0]["_at"] -= 30  # anomaly now 30 s old (< 60 s window)
+        client.post("/actions", json=rec)
+        done = next_of_type(ws, "incident")
+        assert done["status"] == "resolved" and done["incident_id"] == iid
+
+        client.post("/alerts", json=webhook("firing", ("HighMemory", "api-service", "m")))
+        nxt = next_of_type(ws, "incident")
+        assert nxt["status"] == "open" and nxt["incident_id"] != iid
+    assert client.post("/actions", json={**rec, "incident_id": ["x"]}).status_code == 400
 
 
 def test_actions_feed_history_and_reanalyze(client):

@@ -1,0 +1,15 @@
+III System Architecture
+
+The proposed system is organized as a closed control loop, illustrated in Fig. Monitoring data pass through detection, the event gateway, analysis and the policy validator to the executor, and the verifier closes the loop by sending unresolved incidents back for re-analysis.
+
+A. Monitored Application and Detection
+The target is a three-tier web application: a frontend service calls an api-service, which reads and increments a counter in Redis.
+
+B. Event Gateway
+Signals within 60 s on services of the same call chain are combined into one incident, so a Redis failure and the resulting API and frontend alerts are handled together.
+
+C. Analyzer
+The analyzer turns each incident into a response plan: root-cause service, incident type, severity, evidence, confidence, a recommended and a fallback action, and an explanation. The answer is then checked with strict types; a confidence stated as text or as a Boolean, for example, is rejected. If the model cannot be reached, times out, produces invalid output or states a confidence below 0.7, the analyzer falls back to YAML runbooks, deterministic rules that map alert and anomaly patterns to a plan. The analyzer only makes recommendations; it has no access to the containers.
+
+D. Responder and Verifier
+The responder is the only component that takes action. For each plan it re-checks that the incident is still active, passes the plan to the policy validator, executes the permitted action through the service's reset endpoint or the Docker API, and after 45 s checks whether the alerts have cleared and no anomaly is still active. If the incident persists, it asks the gateway to re-analyze it with the attempt number and the actions already attempted; after the third attempt it escalates to a human. All outcomes are reported back to the gateway, so the dashboard and the store capture the entire timeline.

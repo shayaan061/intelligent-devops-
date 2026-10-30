@@ -1,0 +1,4 @@
+V Evaluation Setup
+
+A. Testbed and Fault Scenarios
+All experiments were performed on one laptop (Apple M4, 10 cores, 16 GB) with Docker Desktop; the LLM runs on the host. A Locust load generator sends about five requests per second.

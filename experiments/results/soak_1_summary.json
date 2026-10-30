@@ -1,0 +1,17 @@
+[
+  {
+    "system": "S",
+    "start": "2026-10-12T19:01:00Z",
+    "end": "2026-10-13T05:01:04Z",
+    "awake_hours": 10.001,
+    "events": 19,
+    "note": "",
+    "false_alarms": 0,
+    "per_hour": 0.0,
+    "after_event": 0,
+    "without_event": 0,
+    "by_source": {},
+    "actions_executed": 0,
+    "incidents": []
+  }
+]

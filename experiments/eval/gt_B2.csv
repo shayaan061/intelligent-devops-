@@ -1,0 +1,181 @@
+run_id,scenario,name,fault,target_service,expected_root_cause,expected_action,start,planned_end,end,end_reason,params
+960e28de,3,memory-api,memory,api-service,api-service,restart_container,2026-10-11T21:23:11.422Z,2026-10-11T21:26:11.422Z,2026-10-11T21:24:39.129Z,remediated,memory:{'size_mb': 420}
+47428453,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-11T21:29:39.487Z,2026-10-11T21:34:39.487Z,2026-10-11T21:34:29.024Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+d2e5d25a,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-11T21:39:29.426Z,2026-10-11T21:42:29.426Z,2026-10-11T21:40:50.042Z,remediated,latency
+109071ff,6,redis-stopped,stop,redis,redis,restart_container,2026-10-11T21:45:50.443Z,2026-10-11T21:48:50.443Z,2026-10-11T21:46:57.419Z,remediated,stop
+2a8de8c7,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-11T21:51:57.413Z,2026-10-11T21:54:57.413Z,2026-10-11T21:53:30.416Z,remediated,cpu
+18209587,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-11T21:58:30.410Z,2026-10-11T22:01:30.410Z,2026-10-11T21:59:35.266Z,remediated,stop
+9f954034,5,error-api,error,api-service,api-service,reset_faults,2026-10-11T22:04:35.407Z,2026-10-11T22:07:35.407Z,2026-10-11T22:05:59.120Z,remediated,error
+8714ac7d,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-11T22:10:59.436Z,2026-10-11T22:13:59.436Z,2026-10-11T22:12:15.046Z,remediated,cpu;latency
+38ffe64c,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-11T22:17:15.495Z,2026-10-11T22:20:15.495Z,2026-10-11T22:18:45.440Z,remediated,cpu
+481f287a,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-12T00:15:17.483Z,2026-10-12T00:18:17.483Z,2026-10-12T00:16:29.517Z,remediated,stop
+0ba8a54c,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-12T00:21:29.414Z,2026-10-12T00:24:29.414Z,2026-10-12T00:22:59.489Z,remediated,cpu
+4ba44b80,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-12T00:27:59.413Z,2026-10-12T00:32:59.413Z,2026-10-12T00:32:41.573Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+8da1d203,5,error-api,error,api-service,api-service,reset_faults,2026-10-12T00:37:41.406Z,2026-10-12T00:40:41.406Z,2026-10-12T00:38:52.990Z,remediated,error
+58f933c3,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-12T00:43:53.410Z,2026-10-12T00:46:53.410Z,2026-10-12T00:45:09.041Z,remediated,latency
+5c96710b,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-12T00:50:09.378Z,2026-10-12T00:53:09.378Z,2026-10-12T00:51:40.427Z,remediated,cpu
+5b0092e4,3,memory-api,memory,api-service,api-service,restart_container,2026-10-12T00:56:40.369Z,2026-10-12T00:59:40.369Z,2026-10-12T00:58:07.076Z,remediated,memory:{'size_mb': 420}
+e2384f44,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-12T01:03:07.417Z,2026-10-12T01:06:07.417Z,2026-10-12T01:04:25.215Z,remediated,cpu;latency
+04c0e910,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T01:09:25.487Z,2026-10-12T01:12:25.487Z,2026-10-12T01:10:31.558Z,remediated,stop
+a34ecf51,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-12T03:07:02.484Z,2026-10-12T03:12:02.484Z,2026-10-12T03:11:44.656Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+00ca0bc9,5,error-api,error,api-service,api-service,reset_faults,2026-10-12T03:16:44.418Z,2026-10-12T03:19:44.418Z,2026-10-12T03:17:59.055Z,remediated,error
+58ca7da4,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-12T03:22:59.400Z,2026-10-12T03:25:59.400Z,2026-10-12T03:24:30.310Z,remediated,cpu
+a0c01962,3,memory-api,memory,api-service,api-service,restart_container,2026-10-12T03:29:30.406Z,2026-10-12T03:32:30.406Z,2026-10-12T03:30:51.012Z,remediated,memory:{'size_mb': 420}
+f28dffe4,6,redis-stopped,stop,redis,redis,restart_container,2026-10-12T03:35:51.412Z,2026-10-12T03:38:51.412Z,2026-10-12T03:36:57.397Z,remediated,stop
+607f47a7,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-12T03:41:57.418Z,2026-10-12T03:44:57.418Z,2026-10-12T03:43:05.312Z,remediated,stop
+94faeb1b,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-12T03:48:05.364Z,2026-10-12T03:51:05.364Z,2026-10-12T03:49:40.493Z,remediated,cpu
+341d9c06,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-12T03:54:40.418Z,2026-10-12T03:57:40.418Z,2026-10-12T03:55:54.093Z,remediated,cpu;latency
+5e1bb6e9,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-12T04:00:54.496Z,2026-10-12T04:03:54.496Z,2026-10-12T04:02:09.118Z,remediated,latency
+7db7f4e3,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-13T16:54:43.865Z,2026-10-13T16:57:43.865Z,2026-10-13T16:56:19.996Z,remediated,cpu
+b339319f,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-13T17:01:20.495Z,2026-10-13T17:04:20.495Z,2026-10-13T17:02:37.878Z,remediated,cpu;latency
+37767325,3,memory-api,memory,api-service,api-service,restart_container,2026-10-13T17:07:38.646Z,2026-10-13T17:10:38.646Z,2026-10-13T17:09:04.170Z,remediated,memory:{'size_mb': 420}
+941c4fdf,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-13T17:14:04.468Z,2026-10-13T17:17:04.468Z,2026-10-13T17:15:12.203Z,remediated,stop
+2709210e,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-13T17:20:12.847Z,2026-10-13T17:25:12.847Z,2026-10-13T17:25:01.650Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+9ccec7ad,6,redis-stopped,stop,redis,redis,restart_container,2026-10-13T17:30:01.530Z,2026-10-13T17:33:01.530Z,2026-10-13T17:31:12.561Z,remediated,stop
+2f7feba2,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-13T17:36:12.492Z,2026-10-13T17:39:12.492Z,2026-10-13T17:37:33.013Z,remediated,latency
+adad0a34,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-13T17:42:33.457Z,2026-10-13T17:45:33.457Z,2026-10-13T17:44:10.323Z,remediated,cpu
+84efd9c4,5,error-api,error,api-service,api-service,reset_faults,2026-10-13T17:49:10.522Z,2026-10-13T17:52:10.522Z,2026-10-13T17:50:26.926Z,remediated,error
+7862bc93,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-19T16:35:38.953Z,2026-10-19T16:38:38.953Z,2026-10-19T16:37:15.106Z,remediated,cpu
+f506d63f,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-19T16:42:15.482Z,2026-10-19T16:45:15.482Z,2026-10-19T16:43:31.485Z,remediated,stop
+21e48d0a,3,memory-api,memory,api-service,api-service,restart_container,2026-10-19T16:48:31.477Z,2026-10-19T16:51:31.477Z,2026-10-19T16:49:56.053Z,remediated,memory:{'size_mb': 420}
+62018f64,6,redis-stopped,stop,redis,redis,restart_container,2026-10-19T16:54:56.504Z,2026-10-19T16:57:56.504Z,2026-10-19T16:56:05.341Z,remediated,stop
+58363983,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-19T17:01:05.591Z,2026-10-19T17:04:05.591Z,2026-10-19T17:02:22.131Z,remediated,latency
+67e606ac,5,error-api,error,api-service,api-service,reset_faults,2026-10-19T17:07:22.449Z,2026-10-19T17:10:22.449Z,2026-10-19T17:08:46.018Z,remediated,error
+487e348b,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-19T17:13:46.489Z,2026-10-19T17:18:46.489Z,2026-10-19T17:18:33.583Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+3301a71c,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-19T17:23:33.490Z,2026-10-19T17:26:33.490Z,2026-10-19T17:24:53.317Z,remediated,cpu;latency
+e11d3f70,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-19T17:29:53.546Z,2026-10-19T17:32:53.546Z,2026-10-19T17:31:26.298Z,remediated,cpu
+0ba69f3e,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-19T19:31:40.886Z,2026-10-19T19:36:40.886Z,2026-10-19T19:36:30.474Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+ad3feb67,5,error-api,error,api-service,api-service,reset_faults,2026-10-19T19:41:30.441Z,2026-10-19T19:44:30.441Z,2026-10-19T19:42:47.036Z,remediated,error
+80a8b176,3,memory-api,memory,api-service,api-service,restart_container,2026-10-19T19:47:47.367Z,2026-10-19T19:50:47.367Z,2026-10-19T19:49:12.076Z,remediated,memory:{'size_mb': 420}
+29b1eede,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-19T19:54:12.405Z,2026-10-19T19:57:12.405Z,2026-10-19T19:55:31.217Z,remediated,cpu;latency
+0552f3ce,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-19T20:00:31.578Z,2026-10-19T20:03:31.578Z,2026-10-19T20:01:41.400Z,remediated,stop
+8ffc2d9f,6,redis-stopped,stop,redis,redis,restart_container,2026-10-19T20:06:41.472Z,2026-10-19T20:09:41.472Z,2026-10-19T20:07:47.246Z,remediated,stop
+bc2d45bd,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-19T20:12:47.440Z,2026-10-19T20:15:47.440Z,2026-10-19T20:14:09.067Z,remediated,latency
+4a9a0150,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-19T20:19:09.477Z,2026-10-19T20:22:09.477Z,2026-10-19T20:20:43.357Z,remediated,cpu
+1f687c0d,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-19T20:25:43.474Z,2026-10-19T20:28:43.474Z,2026-10-19T20:27:16.264Z,remediated,cpu
+f906aed7,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-19T22:27:53.868Z,2026-10-19T22:30:53.868Z,2026-10-19T22:29:31.043Z,remediated,cpu
+05d24aef,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-19T22:34:31.465Z,2026-10-19T22:37:31.465Z,2026-10-19T22:35:44.402Z,remediated,stop
+07eea514,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-19T22:40:44.425Z,2026-10-19T22:45:44.425Z,2026-10-19T22:45:24.712Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+3b26767f,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-19T22:50:24.456Z,2026-10-19T22:53:24.456Z,2026-10-19T22:51:44.134Z,remediated,latency
+7c508bd7,6,redis-stopped,stop,redis,redis,restart_container,2026-10-19T22:56:44.473Z,2026-10-19T22:59:44.473Z,2026-10-19T22:57:54.376Z,remediated,stop
+bca02daa,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-19T23:02:54.469Z,2026-10-19T23:05:54.469Z,2026-10-19T23:04:27.440Z,remediated,cpu
+54c2eae8,5,error-api,error,api-service,api-service,reset_faults,2026-10-19T23:09:27.417Z,2026-10-19T23:12:27.417Z,2026-10-19T23:10:49.975Z,remediated,error
+96589883,3,memory-api,memory,api-service,api-service,restart_container,2026-10-19T23:15:50.438Z,2026-10-19T23:18:50.438Z,2026-10-19T23:17:13.097Z,remediated,memory:{'size_mb': 420}
+3a81f08e,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-19T23:22:13.438Z,2026-10-19T23:25:13.438Z,2026-10-19T23:23:33.421Z,remediated,cpu;latency
+8d8f4994,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T01:23:56.832Z,2026-10-20T01:26:56.832Z,2026-10-20T01:25:24.451Z,remediated,error
+5366f0a3,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T01:30:24.422Z,2026-10-20T01:33:24.422Z,2026-10-20T01:31:59.329Z,remediated,cpu
+bad83b49,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T01:36:59.455Z,2026-10-20T01:39:59.455Z,2026-10-20T01:38:08.415Z,remediated,stop
+9448d0a5,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T01:43:08.439Z,2026-10-20T01:46:08.439Z,2026-10-20T01:44:22.414Z,remediated,stop
+7e4d0d00,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T01:49:22.364Z,2026-10-20T01:52:22.364Z,2026-10-20T01:50:46.056Z,remediated,memory:{'size_mb': 420}
+b28f5357,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T01:55:46.444Z,2026-10-20T01:58:46.444Z,2026-10-20T01:57:08.160Z,remediated,latency
+63f4040c,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T02:02:08.462Z,2026-10-20T02:05:08.462Z,2026-10-20T02:03:41.701Z,remediated,cpu
+9df2ef73,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T02:08:41.527Z,2026-10-20T02:11:41.527Z,2026-10-20T02:10:02.364Z,remediated,cpu;latency
+1cc9db4d,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T02:15:02.504Z,2026-10-20T02:20:02.504Z,2026-10-20T02:19:46.894Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+91c2da5d,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T04:20:24.939Z,2026-10-20T04:25:24.939Z,2026-10-20T04:25:10.255Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+4182487b,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T04:30:10.497Z,2026-10-20T04:33:10.497Z,2026-10-20T04:31:43.647Z,remediated,cpu
+62f3cabb,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T04:36:43.509Z,2026-10-20T04:39:43.509Z,2026-10-20T04:37:59.473Z,remediated,stop
+d54f0570,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T04:42:59.508Z,2026-10-20T04:45:59.508Z,2026-10-20T04:44:17.397Z,remediated,cpu;latency
+a09b5781,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T04:49:17.572Z,2026-10-20T04:52:17.572Z,2026-10-20T04:50:28.617Z,remediated,stop
+4a336668,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T04:55:28.558Z,2026-10-20T04:58:28.558Z,2026-10-20T04:56:47.264Z,remediated,latency
+5f49c003,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T05:01:47.443Z,2026-10-20T05:04:47.443Z,2026-10-20T05:03:26.625Z,remediated,cpu
+03c1c84d,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T05:08:26.509Z,2026-10-20T05:11:26.509Z,2026-10-20T05:09:54.205Z,remediated,memory:{'size_mb': 420}
+64bbd900,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T05:14:54.507Z,2026-10-20T05:17:54.507Z,2026-10-20T05:16:16.146Z,remediated,error
+81f1b9dc,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T07:16:38.851Z,2026-10-20T07:21:38.851Z,2026-10-20T07:21:25.317Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+8f2e178d,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T07:26:25.475Z,2026-10-20T07:29:25.475Z,2026-10-20T07:27:39.466Z,remediated,stop
+9aa1fb1b,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T07:32:39.427Z,2026-10-20T07:35:39.427Z,2026-10-20T07:33:56.041Z,remediated,latency
+26b7ce92,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T07:38:56.416Z,2026-10-20T07:41:56.416Z,2026-10-20T07:40:19.062Z,remediated,error
+a481a0f7,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T07:45:19.489Z,2026-10-20T07:48:19.489Z,2026-10-20T07:46:44.226Z,remediated,memory:{'size_mb': 420}
+e500e3a4,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T07:51:44.578Z,2026-10-20T07:54:44.578Z,2026-10-20T07:53:19.662Z,remediated,cpu
+0cf61e0b,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T07:58:19.488Z,2026-10-20T08:01:19.488Z,2026-10-20T07:59:37.361Z,remediated,cpu;latency
+bacf731c,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T08:04:37.494Z,2026-10-20T08:07:37.494Z,2026-10-20T08:05:48.584Z,remediated,stop
+b5871df9,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T08:10:48.484Z,2026-10-20T08:13:48.484Z,2026-10-20T08:12:21.726Z,remediated,cpu
+1ff40d17,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T10:15:06.838Z,2026-10-20T10:18:06.838Z,2026-10-20T10:16:20.904Z,remediated,stop
+057de14c,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T10:21:21.488Z,2026-10-20T10:24:21.488Z,2026-10-20T10:22:49.261Z,remediated,memory:{'size_mb': 420}
+1237bb11,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T10:27:49.499Z,2026-10-20T10:30:49.499Z,2026-10-20T10:29:01.329Z,remediated,stop
+8a54f87c,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T10:34:01.493Z,2026-10-20T10:39:01.493Z,2026-10-20T10:38:49.664Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+27b0611a,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T10:43:49.527Z,2026-10-20T10:46:49.527Z,2026-10-20T10:45:08.119Z,remediated,latency
+861f295f,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T10:50:08.532Z,2026-10-20T10:53:08.532Z,2026-10-20T10:51:32.179Z,remediated,error
+bfe5af76,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T10:56:32.486Z,2026-10-20T10:59:32.486Z,2026-10-20T10:58:10.373Z,remediated,cpu
+d7b57df8,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T11:03:10.550Z,2026-10-20T11:06:10.550Z,2026-10-20T11:04:42.635Z,remediated,cpu
+bd59f485,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T11:09:42.498Z,2026-10-20T11:12:42.498Z,2026-10-20T11:11:02.459Z,remediated,cpu;latency
+73916028,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T13:11:31.011Z,2026-10-20T13:14:31.011Z,2026-10-20T13:13:00.754Z,remediated,memory:{'size_mb': 420}
+baba4a89,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T13:18:00.505Z,2026-10-20T13:21:00.505Z,2026-10-20T13:19:27.181Z,remediated,error
+b36e1434,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T13:24:27.516Z,2026-10-20T13:27:27.516Z,2026-10-20T13:25:46.099Z,remediated,cpu;latency
+cfcc97a5,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T13:30:46.593Z,2026-10-20T13:33:46.593Z,2026-10-20T13:31:57.522Z,remediated,stop
+81e40b1e,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T13:36:57.460Z,2026-10-20T13:39:57.460Z,2026-10-20T13:38:33.671Z,remediated,cpu
+526965be,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T13:43:33.503Z,2026-10-20T13:46:33.503Z,2026-10-20T13:45:09.476Z,remediated,cpu
+5112a5e7,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T13:50:09.540Z,2026-10-20T13:55:09.540Z,2026-10-20T13:54:51.771Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+62a33508,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T13:59:51.452Z,2026-10-20T14:02:51.452Z,2026-10-20T14:01:16.191Z,remediated,latency
+2f242f98,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T14:06:16.540Z,2026-10-20T14:09:16.540Z,2026-10-20T14:07:26.579Z,remediated,stop
+af1a4bce,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T16:07:39.953Z,2026-10-20T16:10:39.953Z,2026-10-20T16:08:52.954Z,remediated,stop
+ac1c2f42,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T16:13:53.507Z,2026-10-20T16:16:53.507Z,2026-10-20T16:15:07.079Z,remediated,error
+639fe560,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T16:20:07.450Z,2026-10-20T16:23:07.450Z,2026-10-20T16:21:46.482Z,remediated,cpu
+b2a95572,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T16:26:46.526Z,2026-10-20T16:29:46.526Z,2026-10-20T16:28:09.222Z,remediated,latency
+067cf2b8,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T16:33:09.470Z,2026-10-20T16:36:09.470Z,2026-10-20T16:34:33.210Z,remediated,memory:{'size_mb': 420}
+b060b1cf,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T16:39:33.539Z,2026-10-20T16:42:33.539Z,2026-10-20T16:41:09.556Z,remediated,cpu
+1b3f5e90,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T16:46:09.569Z,2026-10-20T16:49:09.569Z,2026-10-20T16:47:25.686Z,remediated,stop
+16ee98a7,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T16:52:25.481Z,2026-10-20T16:57:25.481Z,2026-10-20T16:57:15.870Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+986e2615,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T17:02:16.487Z,2026-10-20T17:05:16.487Z,2026-10-20T17:03:39.493Z,remediated,cpu;latency
+58c6f37b,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T19:04:56.907Z,2026-10-20T19:07:56.907Z,2026-10-20T19:06:06.879Z,remediated,stop
+6bf6893e,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T19:11:07.531Z,2026-10-20T19:16:07.531Z,2026-10-20T19:15:43.721Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+a5436eaf,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T19:20:43.499Z,2026-10-20T19:23:43.499Z,2026-10-20T19:22:03.205Z,remediated,latency
+b97079d2,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T19:27:03.527Z,2026-10-20T19:30:03.527Z,2026-10-20T19:28:29.280Z,remediated,memory:{'size_mb': 420}
+8d9c00ea,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T19:33:29.468Z,2026-10-20T19:36:29.468Z,2026-10-20T19:35:04.624Z,remediated,cpu
+f4e0d6f5,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T19:40:04.627Z,2026-10-20T19:43:04.627Z,2026-10-20T19:41:39.495Z,remediated,cpu
+331aa592,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T19:46:39.556Z,2026-10-20T19:49:39.556Z,2026-10-20T19:47:53.809Z,remediated,stop
+35547bd6,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T19:52:54.516Z,2026-10-20T19:55:54.516Z,2026-10-20T19:54:12.324Z,remediated,cpu;latency
+41fbbfb7,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T19:59:12.580Z,2026-10-20T20:02:12.580Z,2026-10-20T20:00:40.276Z,remediated,error
+205b8f20,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-20T22:00:46.979Z,2026-10-20T22:03:46.979Z,2026-10-20T22:02:10.240Z,remediated,cpu;latency
+6ad1ccf0,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-20T22:07:10.575Z,2026-10-20T22:10:10.575Z,2026-10-20T22:08:48.721Z,remediated,cpu
+33637fce,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-20T22:13:48.777Z,2026-10-20T22:16:48.777Z,2026-10-20T22:15:09.464Z,remediated,latency
+5f1d2f99,5,error-api,error,api-service,api-service,reset_faults,2026-10-20T22:20:09.541Z,2026-10-20T22:23:09.541Z,2026-10-20T22:21:30.260Z,remediated,error
+9391d617,6,redis-stopped,stop,redis,redis,restart_container,2026-10-20T22:26:30.510Z,2026-10-20T22:29:30.510Z,2026-10-20T22:27:41.535Z,remediated,stop
+51368efa,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-20T22:32:41.549Z,2026-10-20T22:37:41.549Z,2026-10-20T22:37:28.872Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+d582025e,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-20T22:42:29.528Z,2026-10-20T22:45:29.528Z,2026-10-20T22:43:43.543Z,remediated,stop
+fd1e3000,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-20T22:48:43.528Z,2026-10-20T22:51:43.528Z,2026-10-20T22:50:18.534Z,remediated,cpu
+897a2012,3,memory-api,memory,api-service,api-service,restart_container,2026-10-20T22:55:18.559Z,2026-10-20T22:58:18.559Z,2026-10-20T22:56:45.336Z,remediated,memory:{'size_mb': 420}
+285e7778,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-21T00:57:19.033Z,2026-10-21T01:00:19.033Z,2026-10-21T00:58:36.083Z,remediated,stop
+ae5dd4cf,6,redis-stopped,stop,redis,redis,restart_container,2026-10-21T01:03:36.533Z,2026-10-21T01:06:36.533Z,2026-10-21T01:04:45.546Z,remediated,stop
+fccd7a57,3,memory-api,memory,api-service,api-service,restart_container,2026-10-21T01:09:45.565Z,2026-10-21T01:12:45.565Z,2026-10-21T01:11:06.224Z,remediated,memory:{'size_mb': 420}
+648f87de,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-21T01:16:06.479Z,2026-10-21T01:19:06.479Z,2026-10-21T01:17:27.307Z,remediated,cpu;latency
+acb5d88a,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-21T01:22:27.618Z,2026-10-21T01:25:27.618Z,2026-10-21T01:24:03.644Z,remediated,cpu
+17b3444f,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-21T01:29:03.534Z,2026-10-21T01:34:03.534Z,2026-10-21T01:33:45.028Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+000a6708,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-21T01:38:45.525Z,2026-10-21T01:41:45.525Z,2026-10-21T01:40:04.091Z,remediated,latency
+b0c43e40,5,error-api,error,api-service,api-service,reset_faults,2026-10-21T01:45:04.512Z,2026-10-21T01:48:04.512Z,2026-10-21T01:46:21.098Z,remediated,error
+104f31e8,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-21T01:51:21.577Z,2026-10-21T01:54:21.577Z,2026-10-21T01:53:00.834Z,remediated,cpu
+4e876302,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-21T03:53:49.008Z,2026-10-21T03:56:49.008Z,2026-10-21T03:55:06.114Z,remediated,stop
+64233f8d,3,memory-api,memory,api-service,api-service,restart_container,2026-10-21T04:00:06.493Z,2026-10-21T04:03:06.493Z,2026-10-21T04:01:34.179Z,remediated,memory:{'size_mb': 420}
+d1428ad1,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-21T04:06:34.520Z,2026-10-21T04:09:34.520Z,2026-10-21T04:08:08.565Z,remediated,cpu
+9149225d,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-21T04:13:08.535Z,2026-10-21T04:18:08.535Z,2026-10-21T04:17:54.955Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+4958582b,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-21T04:22:55.554Z,2026-10-21T04:25:55.554Z,2026-10-21T04:24:14.186Z,remediated,latency
+0cc5358b,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-21T04:29:14.748Z,2026-10-21T04:32:14.748Z,2026-10-21T04:30:34.850Z,remediated,cpu;latency
+82b735fa,6,redis-stopped,stop,redis,redis,restart_container,2026-10-21T04:35:35.603Z,2026-10-21T04:38:35.603Z,2026-10-21T04:36:45.612Z,remediated,stop
+94d6fe7a,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-21T04:41:45.864Z,2026-10-21T04:44:45.864Z,2026-10-21T04:43:18.898Z,remediated,cpu
+7facd098,5,error-api,error,api-service,api-service,reset_faults,2026-10-21T04:48:19.563Z,2026-10-21T04:51:19.563Z,2026-10-21T04:49:47.166Z,remediated,error
+90ba551f,3,memory-api,memory,api-service,api-service,restart_container,2026-10-21T06:50:48.284Z,2026-10-21T06:53:48.284Z,2026-10-21T06:52:16.994Z,remediated,memory:{'size_mb': 420}
+6b9e5eab,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-21T06:57:17.628Z,2026-10-21T07:00:17.628Z,2026-10-21T06:58:42.176Z,remediated,cpu;latency
+7d433751,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-21T07:03:43.163Z,2026-10-21T07:08:43.163Z,2026-10-21T07:08:26.254Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+a32535b5,5,error-api,error,api-service,api-service,reset_faults,2026-10-21T07:13:26.557Z,2026-10-21T07:16:26.557Z,2026-10-21T07:14:51.165Z,remediated,error
+46813970,6,redis-stopped,stop,redis,redis,restart_container,2026-10-21T07:19:51.589Z,2026-10-21T07:22:51.589Z,2026-10-21T07:20:59.497Z,remediated,stop
+b2b7f676,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-21T07:25:59.723Z,2026-10-21T07:28:59.723Z,2026-10-21T07:27:12.743Z,remediated,stop
+d4189b05,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-21T07:32:12.551Z,2026-10-21T07:35:12.551Z,2026-10-21T07:33:33.091Z,remediated,latency
+7ec3a49f,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-21T07:38:33.836Z,2026-10-21T07:41:33.836Z,2026-10-21T07:40:08.832Z,remediated,cpu
+d574841c,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-21T07:45:09.689Z,2026-10-21T07:48:09.689Z,2026-10-21T07:46:44.561Z,remediated,cpu
+30cd6aa6,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-21T09:46:34.030Z,2026-10-21T09:49:34.030Z,2026-10-21T09:47:56.884Z,remediated,cpu;latency
+22d3b392,5,error-api,error,api-service,api-service,reset_faults,2026-10-21T09:52:57.761Z,2026-10-21T09:55:57.761Z,2026-10-21T09:54:22.390Z,remediated,error
+5944223d,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-21T09:59:22.585Z,2026-10-21T10:02:22.585Z,2026-10-21T10:00:44.275Z,remediated,latency
+00b8cf3d,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-21T10:05:44.515Z,2026-10-21T10:10:44.515Z,2026-10-21T10:10:30.028Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"
+3b0f1440,3,memory-api,memory,api-service,api-service,restart_container,2026-10-21T10:15:30.472Z,2026-10-21T10:18:30.472Z,2026-10-21T10:16:53.177Z,remediated,memory:{'size_mb': 420}
+f66407e3,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-21T10:21:53.554Z,2026-10-21T10:24:53.554Z,2026-10-21T10:23:27.552Z,remediated,cpu
+4a2755db,6,redis-stopped,stop,redis,redis,restart_container,2026-10-21T10:28:27.695Z,2026-10-21T10:31:27.695Z,2026-10-21T10:29:39.711Z,remediated,stop
+1e80f2c7,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-21T10:34:39.573Z,2026-10-21T10:37:39.573Z,2026-10-21T10:35:53.656Z,remediated,stop
+059641ef,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-21T10:40:53.569Z,2026-10-21T10:43:53.569Z,2026-10-21T10:42:28.486Z,remediated,cpu
+b533fa30,6,redis-stopped,stop,redis,redis,restart_container,2026-10-21T12:44:07.023Z,2026-10-21T12:47:07.023Z,2026-10-21T12:45:20.948Z,remediated,stop
+5876ce41,2,cpu-api,cpu,api-service,api-service,reset_faults,2026-10-21T12:50:21.492Z,2026-10-21T12:53:21.492Z,2026-10-21T12:51:57.236Z,remediated,cpu
+e40e45ca,9,cpu-latency-api,cpu+latency,api-service,api-service,reset_faults,2026-10-21T12:56:57.598Z,2026-10-21T12:59:57.598Z,2026-10-21T12:58:17.533Z,remediated,cpu;latency
+4fb1db38,7,frontend-stopped,stop,frontend,frontend,restart_container,2026-10-21T13:03:17.634Z,2026-10-21T13:06:17.634Z,2026-10-21T13:04:33.768Z,remediated,stop
+4043580c,5,error-api,error,api-service,api-service,reset_faults,2026-10-21T13:09:33.633Z,2026-10-21T13:12:33.633Z,2026-10-21T13:11:02.362Z,remediated,error
+1ec7978f,4,latency-api,latency,api-service,api-service,reset_faults,2026-10-21T13:16:02.560Z,2026-10-21T13:19:02.560Z,2026-10-21T13:17:24.268Z,remediated,latency
+03072645,1,cpu-frontend,cpu,frontend,frontend,reset_faults,2026-10-21T13:22:24.588Z,2026-10-21T13:25:24.588Z,2026-10-21T13:23:57.678Z,remediated,cpu
+d3485843,3,memory-api,memory,api-service,api-service,restart_container,2026-10-21T13:28:57.562Z,2026-10-21T13:31:57.562Z,2026-10-21T13:30:24.370Z,remediated,memory:{'size_mb': 420}
+ad6670df,8,gradual-memory-api,memory,api-service,api-service,restart_container,2026-10-21T13:35:24.556Z,2026-10-21T13:40:24.556Z,2026-10-21T13:40:14.045Z,remediated,"memory:{'size_mb': 440, 'ramp_seconds': 240}"

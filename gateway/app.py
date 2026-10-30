@@ -353,7 +353,8 @@ async def actions(request: Request):
         rec = await read_json(request)
     except Exception:
         return JSONResponse({"error": "body must be JSON"}, status_code=400)
-    if not isinstance(rec, dict) or not rec.get("incident_id") or not rec.get("status"):
+    if (not isinstance(rec, dict) or not rec.get("incident_id") or not rec.get("status")
+            or not isinstance(rec["incident_id"], str)):
         return JSONResponse({"error": "expected {incident_id, status, action, ...}"}, status_code=400)
     inc = grouper.incidents.get(rec["incident_id"])
     action = rec.get("action") or {}
@@ -365,6 +366,12 @@ async def actions(request: Request):
     log.info("ACTION %s %s %s/%s %s", msg["incident_id"], msg["status"], action.get("type"),
              action.get("target"), msg.get("reason") or "")
     await responses_hub.broadcast(msg)
+    # A verified fix closes the incident without the 60 s anomaly wait, so the
+    # next fault opens a new incident instead of joining a finished one
+    if rec["status"] == "verified":
+        closed = grouper.mark_verified(rec["incident_id"], ML_FRESH_SECONDS)
+        if closed is not None:
+            await emit_resolved(closed)
     return {"accepted": True}
 
 

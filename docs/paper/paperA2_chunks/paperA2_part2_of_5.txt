@@ -1,0 +1,49 @@
+Ruling LLM output. Guardrail toolkits, like NeMo Guardrails [9], constrain a conversational model's output and the tools it may call. Such a remedying tests require system state: whether the same action was taken a few minutes ago, the number of actions an alert has already performed, and if the alert persists. Site reliability practice [1] formalizes such rules into runbooks, gradated escalation and review, and chaos engineering [10] introduces failures for testing. We make these rules a validator that every action must pass, evaluate it against adversarial plans, and test the full loop end-to-end on real containers.
+
+III. SYSTEM ARCHITECTURE
+
+The system is designed as a closed control loop, shown in Fig. 1. Data from the monitoring system travel through the detection, event gateway, analysis and policy validator to the executor, which closes the loop by sending the events in-question back for re-analysis.
+
+[Figure 1 appears here in the PDF]
+Fig. 1. The structure of the designed system.
+
+A. Monitored Application and Detection
+
+Each target is a three-layer webapp: a frontend service requests an api-service, which reads and increments a counter in Redis. The two python services report request counts, latency-histogram, an upstream-latency histogram, the container CPU and memory metrics from cAdvisor, and Prometheus [11] scrapes all targets every 5 s. Prometheus alert rules for high cpu, high memory, high latency, high error rate and unavailability use 30 s windows, with a 20 s hold. A per-service anomaly detector, using robust z-scores [12] and an Isolation Forest [13] trained on non-fault traffic adds early warning signals for faults that manifest gradually or remain below alert thresholds. Each service exposes a fault-injection API for the evaluation; its fault-state indicators are stripped from all inputs and used only for scoring.
+
+B. Event Gateway
+
+Alerts are from Alertmanager by the way of a webhook and anomalies are from the detector. For services in the same call chain within 60 s, all signals are aggregated to a single incident, which means the Redis failure with the alert on API and frontend are grouped as well. Once the settle time of 10 s has passed, the gateway constructs the incident context: for each service the current value and 10 min trends of the CPU, memory, latency, error rate and upstream latency, the container status, the topology and the actions taken so far. The incident is pushed via Web Socket and stored in SQLite.
+
+C. Analyzer
+
+The analyzer transforms each incident into a response plan of: root-cause service, incident type, severity, evidence, confidence, a primary and a backup plan, and reasoning. It gives Llama 3.1 8B [14], served on premise by Ollama at temperature 0, a system prompt, some few-shot examples, and the incident, and it constrains the answer using a JSON schema. The answer is then validated with strict types; for example, a confidence given as text is invalid, as a Boolean is invalid. If the model is unavailable, the answer is invalid, or it outputs a confidence below 0.7, the analyzer falls back to YAML runbooks, deterministic rules that are crafted to associate alert and anomaly patterns with a response plan. The analyzer only makes suggestions; it does not have access to the containers.
+
+D. Responder and Verifier
+
+The responder is the only one to carry out an action. It always re-validates the incident on each plan, is replayed to the policy validator, performs the allowed action on the service reset endpoint or the Docker API, and, after 45s, sees if the alerts are gone and that there is no anomaly active. If there is still an incident, it asks the gateway to retrace it with the number of attempts and the actions already used; with a third attempt, he hands over to a human. All of this is reported to the gateway so that the dashboard and the store have the whole timeline.
+
+IV. SAFETY DESIGN
+
+The output from the analyzer is considered untrusted: any client can send a plan to the gateway, and the responder does not trust the analyzer schema. The policy validator runs the checks in Table I on the recommended action, then on the fallback action if the recommended is unsafe; the first to pass is used, otherwise the incident is escalated. We term an action unsafe if it is not on the allowlist, invoked on a component not allowed for it, or executed without a necessary approval.
+
+TABLE I. POLICY CHECKS FOR ALL PLANS
+
+Check | Rule | On failure
+Allowlist | reset, restart, flush cache, refresh resources, escalate | fallback/escalate
+Target | allowed service (no reset on Redis) | fallback/escalate
+Confidence | in [0,1] and at least 0.7 | human approval
+Risk | flush cache, update resources | human approval
+Cooldown | action and target not within 300 s | fallback/escalate
+Action limit | maximum 3 actions taken per incident | escalate
+Attempts | at most 3 analyze, act and verify cycles | accelerate
+
+Three levels of autonomy are established: safe and reversible actions are executed; destructive or questionable actions are queued up for approval; everything else is handed off to a human, with incident details and the suggested course of action. The executor can only execute allowlisted actions so a text-to-shell path is impossible. A pre-check prevents execution of alerts, which cleared while the plan was being generated, and the cooldown breaks restart loops of recurring faults.
+
+To demonstrate this, we constructed an adversarial suite of 29 plans that safely navigate through the real responder with a recording executor: invented action types, shell text in fields, targets outside the app, wrong types (lists, null, Booleans), confidences that are missing, NaN, infinite or outside the range 0.1..0.99, extra command fields, a valid action in cooldown with a malicious fallback, and depleted action budgets. Five of these plans would pass the analyzer's own output schema, so they are thwarted only by the responder's behavior. In the course of designing the suite we found four input-handling bugs in the responder and the gateway, and corrected them; for example, the NaN confidence was passing the threshold test (as NaN<0.7 evaluates to false) and a Boolean true was interpreted as a confidence of 1.0. After these fixes, all 29 cases perform exactly as specified, with the control plan running and all adversarial plans either failing, down to their safe component, or being escalated to a human.
+
+V. EVALUATION SETUP
+
+A. Testbed and Fault Cases
+
+All tests ran on a single laptop (Apple M4, 10 cores, 16 GB RAM, Docker Desktop; the LLM runs on the host). A Locust load generator generates roughly five requests per second. A fault injector begins each fault, records the start time and assumed end time, and polls the target until the fault is gone. A run is considered remediated if the fault is gone before its assumed end, which is only possible when the system remediated the fault. The four scenarios can be seen in Table II.

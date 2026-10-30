@@ -1,0 +1,47 @@
+[
+  {
+    "system": "S",
+    "start": "2026-10-12T19:01:00Z",
+    "end": "2026-10-13T05:01:04Z",
+    "awake_hours": 10.001,
+    "events": 19,
+    "note": "",
+    "false_alarms": 0,
+    "per_hour": 0.0,
+    "after_event": 0,
+    "without_event": 0,
+    "by_source": {},
+    "actions_executed": 0,
+    "incidents": []
+  },
+  {
+    "system": "S",
+    "start": "2026-10-22T21:49:27Z",
+    "end": "2026-10-22T21:49:45Z",
+    "awake_hours": 0.005,
+    "events": 0,
+    "note": "interrupted after 18 s and restarted detached (not a result)",
+    "false_alarms": 0,
+    "per_hour": 0.0,
+    "after_event": 0,
+    "without_event": 0,
+    "by_source": {},
+    "actions_executed": 0,
+    "incidents": []
+  },
+  {
+    "system": "S",
+    "start": "2026-10-22T21:54:45Z",
+    "end": "2026-10-23T09:54:48Z",
+    "awake_hours": 12.001,
+    "events": 23,
+    "note": "",
+    "false_alarms": 0,
+    "per_hour": 0.0,
+    "after_event": 0,
+    "without_event": 0,
+    "by_source": {},
+    "actions_executed": 0,
+    "incidents": []
+  }
+]

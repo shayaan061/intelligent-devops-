@@ -1,0 +1,10 @@
+decision,B1,B2,S,SF
+incidents in the store,171,171,184,36
+recommended action executed,201,174,189,31
+fallback executed (recommended action in cooldown),0,19,19,0
+escalated: recommended and fallback blocked by cooldown,0,18,20,0
+"escalated: recommended action in cooldown, fallback is escalate",0,9,6,0
+escalated by the plan itself,24,0,1,5
+escalated after 3 attempts,3,0,1,0
+skipped by the pre-check (already cleared),0,0,5,0
+"blocked by allowlist, target or confidence, or sent for approval",0,0,0,0

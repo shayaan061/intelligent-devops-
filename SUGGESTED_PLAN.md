@@ -2,7 +2,7 @@
 ### Final Year Project — Suggested Plan (Hybrid: Patent-Aligned + ML Enhancements)
 
 **Team:** Muhammad Shayaan Ali · Riddhima Sharma · Shruti Tyagi
-**Guide:** Ashish Kumar (Assistant Professor, CSE), Sharda University
+**Guide:** Ms. Aliza Rana (Assistant Professor, CSE), Sharda University
 **Plan date:** 1 Oct 2026 · **Target completion:** Apr 2027
 
 > This plan uses the patent-aligned design (`PATENT_ALIGNED_PLAN.md`) as its base and adds three ideas from the ML-centric plan (`PROJECT_PLAN.md`). The reasoning is in `PLAN_COMPARISON.md`.
@@ -363,6 +363,19 @@ intellegent-devops/
 | 7 | Container stopped | frontend | frontend | frontend | restart |
 | 8 | Gradual memory rise (no rule fires early) | api-service | — | api-service (ML) | restart before limit |
 | 9 | Combined CPU + latency | api-service | multiple | api-service | single correct action |
+
+**Extra scenarios (12 Oct 2026)**, run as a separate suite (`run_eval.py --suite extra`): the 9 above are all faults the runbooks were written for and one action fixes, so B1 and B2 can't differ on them and no false alarm, approval or escalation ever happens.
+
+| # | Fault | Target | What it tests | Expected |
+|---|-------|--------|---------------|----------|
+| 10 | Corrupted cache value (api-service 503s while Redis is up) | redis | Misleading symptom; risky fix | `flush_cache` → human approval (restarting Redis reloads the value) |
+| 11 | Slow Redis (writes paused 1.5 s every 2 s) | redis | Misleading symptom (runbook walk stops at api-service) | restart redis |
+| 12 | Latency 0.6 s (rule needs > 1 s) | api-service | Below the rules: ML only | reset / restart |
+| 13 | 5% errors (rule needs > 10%) | api-service | Below the rules: ML only (z 2.5, forest path) | reset / restart |
+| 14 | Latency that comes back after every fix | api-service | Re-analysis, cooldown → fallback, escalation | escalate after 3 attempts |
+| SF | Scenarios 3, 4, 6, 8 with the LLM unreachable | — | Runbook fallback keeps the system working | as in the table above |
+
+Plus a **soak test** (`run_eval.py soak --hours N --events`): no faults for 12–24 h, with harmless restarts and load changes (5 → 10 → 5 users, 5 → 2 → 5 users); every incident is a false alarm.
 
 **Scoring decisions (6 Oct 2026):**
 - Scenario 3 (memory): only `restart_container` counts as correct. `experiments/score.py` encodes the accepted actions per row of this table; scenarios 1 and 2 accept reset or restart.
